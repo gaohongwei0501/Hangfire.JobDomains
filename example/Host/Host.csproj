@@ -85,7 +85,6 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\Store.dat" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -102,6 +101,10 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Location\Hangfire.JobDomains.Location.csproj">
+      <Project>{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}</Project>
+      <Name>Hangfire.JobDomains.Location</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.JobDomains.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>
       <Name>Hangfire.JobDomains</Name>
@@ -134,7 +137,7 @@
   </ProjectExtensions>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+      <ErrorText>��̨�������ȱ�ٴ���Ŀ���õ� NuGet �������ʹ�á�NuGet �������ԭ����������Щ��������йظ�����Ϣ����μ� http://go.microsoft.com/fwlink/?LinkID=322105��ȱ�ٵ��ļ��� {0}��</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Microsoft.Net.Compilers.2.1.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Net.Compilers.2.1.0\build\Microsoft.Net.Compilers.props'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.7\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.7\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />

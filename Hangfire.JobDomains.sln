@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Interfa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host", "example\Host\Host.csproj", "{A6A13437-F3BE-4997-A2B0-D6FFF03BD623}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Location", "src\Hangfire.JobDomains.Location\Hangfire.JobDomains.Location.csproj", "{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{A6A13437-F3BE-4997-A2B0-D6FFF03BD623}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6A13437-F3BE-4997-A2B0-D6FFF03BD623}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6A13437-F3BE-4997-A2B0-D6FFF03BD623}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{D0A78F95-F4F6-4A90-800C-AAB3920BD830} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 		{F0FC1AA5-7E4F-4C49-8412-4697B0F017EF} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 		{A6A13437-F3BE-4997-A2B0-D6FFF03BD623} = {44CA269D-E7C4-423A-9EBE-2FCF79EBF85C}
+		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE16536F-CDBB-4B00-9D4D-1A3B0C085462}

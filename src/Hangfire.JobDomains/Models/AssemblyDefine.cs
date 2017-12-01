@@ -14,7 +14,7 @@ namespace Hangfire.JobDomains.Models
     /// <summary>
     /// 程序集定义
     /// </summary>
-    internal class AssemblyDefine
+    public class AssemblyDefine
     {
 
         /// <summary>
@@ -43,44 +43,35 @@ namespace Hangfire.JobDomains.Models
         public string Description { get; private set; }
 
         /// <summary>
-        /// 配件箱
-        /// </summary>
-        public Assembly Define { get; private set; }
-
-        /// <summary>
         /// 配件
         /// </summary>
-        public List<JobDefine> Jobs { get; private set; }
+        public List<JobDefine> Jobs { get; private set; } = new List<JobDefine>();
 
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public AssemblyDefine(Assembly define, List<JobDefine> jobs)
+        public void AddJob(JobDefine job)
         {
-            Define = define;
-            Jobs = jobs;
-            init();
+            if (job != null) Jobs.Add(job);
+        }
+
+        public void AddJob(IEnumerable<JobDefine> jobs)
+        {
+            if (jobs != null) Jobs.AddRange(jobs);
         }
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public AssemblyDefine(string path)
+        public AssemblyDefine(string file, string fullname, string shortname, string title, string description, IEnumerable<JobDefine> jobs = null)
         {
-            var info = new FileInfo(path);
-            FileName = info.FullName;
-            ShortName = info.Name.Replace(".dll", string.Empty);
+            if(jobs!=null) Jobs.AddRange(jobs);
+            FileName = file;
+            FullName = fullname;
+            ShortName = shortname;
+            Title = title;
+            Description = description;
         }
 
-        void init()
-        {
-            FileName= Define.Location;
-            FullName = Define.FullName;
-            ShortName = Define.ManifestModule.Name.Replace(".dll",string.Empty);
-            Title = Define.ReadReflectionOnlyAssemblyAttribute<AssemblyTitleAttribute>();
-            Description = Define.ReadReflectionOnlyAssemblyAttribute<AssemblyDescriptionAttribute>();
-        }
+     
 
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Hangfire.JobDomains.AppSetting;
-using Hangfire.JobDomains.Interface;
-using Hangfire.JobDomains.Loader;
 using Hangfire.JobDomains.Models;
+using Hangfire.JobDomains.Server;
+using Hangfire.JobDomains.Storage;
 
 using System;
 using System.Collections.Generic;
@@ -15,9 +15,9 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
     internal class JobCommandDispatcher : CommandDispatcher<JsonData>
     {
 
-        public override async Task<JsonData> Exception(Exception ex)
+        public override Task<JsonData> Exception(Exception ex)
         {
-            return new JsonData(ex, null);
+            return Task.FromResult(new JsonData(ex, null));
         }
 
         public DomainDefine TheDomain { get; set; }
@@ -45,7 +45,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             if (JobData.Count == 0) throw (new Exception("提交任务操作参数不齐全."));
             var paramers = JobData == null ? null : JobData.Select(s => s.Value).ToArray();
 
-            var set = JobDomainManager.GetDomainDefines();
+            var set = StorageService.Provider.GetDomainDefines();
             TheDomain = set.SingleOrDefault(s => s.Name == domain);
             TheAssembly = TheDomain == null ? null : TheDomain.JobSets.SingleOrDefault(s => s.ShortName == assembly);
             TheJob = TheAssembly == null ? null : TheAssembly.Jobs.SingleOrDefault(s => s.Name == job);
@@ -72,19 +72,19 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
         {
             if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
             if (JobCornSetting.Dictionary.Contains(period) == false) throw (new Exception("任务周期设置设置失败"));
-            RecurringJob.AddOrUpdate(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.Define.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period));
+            RecurringJob.AddOrUpdate(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period));
         }
 
         void Delay(DateTime start, object[] paramers)
         {
             if (start < DateTime.Now) throw (new  Exception("任务启动时间设置失败"));
             var delay = start - DateTime.Now;
-            BackgroundJob.Schedule(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.Define.FullName, TheJob.FullName, paramers), delay);
+            BackgroundJob.Schedule(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), delay);
         }
 
         void Immediately(object[] paramers)
         {
-            BackgroundJob.Enqueue(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.Define.FullName, TheJob.FullName, paramers));
+            BackgroundJob.Enqueue(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers));
         }
 
     }

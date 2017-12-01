@@ -1,5 +1,6 @@
 ﻿using Hangfire.Dashboard;
 using Hangfire.JobDomains.Models;
+using Hangfire.JobDomains.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             FetchHeader = () => TheDomain == null ? name : TheDomain.Name;
 
             Sidebar = ()=>SidebarMenus.DomainsMenu(name);
-            var set = JobDomainManager.GetDomainDefines();
+            var set = StorageService.Provider.GetDomainDefines();
             TheDomain = set.SingleOrDefault(s => s.Name == name);
         }
 

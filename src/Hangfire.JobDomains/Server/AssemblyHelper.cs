@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
 
-namespace Hangfire.JobDomains
+namespace Hangfire.JobDomains.Server
 {
     internal static class AssemblyHelper
     {

@@ -29,7 +29,7 @@ namespace Hangfire.JobDomains.Dashboard.PageResult
             }
             catch (Exception ex)
             {
-                Page.HtmlWrite($@"<div class=""alert alert-danger"" role=""alert""> PageResult 渲染遇见异常：{ ex.Message }.</div>");
+                Page.HtmlWrite($@"<div class=""alert alert-danger"" role=""alert""> { nameof(ContentResult) } 渲染遇见异常：{ ex.Message }.</div>");
             }
         }
 
@@ -40,14 +40,9 @@ namespace Hangfire.JobDomains.Dashboard.PageResult
             Page.SetLayout(layout);
 
             var pageHeader = Page.FetchHeader();
-            WriteStyleFile(Page.Url.To("/cssex/jobdomain"));
-            var loadingMessage = "加载中...";
-            var loading = Tag.CreateLoadingWall(loadingMessage);
 
             Page.HtmlWrite("<div class=\"row\">\r\n");
             Page.HtmlWrite("<div class=\"col-md-3\">\r\n");
-
-            Page.HtmlWrite(loading);
 
             var sideMenu = Page.Sidebar == null ? new List<Func<RazorPage, MenuItem>>() : Page.Sidebar();
             Page.HtmlWrite(new SidebarPartial(sideMenu));
@@ -63,6 +58,11 @@ namespace Hangfire.JobDomains.Dashboard.PageResult
             Page.HtmlWrite("\r\n</div>\r\n");
             Page.HtmlWrite("\r\n</div>\r\n");
 
+            WriteStyleFile(Page.Url.To("/cssex/jobdomain"));
+
+            var loadingMessage = "加载中...";
+            var loading = Tag.CreateLoadingWall(loadingMessage);
+            Page.HtmlWrite(loading);
             var Script = Tag.ScriptPlug(ScriptFileBuilder.ToString(),Cssbulider.ToString(), ScriptBuilder.ToString());
             Page.HtmlWrite(Script);
             return false;

@@ -64,7 +64,7 @@
     <Compile Include="AppSetting\AppSettingCache.cs" />
     <Compile Include="AppSetting\JobCornSetting.cs" />
     <Compile Include="AppSetting\SysSetting.cs" />
-    <Compile Include="AssemblyHelper.cs" />
+    <Compile Include="Server\AssemblyHelper.cs" />
     <Compile Include="ConvertExtension.cs" />
     <Compile Include="Dashboard\Dispatchers\CommandDispatcher.cs" />
     <Compile Include="Dashboard\Dispatchers\JobCommandDispatcher.cs" />
@@ -83,8 +83,9 @@
     <Compile Include="Dashboard\SidebarPartial.cs" />
     <Compile Include="Dashboard\UrlHelperExtension.cs" />
     <Compile Include="GlobalConfigurationExtension.cs" />
-    <Compile Include="JobDomainManager.cs" />
-    <Compile Include="JobInvoke.cs" />
+    <Compile Include="Models\ConstructorDefine.cs" />
+    <Compile Include="Server\JobDomainManager.cs" />
+    <Compile Include="Server\JobInvoke.cs" />
     <Compile Include="Loader\LogWriter.cs" />
     <Compile Include="Loader\PluginHost.cs" />
     <Compile Include="Loader\PluginLoader.cs" />
@@ -96,12 +97,10 @@
     <Compile Include="Models\JobDefine.cs" />
     <Compile Include="Models\JsonData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Temp\JobDescriptor.cs" />
-    <Compile Include="Temp\ReaderWriterCache.cs" />
-    <Compile Include="Temp\RequestAnalysis.cs" />
+    <Compile Include="Storage\IDomainStorage.cs" />
+    <Compile Include="Storage\StorageService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -117,5 +116,6 @@
     <EmbeddedResource Include="Dashboard\Content\image\loading.gif" />
     <EmbeddedResource Include="Dashboard\Content\JobDomains.css" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

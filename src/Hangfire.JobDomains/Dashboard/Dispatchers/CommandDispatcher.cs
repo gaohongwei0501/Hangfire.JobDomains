@@ -153,9 +153,9 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             await Context.Response.WriteAsync(serialized);
         }
 
-        public virtual async Task<T> Exception(Exception ex)
+        public virtual Task<T> Exception(Exception ex)
         {
-            return default(T);
+            return Task.FromResult(default(T));
         }
 
         async Task<T> TryInvoke()

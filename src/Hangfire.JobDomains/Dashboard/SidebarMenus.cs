@@ -1,6 +1,7 @@
 ﻿using Hangfire.Annotations;
 using Hangfire.Dashboard;
 using Hangfire.JobDomains.Models;
+using Hangfire.JobDomains.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace Hangfire.JobDomains.Dashboard
 
              menus.Add(page => new MenuItem("任务包列表", "#"));
 
-             var domains = JobDomainManager.GetDomainDefines().OrderBy(s=>s.Name);
+             var domains = StorageService.Provider.GetDomainDefines().OrderBy(s => s.Name);
 
              foreach (var one in domains)
              {
@@ -57,8 +58,8 @@ namespace Hangfire.JobDomains.Dashboard
 
             var menus = new List<Func<RazorPage, MenuItem>>();
 
-            var domains = JobDomainManager.GetDomainDefines();
-            var theDomain = domains.SingleOrDefault(s => s.Name == d);
+            var set = StorageService.Provider.GetDomainDefines();
+            var theDomain = set.SingleOrDefault(s => s.Name == d);
             if (theDomain == null) return menus;
             var theSet = theDomain.JobSets.SingleOrDefault(s => s.ShortName == a);
             if (theSet == null) return menus;

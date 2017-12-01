@@ -1,4 +1,5 @@
 ﻿using Hangfire.Dashboard;
+using Hangfire.JobDomains.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
         protected override bool Content()
         {
-            var set = JobDomainManager.GetDomainDefines();
+            var set = StorageService.Provider.GetDomainDefines();
             var list = set.OrderBy(s => s.Name);
 
             PageContent.WritePagerPanel("工作域任务包", list, PageIndex, PageSize, d => Url.CreateRoute(d));

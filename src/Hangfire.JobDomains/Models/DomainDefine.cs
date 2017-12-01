@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Models
 {
-    internal class DomainDefine
+    public class DomainDefine
     {
 
         public string Name { get; private set; }
@@ -32,7 +32,7 @@ namespace Hangfire.JobDomains.Models
 
         public List<AssemblyDefine> GetJobSets()
         {
-            return JobSets.Where(s=>s.Define!=null).ToList();
+            return JobSets.Where(s => s.Jobs.Count > 0).ToList();
         }
         
     }

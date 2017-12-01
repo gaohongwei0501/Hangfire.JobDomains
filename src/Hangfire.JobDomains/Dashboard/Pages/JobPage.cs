@@ -1,4 +1,5 @@
 ﻿using Hangfire.JobDomains.Models;
+using Hangfire.JobDomains.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             FetchHeader = () => TheJob == null ? name : TheJob.Name;
             Sidebar = () => SidebarMenus.JobsMenu(domain, assembly, name);
 
-            var set = JobDomainManager.GetDomainDefines();
+            var set = StorageService.Provider.GetDomainDefines();
             TheDomain = set.SingleOrDefault(s => s.Name == domain);
             TheAssembly = TheDomain == null ? null : TheDomain.JobSets.SingleOrDefault(s => s.ShortName == assembly);
             TheJob = TheAssembly == null ? null : TheAssembly.Jobs.SingleOrDefault(s => s.Name == name);
@@ -64,7 +65,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         {
             WriteBar();
 
-            var structures = TheJob.Type.GetConstructors();
+            var structures = TheJob.Constructors;
 
             var customAttr=$@" data-domain=""{ TheDomain.Name }""  data-assembly=""{ TheAssembly.ShortName }"" data-job=""{ TheJob.Name }""  data-url=""{Url.To(UrlHelperExtension.JobCommandRoute)}"" ";
 
@@ -73,26 +74,26 @@ namespace Hangfire.JobDomains.Dashboard.Pages
                 var id = Guid.NewGuid().ToString();
                 StringBuilder title = new StringBuilder();
                 StringBuilder inputs = new StringBuilder();
-                foreach (var parameterInfo in structure.GetParameters())
+                foreach (var parameterInfo in structure.Paramers)
                 {
-                    title.Append($"{parameterInfo.ParameterType.Name} {parameterInfo.Name},");
-                    var parameterId = $"{id}_{parameterInfo.Name}";
-                    var name = $"{parameterInfo.Name}({ parameterInfo.ParameterType.Name })";
-                    var dataTag = $@" data-name=""{parameterInfo.Name}""  data-type=""{parameterInfo.ParameterType.Name}""";
+                    title.Append($"{ parameterInfo.Type } { parameterInfo.Name },");
+                    var parameterId = $"{ id }_{ parameterInfo.Name }";
+                    var name = $"{ parameterInfo.Name }({ parameterInfo.Type })";
+                    var dataTag = $@" data-name=""{ parameterInfo.Name }""  data-type=""{ parameterInfo.Type }""";
 
-                    if (parameterInfo.ParameterType == typeof(string))
+                    if (parameterInfo.Type == typeof(string).Name)
                     {
                         inputs.Append(PageContent.Tag.InputTextbox(parameterId, name, parameterInfo.Name, dataTag));
                     }
-                    else if (parameterInfo.ParameterType == typeof(int))
+                    else if (parameterInfo.Type == typeof(int).Name)
                     {
                         inputs.Append(PageContent.Tag.InputNumberbox(parameterId, name, parameterInfo.Name, dataTag));
                     }
-                    else if (parameterInfo.ParameterType == typeof(DateTime))
+                    else if (parameterInfo.Type == typeof(DateTime).Name)
                     {
                         inputs.Append(PageContent.Tag.InputDatebox(parameterId, name, parameterInfo.Name, dataTag));
                     }
-                    else if (parameterInfo.ParameterType == typeof(bool))
+                    else if (parameterInfo.Type == typeof(bool).Name)
                     {
                         inputs.Append("<br/>" + PageContent.Tag.InputCheckbox(parameterId, name, parameterInfo.Name, dataTag));
                     }

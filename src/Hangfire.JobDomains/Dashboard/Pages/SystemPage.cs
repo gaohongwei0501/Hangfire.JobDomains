@@ -20,8 +20,6 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
         protected override bool Content()
         {
-            var assemblySet = JobDomainManager.GetDomainDefines();
-
             var content = PageContent.Tag.CreateSysList() ;
             var panel = PageContent.Tag.Panel("参数", string.Empty, content, string.Empty);
             WriteLiteral(panel);
