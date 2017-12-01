@@ -5,7 +5,7 @@
 Hangfire.JobDomains 是 Hangfire 扩展，增加预制任务功能，提供对继承指定接口的任务类的动态创建，在 Hangfire 的UI 面板中增加一主菜单用于对对预制任务管理等相关操作。
 项目目前仍在不断完善中...
 
-![management](management.PNG)
+![JobDomains]
 
 ## Features
 待完善 
