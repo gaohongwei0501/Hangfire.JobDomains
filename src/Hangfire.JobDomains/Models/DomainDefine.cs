@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Models
 {
+   
+
     public class DomainDefine
     {
 

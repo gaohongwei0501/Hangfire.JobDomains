@@ -24,6 +24,7 @@ namespace Hangfire.JobDomains.Dashboard
             };
 
             menus.Add(page => CreatePageMenu(page, page.Url.CreateRoute()));
+            menus.Add(page => CreatePageMenu(page, page.Url.CreateServerListRoute()));
             menus.Add(page => CreatePageMenu(page, page.Url.CreateSystemRoute()));
             menus.Add(page => CreatePageMenu(page, page.Url.CreateBatchRoute()));
          
@@ -52,6 +53,30 @@ namespace Hangfire.JobDomains.Dashboard
              }
              return menus;
          };
+
+
+        public static Func<string, List<Func<RazorPage, MenuItem>>> ServersMenu = (current) =>
+        {
+
+            var menus = new List<Func<RazorPage, MenuItem>>();
+
+            menus.Add(page => new MenuItem("服务器列表", "#"));
+
+            var servers = StorageService.Provider.GetServers().OrderBy(s => s.Name);
+
+            foreach (var one in servers)
+            {
+                menus.Add(page =>
+                {
+                    var oneRoute = page.Url.CreateServerRoute(one);
+                    return new MenuItem(oneRoute.Name, oneRoute.Link)
+                    {
+                        Active = one.Name == current
+                    };
+                });
+            }
+            return menus;
+        };
 
         public static Func<string, string, string, List<Func<RazorPage, MenuItem>>> JobsMenu = (d, a, j) =>
         {

@@ -61,9 +61,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppSetting\AppSettingCache.cs" />
-    <Compile Include="AppSetting\JobCornSetting.cs" />
-    <Compile Include="AppSetting\SysSetting.cs" />
+    <Compile Include="Dashboard\Pages\ServerPage.cs" />
+    <Compile Include="Dashboard\Pages\ServerListPage.cs" />
+    <Compile Include="Models\ServerDefine.cs" />
+    <Compile Include="Models\SysSettingKey.cs" />
     <Compile Include="Server\AssemblyHelper.cs" />
     <Compile Include="ConvertExtension.cs" />
     <Compile Include="Dashboard\Dispatchers\CommandDispatcher.cs" />

@@ -1,4 +1,4 @@
-﻿using Hangfire.JobDomains.AppSetting;
+﻿using Hangfire.JobDomains.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,8 +24,8 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             var panel = PageContent.Tag.Panel("参数", string.Empty, content, string.Empty);
             WriteLiteral(panel);
 
-            var list = JobCornSetting.Dictionary.GetValue();
-            var cronContent = PageContent.Tag.List(list.Select(s=> PageContent.Tag.ListItem($"{ s.Value }({ s.Key } min)", PageContent.Tag.CreateCronDeleteButtons(s.Key))));
+            var list = StorageService.Provider.GetJobCornSetting();
+            var cronContent = PageContent.Tag.List(list, s => PageContent.Tag.ListItem($"{ s.Value }({ s.Key } min)", PageContent.Tag.CreateCronDeleteButtons(s.Key)));
             var cronPanel = PageContent.Tag.Panel("周期设置", string.Empty, cronContent, PageContent.Tag.CreateCronAddButtons());
             WriteLiteral(cronPanel);
 

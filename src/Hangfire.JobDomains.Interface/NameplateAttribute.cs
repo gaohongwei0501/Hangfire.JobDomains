@@ -11,11 +11,10 @@ namespace Hangfire.JobDomains.Interface
         /// <summary>
         /// 构造函数
         /// </summary>
-        public NameplateAttribute(string title = "", string description = "", string queue = "default")
+        public NameplateAttribute(string title = "", string description = "")
         {
             Title = title;
             Description = description;
-            Queue = queue;
         }
 
         /// <summary>
@@ -27,12 +26,7 @@ namespace Hangfire.JobDomains.Interface
         /// 描述
         /// </summary>
         public string Description { get; set; }
-
-        /// <summary>
-        /// 队列
-        /// </summary>
-        public string Queue { get; set; }
-
+   
     }
 
 

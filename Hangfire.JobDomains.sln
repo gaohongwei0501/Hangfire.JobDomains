@@ -15,7 +15,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Interfa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host", "example\Host\Host.csproj", "{A6A13437-F3BE-4997-A2B0-D6FFF03BD623}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Location", "src\Hangfire.JobDomains.Location\Hangfire.JobDomains.Location.csproj", "{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.Location", "src\Hangfire.JobDomains.Location\Hangfire.JobDomains.Storage.Location.csproj", "{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.Sqlite", "src\Hangfire.JobDomains..Storage.Sqlite\Hangfire.JobDomains.Storage.Sqlite.csproj", "{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{F0FC1AA5-7E4F-4C49-8412-4697B0F017EF} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 		{A6A13437-F3BE-4997-A2B0-D6FFF03BD623} = {44CA269D-E7C4-423A-9EBE-2FCF79EBF85C}
 		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
+		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE16536F-CDBB-4B00-9D4D-1A3B0C085462}

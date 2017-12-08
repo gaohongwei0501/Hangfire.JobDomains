@@ -1,5 +1,6 @@
 ﻿using Hangfire.Dashboard;
-using Hangfire.JobDomains.AppSetting;
+using Hangfire.JobDomains.Models;
+using Hangfire.JobDomains.Storage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -59,10 +60,10 @@ namespace Hangfire.JobDomains.Dashboard
                         </div>";
         }
 
-        public string List(Func<IEnumerable<string>> fetchItems)
+
+        public string List(params string[] Items)
         {
-            var Items = fetchItems();
-            return List(Items);
+            return List(Items as IEnumerable<string>);
         }
 
         public string List(IEnumerable<string> Items)
@@ -78,36 +79,35 @@ namespace Hangfire.JobDomains.Dashboard
             return $@"<div class=""list-group"">  {bulider}  </div>";
         }
 
-        public string List(IEnumerable<Func<string>> fetchItems)
+        public string ListLink<T>(IEnumerable<T> source, Func<T, (string Name, string Link)> CreateRoute)
+        {
+            return List<T>(source, one => {
+                var route = CreateRoute(one);
+                return ListLinkItem(route.Name, route.Link);
+            });
+        }
+
+        public string List<T>(IEnumerable<T> source, Func<T,string> CreateItem)
         {
             var bulider = new StringBuilder();
-            if (fetchItems != null)
+            if (source != null&& CreateItem != null)
             {
-                foreach (var fetch in fetchItems)
+                foreach (var one in source)
                 {
-                    var item = fetch();
+                    var item = CreateItem(one);
                     bulider.Append(item);
                 }
             }
             return $@"<div class=""list-group"">  {bulider}  </div>";
         }
-
-        public string List(params string[] Items)
-        {
-            return List(Items as IEnumerable<string>);
-        }
-
-        public string List(params Func<string>[] fetchItems)
-        {
-            return List(fetchItems as IEnumerable<Func<string>>);
-        }
-
+       
         public string ListItem(string content,string badge="")
         {
             badge = string.IsNullOrEmpty(badge) ? string.Empty:$@"<span class=""badge"">{badge}</span>";
             return $@" <div href="""" class=""list-group-item "" >{badge}{content}</div> ";
         }
 
+     
         public string ListLinkItem(string content, string url, string badge = "", bool active = false)
         {
             badge = string.IsNullOrEmpty(badge) ? string.Empty : $@"<span class=""badge"">{badge}</span>";
@@ -201,7 +201,7 @@ namespace Hangfire.JobDomains.Dashboard
        
         public static string CreateJobScheduleButtons(this TagHelper Tag , string id)
         {
-            var jobCorns = JobCornSetting.Dictionary.GetValue();
+            var jobCorns = StorageService.Provider.GetJobCornSetting();
             var bulider = new StringBuilder();
             var loadingText = "Loading...";
             bulider.Append(@"<div class=""col-sm-5 pull-right"">
@@ -241,6 +241,15 @@ namespace Hangfire.JobDomains.Dashboard
             return bulider.ToString();
         }
 
+        public static string CreateServerList(this TagHelper Tag, ServerDefine define)
+        {
+            var bulider = new StringBuilder();
+            bulider.Append(Tag.ListItem($" 服务名器：{define.Name}"));
+            bulider.Append(Tag.ListItem($" 插件位置：{define.PlugPath}", "编辑"));
+            return Tag.List(bulider.ToString());
+        }
+
+
         static Dictionary<SysSettingKey, string> SysSettingDescriptions = new Dictionary<SysSettingKey, string>();
 
         public static string CreateSysList(this  TagHelper Tag)
@@ -248,7 +257,7 @@ namespace Hangfire.JobDomains.Dashboard
             var bulider = new StringBuilder();
             if (SysSettingDescriptions.Count == 0) ReadDescriptions();
             Array arrays = Enum.GetValues(typeof(SysSettingKey));
-            var cache = SysSetting.Dictionary.GetValue();
+            var cache = StorageService.Provider.GetSysSetting();
             for (int i = 0; i < arrays.LongLength; i++)
             {
                 var key = (SysSettingKey)arrays.GetValue(i);

@@ -7,7 +7,7 @@ using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.AppSetting
+namespace Hangfire.JobDomains.Storage.Location
 {
     internal abstract class AppSettingCache<T> where T : class
     {

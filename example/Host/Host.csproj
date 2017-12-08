@@ -44,8 +44,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dapper, Version=1.50.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Dapper.1.50.2\lib\net451\Dapper.dll</HintPath>
+    <Reference Include="Dapper, Version=1.50.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Dapper.1.50.4\lib\net451\Dapper.dll</HintPath>
     </Reference>
     <Reference Include="Hangfire.Core, Version=1.6.17.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Hangfire.Core.1.6.17\lib\net45\Hangfire.Core.dll</HintPath>
@@ -83,6 +83,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -101,9 +103,9 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Location\Hangfire.JobDomains.Location.csproj">
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Location\Hangfire.JobDomains.Storage.Location.csproj">
       <Project>{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}</Project>
-      <Name>Hangfire.JobDomains.Location</Name>
+      <Name>Hangfire.JobDomains.Storage.Location</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.JobDomains.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>

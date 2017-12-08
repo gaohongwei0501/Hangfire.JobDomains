@@ -8,13 +8,14 @@ using Hangfire.JobDomains;
 using Hangfire.SQLite;
 using Hangfire;
 using System.Threading.Tasks;
-using Hangfire.JobDomains.Location;
+using Hangfire.JobDomains.Storage.Location;
 
 [assembly: OwinStartup(typeof(Host.Startup))]
 namespace Host
 {
     public class Startup
     {
+
 
         public void Configuration(IAppBuilder app)
         {
@@ -23,7 +24,7 @@ namespace Host
             app.UseDomains<LocationStorage>(@"E:\Hangfile.Sparepart.Lib");
             app.Run(context =>
             {
-                context.Response.Redirect("/Hangfire");
+                context.Response.Redirect("/HangfireDomain");
                 return context.Response.WriteAsync("Hello, world.");
             });
         }

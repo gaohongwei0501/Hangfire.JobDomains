@@ -1,5 +1,6 @@
 ﻿using Hangfire.JobDomains.Interface;
 using Hangfire.JobDomains.Loader;
+using Hangfire.States;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,28 @@ namespace Hangfire.JobDomains.Server
 {
     internal class JobInvoke
     {
+        public static void ScheduleEnqueued(TimeSpan delay, int period, string queue, string path, string assembly, string job, object[] paramers)
+        {
+            BackgroundJob.Schedule(() => RecurringInvoke(period, queue, path, assembly, job, paramers), delay);
+        }
+
+        public static void DelayEnqueued(TimeSpan delay, string queue, string path, string assembly, string job, object[] paramers )
+        {
+            BackgroundJob.Schedule(() => ImmediatelyEnqueued(queue, path, assembly, job, paramers), delay);
+        }
+
+        public static void ImmediatelyEnqueued(string queue,string path, string assembly, string job, object[] paramers)
+        {
+            IBackgroundJobClient hangFireClient = new BackgroundJobClient();
+            EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
+            hangFireClient.Create<JobInvoke>(c => Invoke(path, assembly, job, paramers), state);
+        }
+
+        public static void RecurringInvoke(int period, string queue, string path, string assembly, string job, object[] paramers)
+        {
+            RecurringJob.AddOrUpdate(() => Invoke(path, assembly, job, paramers), Cron.MinuteInterval(period), queue: queue);
+        }
+
         public static void Invoke(string path, string assembly, string job, object[] paramers)
         {
             using (PluginHost host = new PluginHost(path))
@@ -23,7 +46,7 @@ namespace Hangfire.JobDomains.Server
                 }
                 else
                 {
-                    throw (new Exception("no load"));
+                    throw (new Exception("Plugin Not Been Loaded"));
                 }
             }
         }

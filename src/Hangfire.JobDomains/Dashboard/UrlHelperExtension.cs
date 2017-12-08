@@ -77,6 +77,51 @@ namespace Hangfire.JobDomains.Dashboard
 
         #endregion
 
+        #region ServerListPage
+
+        public const string ServerListPageRoute = "/domains/servers";
+
+        /// <summary>
+        /// DomainPage CreateRoute
+        /// </summary>
+        public static (string Name, string Link) CreateServerListRoute(this UrlHelper Url)
+        {
+            var name = ServerListPage.Title;
+            var link = ServerListPageRoute;
+            return (name, Url.To(link));
+        }
+
+        #endregion
+
+        #region ServerPage
+
+        public const string ServerPageRoute = "/domains/server-(?<name>.+)";
+
+        /// <summary>
+        /// DomainPage CreateRoute
+        /// </summary>
+        public static (string Name, string Link) CreateServerRoute(this UrlHelper Url, ServerDefine server)
+        {
+            var name = server.Name;
+            var link = ServerPageRoute.Replace("(?<name>.+)", name).EscapeRoute();
+            return (name, Url.To(link));
+        }
+
+        public static (string Name, string Link) CreateServerRoute(this UrlHelper Url, string serverName)
+        {
+            var name = serverName;
+            var link = ServerPageRoute.Replace("(?<name>.+)", serverName).EscapeRoute();
+            return (name, Url.To(link));
+        }
+
+        public static ServerPage CreateServerPage(Match match)
+        {
+            var name = match.Groups["name"];
+            return new ServerPage(name.EscapeNomal());
+        }
+
+        #endregion
+
         #region DomainPage
 
         public const string DomainPageRoute = "/domains/domain-(?<name>.+)";

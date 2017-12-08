@@ -1,8 +1,7 @@
-﻿using Hangfire.JobDomains.AppSetting;
-using Hangfire.JobDomains.Models;
+﻿using Hangfire.JobDomains.Models;
 using Hangfire.JobDomains.Server;
 using Hangfire.JobDomains.Storage;
-
+using Hangfire.States;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +41,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             var period = await GetFromValue<int>("period", 0);
 
             JobData = await GetDictionaryValue("data");
-            if (JobData.Count == 0) throw (new Exception("提交任务操作参数不齐全."));
+           // if (JobData.Count == 0) throw (new Exception("提交任务操作参数不齐全."));
             var paramers = JobData == null ? null : JobData.Select(s => s.Value).ToArray();
 
             var set = StorageService.Provider.GetDomainDefines();
@@ -71,20 +70,27 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
         void Schedule(DateTime start, int period, object[] paramers)
         {
             if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
-            if (JobCornSetting.Dictionary.Contains(period) == false) throw (new Exception("任务周期设置设置失败"));
-            RecurringJob.AddOrUpdate(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period));
+            var set = StorageService.Provider.GetJobCornSetting();
+            if (set.ContainsKey(period) == false) throw (new Exception("任务周期设置设置失败"));
+            // RecurringJob.AddOrUpdate(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period), queue: TheDomain.Name.ToLower());
+            var delay = start - DateTime.Now;
+            JobInvoke.ScheduleEnqueued(delay, period, TheDomain.Name.ToLower(), TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Delay(DateTime start, object[] paramers)
         {
-            if (start < DateTime.Now) throw (new  Exception("任务启动时间设置失败"));
+            if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
             var delay = start - DateTime.Now;
-            BackgroundJob.Schedule(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), delay);
+            //  BackgroundJob.Schedule(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), delay);
+            JobInvoke.DelayEnqueued(delay, TheDomain.Name.ToLower(), TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Immediately(object[] paramers)
         {
-            BackgroundJob.Enqueue(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers));
+            //IBackgroundJobClient hangFireClient = new BackgroundJobClient();
+            //EnqueuedState state = new Hangfire.States.EnqueuedState(TheDomain.Name.ToLower());
+            //hangFireClient.Create<JobInvoke>(c => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), state);
+            JobInvoke.ImmediatelyEnqueued(TheDomain.Name.ToLower(), TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
     }

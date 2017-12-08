@@ -31,8 +31,16 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         protected override bool Content()
         {
             if (TheDomain == null) return NoFound();
+
             WriteBar();
+
+            var servers = StorageService.Provider.GetServersByDomain(TheDomain.Name);
+            var serverList = PageContent.Tag.ListLink(servers, Url.CreateServerRoute);
+            var panel = PageContent.Tag.Panel("支持该服务的服务器", string.Empty, serverList);
+            WriteLiteral(panel);
+
             if (TheDomain.JobSets.Count == 0) return None();
+         
             PageContent.WritePagerPanel($@"任务程序集", TheDomain.GetJobSets(), PageIndex, PageSize, d => Url.CreateRoute(TheDomain, d));
             return true;
         }
@@ -60,7 +68,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             WriteLiteral(bar);
         }
 
-       
-        
+
+
     }
 }

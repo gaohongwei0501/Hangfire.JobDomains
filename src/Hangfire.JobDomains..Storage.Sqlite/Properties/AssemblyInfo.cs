@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("Hangfire.JobDomains..Storage.Location")]
+[assembly: AssemblyTitle("Hangfire.JobDomains..Storage.Sqlite")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Hangfire.JobDomains..Storage.Location")]
+[assembly: AssemblyProduct("Hangfire.JobDomains..Storage.Sqlite")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("a9a2fe55-76e9-4be5-9b5e-65467a8bfdb9")]
+[assembly: Guid("582e67be-0e5c-463c-a77c-dba858e9e3f1")]
 
 // 程序集的版本信息由下列四个值组成: 
 //

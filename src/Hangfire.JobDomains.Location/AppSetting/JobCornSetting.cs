@@ -1,16 +1,13 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.AppSetting
+namespace Hangfire.JobDomains.Storage.Location
 {
     internal class JobCornSetting : AppSettingCache<Dictionary<int, string>>
     {
-
-        public static readonly JobCornSetting Dictionary = new JobCornSetting();
 
         public override string Key { get; } = "cron.json";
 
@@ -25,7 +22,7 @@ namespace Hangfire.JobDomains.AppSetting
             return value;
         }
 
-        public void SetValue(int key, string value)
+        public bool SetValue(int key, string value)
         {
             var cache = GetValue();
             if (cache.ContainsKey(key))
@@ -34,12 +31,19 @@ namespace Hangfire.JobDomains.AppSetting
                 cache.Add(key, value);
 
             CreateOrUpdateSettingFile(() => cache);
+            return true;
         }
 
         public bool Contains(int key)
         {
             var cache = GetValue();
             return cache.ContainsKey(key);
+        }
+
+        public bool DeleteValue(int key)
+        {
+            var cache = GetValue();
+            return cache.Remove(key);
         }
 
     }

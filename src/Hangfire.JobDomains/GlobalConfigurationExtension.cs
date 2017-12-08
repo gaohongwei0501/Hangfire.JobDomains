@@ -15,6 +15,7 @@ using Owin;
 using Hangfire.JobDomains.Dashboard.Dispatchers;
 using Hangfire.JobDomains.Dashboard;
 using Hangfire.JobDomains.Dashboard.Pages;
+using System.Net;
 
 namespace Hangfire.JobDomains
 {
@@ -37,27 +38,27 @@ namespace Hangfire.JobDomains
 
     public static class GlobalConfigurationExtension
     {
+
         /// <summary>
         /// 
         /// </summary>
-        public static HangfireDomainMode GlobalMode { get;private set; }
+        public static HangfireDomainMode GlobalMode { get; private set; }
 
         /// <summary>
         /// 任务域服务（单机模式）
         /// </summary>
         /// <param name="config">全局配置</param>
         /// <param name="path">插件路径</param>
-        public static void UseDomains<T>(this IAppBuilder app,  string path, string connectString="") where T : IDomainStorage, new()
+        public static void UseDomains<T>(this IAppBuilder app, string path, string connectString = "") where T : IDomainStorage, new()
         {
             if (string.IsNullOrEmpty(path)) return;
-            StorageService.Storage = new T();
-            var connecting=  StorageService.Storage.SetConnectString(connectString);
-            if (connecting == false) throw (new  Exception(" HangfireDomain 数据服务连接失败"));
+            var connecting = StorageService.Provider.SetStorage(new T(), connectString);
+            if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
+           
+            var options = JobDomainManager.InitServer(path);
+            app.UseHangfireServer(options);
 
-            app.UseHangfireServer();
-            JobDomainManager.InitServer(path);
-
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/HangfireDomain");
             InitRoute();
 
         }
@@ -67,15 +68,14 @@ namespace Hangfire.JobDomains
         /// </summary>
         /// <param name="config"></param>
         /// <param name="path"></param>
-        public static void UseDomainsAtServer<T>(this IAppBuilder app, string path, string connectString) where T: IDomainStorage,new()
+        public static void UseDomainsAtServer<T>(this IAppBuilder app, string path, string connectString) where T : IDomainStorage, new()
         {
             if (string.IsNullOrEmpty(path)) return;
-            StorageService.Storage = new T();
-            var connecting = StorageService.Storage.SetConnectString(connectString);
+            var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
 
+            var options = JobDomainManager.InitServer(path);
             app.UseHangfireServer();
-            JobDomainManager.InitServer(path);
         }
 
         /// <summary>
@@ -83,11 +83,10 @@ namespace Hangfire.JobDomains
         /// </summary>
         public static void UseDomainsAtClient<T>(this IAppBuilder app, string connectString) where T : IDomainStorage, new()
         {
-            StorageService.Storage = new T();
-            var connecting = StorageService.Storage.SetConnectString(connectString);
+            var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
 
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/HangfireDomain");
             InitRoute();
         }
 
@@ -100,6 +99,8 @@ namespace Hangfire.JobDomains
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.MainPageRoute, x => new MainPage());
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.SystemPageRoute, x => new SystemPage());
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.BatchSchedulePageRoute, x => new BatchSchedulePage());
+            DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.ServerListPageRoute, x => new  ServerListPage());
+            DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.ServerPageRoute, x => UrlHelperExtension.CreateServerPage(x));
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.DomainPageRoute, x => UrlHelperExtension.CreateDomainPage(x));
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.AssemblyPageRoute, x => UrlHelperExtension.CreateAssemblyPage(x));
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.JobPageRoute, x => UrlHelperExtension.CreateJobPage(x));
@@ -111,6 +112,13 @@ namespace Hangfire.JobDomains
             });
         }
 
-    }
+        static string GetLocalIp()
+        {
+            string hostname = Dns.GetHostName();//得到本机名   
+            IPHostEntry localhost = Dns.GetHostEntry(hostname);
+            IPAddress localaddr = localhost.AddressList[0];
+            return localaddr.ToString();
+        }
 
+    }
 }

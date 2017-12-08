@@ -10,13 +10,36 @@ namespace Hangfire.JobDomains.Storage
 
     public interface IDomainStorage
     {
-        bool IsEmpty { get; }
+
+        bool AddOrUpdateServer(ServerDefine server);
+
+        bool UpdateServerDomains(string server, List<string> domains);
+
+        List<ServerDefine> GetServers();
+
+        ServerDefine GetServer(string server);
+
+        List<string> GetServersByDomain(string domain);
+
+        bool IsDomainsEmpty();
 
         bool SetConnectString(string connectString);
 
-        List<DomainDefine> GetAll();
+        List<DomainDefine> GetAllDomains();
 
-        bool Add(string path, DomainDefine define);
+        bool AddDomain(DomainDefine define);
+
+        Dictionary<SysSettingKey, string> GetSysSetting();
+
+        bool SetSysSetting(SysSettingKey key, string value);
+
+        Dictionary<int, string> GetJobCornSetting();
+
+        bool AddJobCornSetting(int key, string value);
+
+        bool DeleteJobCornSetting(int key);
+
+
     }
 
 }

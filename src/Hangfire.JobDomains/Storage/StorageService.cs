@@ -12,19 +12,58 @@ namespace Hangfire.JobDomains.Storage
 
         public readonly static StorageService Provider = new StorageService();
 
-        public static IDomainStorage Storage { get; set; }
+        static IDomainStorage Storage { get; set; }
 
-        public List<DomainDefine> GetDomainDefines()
+        public bool SetStorage(IDomainStorage store,string connectString)
         {
-            //var list = new List<DomainDefine>();
-            //var path = SysSetting.GetValue<string>(SysSettingKey.BasePath);
-            //if (string.IsNullOrEmpty(path)) return list;
-            return Storage.GetAll();
+            if (Storage == null) Storage = store;
+            return Storage.SetConnectString(connectString);
         }
 
-        public bool IsEmpty => Storage.IsEmpty;
+        public bool AddOrUpdateServer(ServerDefine server)=> Storage.AddOrUpdateServer(server);
 
-        public bool Add(string path, DomainDefine define) => Storage.Add(path, define);
+        public bool UpdateServerDomains(string server,List<string> domains) => Storage.UpdateServerDomains(server, domains);
+
+        public List<ServerDefine> GetServers() => Storage.GetServers();
+
+        public ServerDefine GetServer(string server) => Storage.GetServer(server);
+
+        public List<string> GetServersByDomain(string domain) => Storage.GetServersByDomain(domain);
+
+
+        public List<DomainDefine> GetDomainDefines() => Storage.GetAllDomains();
+      
+
+        public bool IsDomainsEmpty => Storage.IsDomainsEmpty();
+
+
+        public bool Add(DomainDefine define) => Storage.AddDomain(define);
+
+
+        public Dictionary<SysSettingKey, string> GetSysSetting()
+        {
+            return Storage.GetSysSetting();
+        }
+
+        public bool SetSysSetting(SysSettingKey key,string value)
+        {
+            return Storage.SetSysSetting(key, value);
+        }
+
+        public Dictionary<int, string> GetJobCornSetting()
+        {
+            return Storage.GetJobCornSetting();
+        }
+
+        public bool AddJobCornSetting(int key, string value)
+        {
+            return Storage.AddJobCornSetting(key, value);
+        }
+
+        public bool DeleteJobCornSetting(int key)
+        {
+            return Storage.DeleteJobCornSetting(key);
+        }
 
     }
 

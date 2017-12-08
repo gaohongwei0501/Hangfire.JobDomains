@@ -1,21 +1,10 @@
-﻿using Hangfire.Dashboard;
-using Hangfire.JobDomains.Dashboard;
-using Hangfire.JobDomains.Dashboard.Pages;
-using Hangfire.JobDomains.Models;
+﻿using Hangfire.JobDomains.Models;
 using System;
-using System.Runtime.Caching;
-using System.Collections.Concurrent;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Policy;
-using Hangfire.JobDomains.Loader;
 using Hangfire.JobDomains.Interface;
-using Hangfire.JobDomains.AppSetting;
-using Hangfire.JobDomains.Dashboard.Dispatchers;
 using Hangfire.JobDomains.Storage;
 
 namespace Hangfire.JobDomains.Server
@@ -23,21 +12,23 @@ namespace Hangfire.JobDomains.Server
     internal class JobDomainManager
     {
 
-        public static void InitServer(string path)
+        public static BackgroundJobServerOptions InitServer(string path)
         {
-            if (string.IsNullOrEmpty(path)) return;
-            InitStorage(path);
+            if (string.IsNullOrEmpty(path)) return null;
+            var queues= InitStorage(path);
+            var options = CreateServerOptions(queues);
+            StorageService.Provider.UpdateServerDomains(Environment.MachineName.ToLower(), queues);
+            return options;
         }
-
      
         public static bool ChangePath(string path)
         {
             try
             {
-                if (StorageService.Provider.IsEmpty == false) return false;
+                if (StorageService.Provider.IsDomainsEmpty == false) return false;
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
-                SysSetting.Dictionary.SetValue(SysSettingKey.BasePath, path);
-                return true;
+                var server = new ServerDefine() { PlugPath= path };
+                return StorageService.Provider.AddOrUpdateServer(server);
             }
             catch
             {
@@ -45,10 +36,11 @@ namespace Hangfire.JobDomains.Server
             }
         }
 
-        public static void InitStorage(string basePath)
+        static List<string> InitStorage(string basePath)
         {
+            var queues = new List<string>();
             var success = ChangePath(basePath);
-            if (success == false) return;
+            if (success == false) return queues;
             var paths = Directory.GetDirectories(basePath);
             foreach (var path in paths)
             {
@@ -59,15 +51,22 @@ namespace Hangfire.JobDomains.Server
                     var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
                     var jobs = ReadPrefabricationAssembly(assemblyItem);
                     if (jobs.Count == 0) continue;
-                    var assemblyDefine =  CreateAssemblyDefine(assemblyItem, jobs);
+                    var assemblyDefine = CreateAssemblyDefine(assemblyItem, jobs);
                     assemblies.Add(assemblyDefine);
                 }
                 var define = new DomainDefine(path, assemblies);
-                StorageService.Provider.Add(path, define);
+                StorageService.Provider.Add(define);
+                queues.Add(define.Name);
             }
+            return queues;
         }
 
-  
+        static BackgroundJobServerOptions CreateServerOptions(List<string> queues) {
+            var Queues = new List<string> { "default", Environment.MachineName.ToLower() };
+            Queues.AddRange(queues);
+            var options = new BackgroundJobServerOptions { Queues = Queues.ToArray() };
+            return options;
+        }
 
         static AssemblyDefine CreateAssemblyDefine(Assembly define, List<JobDefine> jobs)
         {
