@@ -11,9 +11,9 @@ namespace Hangfire.JobDomains.Storage
     public interface IDomainStorage
     {
 
-        bool AddOrUpdateServer(ServerDefine server);
+        Task<bool> AddOrUpdateServerAsync(ServerDefine server);
 
-        bool UpdateServerDomains(string server, List<string> domains);
+        Task<bool> UpdateServerDomainMapAsync(string server, List<string> domains);
 
         List<ServerDefine> GetServers();
 
@@ -27,7 +27,7 @@ namespace Hangfire.JobDomains.Storage
 
         List<DomainDefine> GetAllDomains();
 
-        bool AddDomain(DomainDefine define);
+        Task<bool> AddDomainAsync(DomainDefine define);
 
         Dictionary<SysSettingKey, string> GetSysSetting();
 

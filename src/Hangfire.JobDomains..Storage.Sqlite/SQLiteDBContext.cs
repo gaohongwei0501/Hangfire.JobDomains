@@ -11,6 +11,7 @@ namespace Hangfire.JobDomains.Storage.Sqlite
    
     internal class SQLiteDBContext : DbContext
     {
+
         private static bool _created = false;
 
         public SQLiteDBContext()
@@ -23,7 +24,8 @@ namespace Hangfire.JobDomains.Storage.Sqlite
             }
         }
 
-        public DbSet<ServerGroup> ServerGroups { get; set; }
+        public DbSet<Entities.Server> Servers { get; set; }
+        public DbSet<ServerPlugMap> ServerPlugMaps { get; set; }
 
         public DbSet<Domain> Domains { get; set; }
 
@@ -31,17 +33,18 @@ namespace Hangfire.JobDomains.Storage.Sqlite
 
         public DbSet<Job> Jobs { get; set; }
 
-        public DbSet<JobConstructor> JobConstructors { get; set; }
+        public DbSet<JobConstructorParameter> JobConstructorParameters { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<ServerGroup>().ToTable("Hangfire.JobDomains.ServerGroup");
+            modelBuilder.Entity<Entities.Server>().ToTable("Hangfire.JobDomains.Server");
+            modelBuilder.Entity<ServerPlugMap>().ToTable("Hangfire.JobDomains.ServerPlugMap");
             modelBuilder.Entity<Domain>().ToTable("Hangfire.JobDomains.Domain");
             modelBuilder.Entity<Assembly>().ToTable("Hangfire.JobDomains.Assembly");
             modelBuilder.Entity<Job>().ToTable("Hangfire.JobDomains.Job");
-            modelBuilder.Entity<JobConstructor>().ToTable("Hangfire.JobDomains.JobConstructor");
+            modelBuilder.Entity<JobConstructorParameter>().ToTable("Hangfire.JobDomains.JobConstructor");
         }
 
         public static string ConnectionString { get; set; }

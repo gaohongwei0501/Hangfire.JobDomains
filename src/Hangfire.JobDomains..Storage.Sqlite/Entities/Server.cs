@@ -9,6 +9,10 @@ namespace Hangfire.JobDomains.Storage.Sqlite.Entities
     internal class Server: SQLiteEntityBase
     {
 
+        public string Name { get; set; }
+
+        public string Description { get; set; }
+
         public string PlugPath { get; set; }
 
     }

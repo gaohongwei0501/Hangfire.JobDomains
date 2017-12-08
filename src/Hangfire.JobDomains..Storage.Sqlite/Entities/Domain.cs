@@ -8,7 +8,6 @@ namespace Hangfire.JobDomains.Storage.Sqlite.Entities
 {
     internal class Domain : SQLiteEntityBase
     {
-        public int ServerGroupId { get; set; }
 
         public string Name { get; set; }
 

@@ -6,29 +6,30 @@ using System.IO;
 using System.Reflection;
 using Hangfire.JobDomains.Interface;
 using Hangfire.JobDomains.Storage;
+using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Server
 {
     internal class JobDomainManager
     {
 
-        public static BackgroundJobServerOptions InitServer(string path)
+        public static async Task<BackgroundJobServerOptions>  InitServer(string path)
         {
             if (string.IsNullOrEmpty(path)) return null;
-            var queues= InitStorage(path);
+            var queues=await InitStorage(path);
             var options = CreateServerOptions(queues);
             StorageService.Provider.UpdateServerDomains(Environment.MachineName.ToLower(), queues);
             return options;
         }
      
-        public static bool ChangePath(string path)
+        public static async Task<bool> ChangePath(string path)
         {
             try
             {
                 if (StorageService.Provider.IsDomainsEmpty == false) return false;
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
                 var server = new ServerDefine() { PlugPath= path };
-                return StorageService.Provider.AddOrUpdateServer(server);
+                return await StorageService.Provider.AddOrUpdateServerAsync(server);
             }
             catch
             {
@@ -36,10 +37,10 @@ namespace Hangfire.JobDomains.Server
             }
         }
 
-        static List<string> InitStorage(string basePath)
+        static async Task<List<string>> InitStorage(string basePath)
         {
             var queues = new List<string>();
-            var success = ChangePath(basePath);
+            var success =await ChangePath(basePath);
             if (success == false) return queues;
             var paths = Directory.GetDirectories(basePath);
             foreach (var path in paths)
@@ -55,7 +56,7 @@ namespace Hangfire.JobDomains.Server
                     assemblies.Add(assemblyDefine);
                 }
                 var define = new DomainDefine(path, assemblies);
-                StorageService.Provider.Add(define);
+                await StorageService.Provider.AddDomainAsync(define);
                 queues.Add(define.Name);
             }
             return queues;

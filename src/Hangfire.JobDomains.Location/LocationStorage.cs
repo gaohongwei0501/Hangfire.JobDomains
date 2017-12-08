@@ -17,7 +17,7 @@ namespace Hangfire.JobDomains.Storage.Location
 
         static ServerDefine Server { get; set; }
 
-        public bool AddOrUpdateServer(ServerDefine server)
+        public bool AddOrUpdateServerAsync(ServerDefine server)
         {
             Server = server;
             return true;
@@ -55,7 +55,7 @@ namespace Hangfire.JobDomains.Storage.Location
 
         public bool IsDomainsEmpty () => Storage.IsEmpty;
 
-        public bool AddDomain(DomainDefine define)
+        public bool AddDomainAsync(DomainDefine define)
         {
             return Storage.TryAdd(define.BasePath, define);
         }

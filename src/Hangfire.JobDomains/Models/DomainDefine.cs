@@ -22,19 +22,36 @@ namespace Hangfire.JobDomains.Models
 
         public string Description { get; private set; }
 
-        public List<AssemblyDefine> JobSets { get; private set; } = new List<AssemblyDefine>();
+        List<AssemblyDefine> _jobSets = null;
 
-        public DomainDefine(string path,IEnumerable<AssemblyDefine> sets)
+        public DomainDefine(string path)
         {
             BasePath = path;
             var index = path.LastIndexOf("\\");
             Name = path.Substring(index + 1);
-            JobSets.AddRange(sets);
+        }
+
+        public DomainDefine(string path, string name , string description)
+        {
+            BasePath = path;
+            Name = name;
+            Description = description;
+        }
+
+        public DomainDefine(string path, IEnumerable<AssemblyDefine> sets,string name="",string description="") : this(path)
+        {
+            _jobSets = new List<AssemblyDefine>();
+            _jobSets.AddRange(sets);
+            if (string.IsNullOrEmpty(name) == false) Name = name;
+            Description = description;
         }
 
         public List<AssemblyDefine> GetJobSets()
         {
-            return JobSets.Where(s => s.Jobs.Count > 0).ToList();
+            if (_jobSets != null) return _jobSets;
+
+
+            return null;
         }
         
     }
