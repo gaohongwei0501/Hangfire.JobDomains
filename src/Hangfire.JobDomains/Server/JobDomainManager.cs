@@ -69,9 +69,11 @@ namespace Hangfire.JobDomains.Server
                 var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
                 var assemblyDefine = CreateAssemblyDefine(define, assemblyItem);
                 var jobs = ReadPrefabricationAssembly(assemblyDefine, assemblyItem);
+                if (jobs.Count == 0) continue;
                 assemblyDefine.SetJobs(jobs);
                 assemblies.Add(assemblyDefine);
             }
+            if (assemblies.Count == 0) return;
             define.SetJobSets(assemblies);
         }
 

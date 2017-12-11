@@ -52,6 +52,8 @@ namespace Hangfire.JobDomains.Models
             _jobSets = new List<AssemblyDefine>(assemblyDefines);
         }
 
+        public List<AssemblyDefine> InnerJobSets { get { return _jobSets; } }
+
         public List<AssemblyDefine> GetJobSets()
         {
             if (_jobSets != null) return _jobSets;

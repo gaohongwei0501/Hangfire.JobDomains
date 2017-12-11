@@ -76,6 +76,8 @@ namespace Hangfire.JobDomains.Models
             }
         }
 
+        public List<ConstructorDefine> InnerConstructors { get { return _constructors; } }
+
         public List<ConstructorDefine> GetConstructors()
         {
             if (_constructors != null) return _constructors;

@@ -63,9 +63,11 @@ namespace Hangfire.JobDomains.Models
 
         public void SetJobs(IEnumerable<JobDefine> jobs)
         {
-            if (jobs != null || jobs.Count() == 0) return;
+            if (jobs == null || jobs.Count() == 0) return;
             _jobs = new List<JobDefine>(jobs);
         }
+
+        public List<JobDefine> InnerJobs { get { return _jobs; } }
 
         public List<JobDefine> GetJobs()
         {
@@ -73,6 +75,6 @@ namespace Hangfire.JobDomains.Models
             return Storage.StorageService.Provider.GetJobs(this);
         }
 
-
+      
     }
 }

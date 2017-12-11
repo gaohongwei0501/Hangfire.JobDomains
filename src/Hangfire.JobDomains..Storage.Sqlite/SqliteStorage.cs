@@ -184,21 +184,25 @@ namespace Hangfire.JobDomains.Storage.Sqlite
                 var domain = define.GetDomain();
                 ClearDomainAsync(context, domain.Name);
                 var domainResult = await context.Domains.AddAsync(domain);
-                var assemblies = define.GetJobSets();
-                foreach (var assembly in assemblies)
-                {
-                    var assemblyOne = assembly.GetAssembly(domainResult.Entity.ID);
-                    var assemblyResult = await context.Assemblies.AddAsync(assemblyOne);
-                    var jobs = assembly.GetJobs();
-                    foreach (var job in jobs)
+                var assemblies = define.InnerJobSets;
+                if (assemblies != null) {  
+                    foreach (var assembly in assemblies)
                     {
-                        var jobOne = job.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
-                        var jobResult = await context.Jobs.AddAsync(jobOne);
-                        var constructors = job.GetConstructors();
-                        foreach (var constructor in constructors)
+                        var assemblyOne = assembly.GetAssembly(domainResult.Entity.ID);
+                        var assemblyResult = await context.Assemblies.AddAsync(assemblyOne);
+                        var jobs = assembly.InnerJobs;
+                        if (jobs == null) continue;
+                        foreach (var job in jobs)
                         {
-                            var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
-                            await context.JobConstructorParameters.AddRangeAsync(paramers);
+                            var jobOne = job.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
+                            var jobResult = await context.Jobs.AddAsync(jobOne);
+                            var constructors = job.InnerConstructors;
+                            if (constructors == null) continue;
+                            foreach (var constructor in constructors)
+                            {
+                                var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
+                                await context.JobConstructorParameters.AddRangeAsync(paramers);
+                            }
                         }
                     }
                 }

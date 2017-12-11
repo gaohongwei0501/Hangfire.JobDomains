@@ -23,8 +23,8 @@ namespace Host
             var filePath = @"E:\Hangfile.Sparepart.Lib";
             var dataPath = @"Data Source=E:\Hangfile.Sparepart.Lib\Data\Store.dat;";//Version=3;
             GlobalConfiguration.Configuration.UseSQLiteStorage(dataPath);
-         //   app.UseDomains<LocationStorage>(@"E:\Hangfile.Sparepart.Lib");
-            app.UseDomains<Hangfire.JobDomains.Storage.Sqlite.SQLiteStorage>(filePath, dataPath);
+            app.UseDomains<LocationStorage>(filePath);
+          //  app.UseDomains<Hangfire.JobDomains.Storage.Sqlite.SQLiteStorage>(filePath, dataPath);
             app.Run(context =>
             {
                 context.Response.Redirect("/HangfireDomain");
