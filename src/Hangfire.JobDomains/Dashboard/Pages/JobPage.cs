@@ -30,8 +30,8 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
             var set = StorageService.Provider.GetDomainDefines();
             TheDomain = set.SingleOrDefault(s => s.Name == domain);
-            TheAssembly = TheDomain == null ? null : TheDomain.JobSets.SingleOrDefault(s => s.ShortName == assembly);
-            TheJob = TheAssembly == null ? null : TheAssembly.Jobs.SingleOrDefault(s => s.Name == name);
+            TheAssembly = TheDomain == null ? null : TheDomain.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
+            TheJob = TheAssembly == null ? null : TheAssembly.GetJobs().SingleOrDefault(s => s.Name == name);
         }
 
         protected override bool Content()
@@ -65,7 +65,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         {
             WriteBar();
 
-            var structures = TheJob.Constructors;
+            var structures = TheJob.GetConstructors();
 
             var customAttr=$@" data-domain=""{ TheDomain.Name }""  data-assembly=""{ TheAssembly.ShortName }"" data-job=""{ TheJob.Name }""  data-url=""{Url.To(UrlHelperExtension.JobCommandRoute)}"" ";
 

@@ -16,6 +16,7 @@ namespace Hangfire.JobDomains.Models
     /// </summary>
     public class AssemblyDefine
     {
+        public DomainDefine Parent { get; private set; }
 
         /// <summary>
         /// 全名
@@ -45,25 +46,14 @@ namespace Hangfire.JobDomains.Models
         /// <summary>
         /// 配件
         /// </summary>
-        public List<JobDefine> Jobs { get; private set; } = new List<JobDefine>();
-
-
-        public void AddJob(JobDefine job)
-        {
-            if (job != null) Jobs.Add(job);
-        }
-
-        public void AddJob(IEnumerable<JobDefine> jobs)
-        {
-            if (jobs != null) Jobs.AddRange(jobs);
-        }
+        List<JobDefine> _jobs { get;  set; }
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public AssemblyDefine(string file, string fullname, string shortname, string title, string description, IEnumerable<JobDefine> jobs = null)
+        public AssemblyDefine(DomainDefine parent, string file, string fullname, string shortname, string title, string description)
         {
-            if(jobs!=null) Jobs.AddRange(jobs);
+            Parent = parent;
             FileName = file;
             FullName = fullname;
             ShortName = shortname;
@@ -71,7 +61,18 @@ namespace Hangfire.JobDomains.Models
             Description = description;
         }
 
-     
+        public void SetJobs(IEnumerable<JobDefine> jobs)
+        {
+            if (jobs != null || jobs.Count() == 0) return;
+            _jobs = new List<JobDefine>(jobs);
+        }
+
+        public List<JobDefine> GetJobs()
+        {
+            if (_jobs != null) return _jobs;
+            return Storage.StorageService.Provider.GetJobs(this);
+        }
+
 
     }
 }

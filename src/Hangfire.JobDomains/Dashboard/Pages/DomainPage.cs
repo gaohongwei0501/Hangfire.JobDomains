@@ -39,9 +39,9 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             var panel = PageContent.Tag.Panel("支持该服务的服务器", string.Empty, serverList);
             WriteLiteral(panel);
 
-            if (TheDomain.JobSets.Count == 0) return None();
-         
-            PageContent.WritePagerPanel($@"任务程序集", TheDomain.GetJobSets(), PageIndex, PageSize, d => Url.CreateRoute(TheDomain, d));
+            var list = TheDomain.GetJobSets();
+            if (list.Count == 0) return None();
+            PageContent.WritePagerPanel($@"任务程序集", list, PageIndex, PageSize, d => Url.CreateRoute(TheDomain, d));
             return true;
         }
 

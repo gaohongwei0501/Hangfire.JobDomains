@@ -26,7 +26,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             Sidebar = ()=>SidebarMenus.DomainsMenu(domain);
             var set = StorageService.Provider.GetDomainDefines();
             TheDomain = set.SingleOrDefault(s => s.Name == domain);
-            TheAssembly = TheDomain == null ? null : TheDomain.JobSets.SingleOrDefault(s => s.ShortName == name);
+            TheAssembly = TheDomain == null ? null : TheDomain.GetJobSets().SingleOrDefault(s => s.ShortName == name);
         }
 
         protected override bool Content()
@@ -56,7 +56,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         bool Nomal()
         {
             WriteBar();
-            PageContent.WritePagerPanel(TheAssembly.ShortName, TheAssembly.Jobs, PageIndex, PageSize, d => Url.CreateRoute(TheDomain, TheAssembly, d));
+            PageContent.WritePagerPanel(TheAssembly.ShortName, TheAssembly.GetJobs(), PageIndex, PageSize, d => Url.CreateRoute(TheDomain, TheAssembly, d));
             return true;
         }
 

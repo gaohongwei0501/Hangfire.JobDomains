@@ -86,7 +86,7 @@ namespace Hangfire.JobDomains.Dashboard
             var set = StorageService.Provider.GetDomainDefines();
             var theDomain = set.SingleOrDefault(s => s.Name == d);
             if (theDomain == null) return menus;
-            var theSet = theDomain.JobSets.SingleOrDefault(s => s.ShortName == a);
+            var theSet = theDomain.GetJobSets().SingleOrDefault(s => s.ShortName == a);
             if (theSet == null) return menus;
 
             menus.Add(page =>
@@ -98,8 +98,7 @@ namespace Hangfire.JobDomains.Dashboard
                 };
             });
 
-            var jobs = theSet.Jobs.OrderBy(s => s.Title);
-
+            var jobs = theSet.GetJobs().OrderBy(s => s.Title);
             foreach (var one in jobs)
             {
                 menus.Add(page =>

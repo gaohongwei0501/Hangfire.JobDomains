@@ -22,7 +22,7 @@ namespace Hangfire.JobDomains.Storage
 
         public Task<bool> AddOrUpdateServerAsync(ServerDefine server)=> Storage.AddOrUpdateServerAsync(server);
 
-        public bool UpdateServerDomains(string server,List<string> domains) => Storage.UpdateServerDomainMapAsync(server, domains);
+        public Task<bool> UpdateServerDomains(string server,List<string> domains) => Storage.UpdateServerDomainMapAsync(server, domains);
 
         public List<ServerDefine> GetServers() => Storage.GetServers();
 
@@ -32,13 +32,16 @@ namespace Hangfire.JobDomains.Storage
 
 
         public List<DomainDefine> GetDomainDefines() => Storage.GetAllDomains();
-      
+
+        public List<AssemblyDefine> GetAssemblies(DomainDefine domain) => Storage.GetAssemblies(domain);
+
+        public List<JobDefine> GetJobs(AssemblyDefine assembly) => Storage.GetJobs(assembly);
+
+        public List<ConstructorDefine> GetConstructors(JobDefine job) => Storage.GetConstructors(job);
 
         public bool IsDomainsEmpty => Storage.IsDomainsEmpty();
 
-
         public Task<bool> AddDomainAsync(DomainDefine define) => Storage.AddDomainAsync(define);
-
 
         public Dictionary<SysSettingKey, string> GetSysSetting()
         {

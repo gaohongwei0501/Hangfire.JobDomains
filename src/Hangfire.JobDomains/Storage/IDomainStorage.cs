@@ -27,6 +27,12 @@ namespace Hangfire.JobDomains.Storage
 
         List<DomainDefine> GetAllDomains();
 
+        List<AssemblyDefine> GetAssemblies(DomainDefine domain);
+
+        List<JobDefine> GetJobs(AssemblyDefine assembly);
+
+        List<ConstructorDefine> GetConstructors(JobDefine job);
+
         Task<bool> AddDomainAsync(DomainDefine define);
 
         Dictionary<SysSettingKey, string> GetSysSetting();

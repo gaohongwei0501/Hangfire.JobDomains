@@ -54,10 +54,10 @@ namespace Hangfire.JobDomains
             if (string.IsNullOrEmpty(path)) return;
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-           
-            var options = JobDomainManager.InitServer(path);
-            app.UseHangfireServer(options);
-
+            var fetchOptions = JobDomainManager.InitServer(path);
+            Task.WaitAny(fetchOptions);
+            if(fetchOptions.IsFaulted) throw (fetchOptions.Exception);
+            app.UseHangfireServer(fetchOptions.Result);
             app.UseHangfireDashboard("/HangfireDomain");
             InitRoute();
 

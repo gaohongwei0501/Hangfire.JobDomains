@@ -14,13 +14,24 @@ namespace Hangfire.JobDomains.Models
     /// </summary>
     public class JobDefine
     {
+        public AssemblyDefine Parent { get; private set; }
 
-        public JobDefine(string fullname, string name, IEnumerable<ConstructorDefine> constructors, NameplateAttribute attr = null)
+        public JobDefine(AssemblyDefine parent,string fullname, string name, string title, string description)
         {
-            if (constructors == null) throw (new Exception("任务类构造函数加载失败！"));
+            Parent = parent;
             FullName = fullname;
             Name = name;
-            Constructors.AddRange(constructors);
+            Nameplate = new NameplateAttribute(title, description);
+        }
+
+        public JobDefine(AssemblyDefine parent, string fullname, string name, IEnumerable<ConstructorDefine> constructors , NameplateAttribute attr = null)
+        {
+            if (constructors == null) throw (new Exception("任务类构造函数加载失败！"));
+            _constructors = new List<ConstructorDefine>(constructors);
+
+            Parent = parent;
+            FullName = fullname;
+            Name = name;
             Nameplate = attr;
         }
 
@@ -42,7 +53,7 @@ namespace Hangfire.JobDomains.Models
         /// <summary>
         /// 构造函数集合
         /// </summary>
-        public List<ConstructorDefine> Constructors { get; private set; } = new List<ConstructorDefine>();
+        List<ConstructorDefine> _constructors { get;  set; } 
 
         /// <summary>
         /// 标题 
@@ -65,5 +76,10 @@ namespace Hangfire.JobDomains.Models
             }
         }
 
+        public List<ConstructorDefine> GetConstructors()
+        {
+            if (_constructors != null) return _constructors;
+            return Storage.StorageService.Provider.GetConstructors(this);
+        }
     }
 }

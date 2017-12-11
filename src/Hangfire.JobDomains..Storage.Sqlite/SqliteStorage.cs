@@ -10,14 +10,15 @@ namespace Hangfire.JobDomains.Storage.Sqlite
 {
     internal static class EntityMapper
     {
+
         public static Entities.Server Convert(this ServerDefine model)
         {
             return new Entities.Server
             {
-                 Name =model.Name,
-                 PlugPath=model.PlugPath,
-                 Description=model.Description,
-                 CreatedAt=DateTime.Now,
+                Name = model.Name,
+                PlugPath = model.PlugPath,
+                Description = model.Description,
+                CreatedAt = DateTime.Now,
             };
         }
 
@@ -99,9 +100,11 @@ namespace Hangfire.JobDomains.Storage.Sqlite
 
     public class SQLiteStorage : IDomainStorage
     {
- 
-        public string ServerName  {
-            get {
+
+        public string ServerName
+        {
+            get
+            {
                 return Environment.MachineName.ToLower();
             }
         }
@@ -130,7 +133,7 @@ namespace Hangfire.JobDomains.Storage.Sqlite
             if (server != ServerName) throw (new Exception("服务器数据本身修改"));
             using (var context = new SQLiteDBContext())
             {
-                var mappers = context.ServerPlugMaps.Where(s=>s.ServerName== server);
+                var mappers = context.ServerPlugMaps.Where(s => s.ServerName == server);
                 context.ServerPlugMaps.RemoveRange(mappers);
                 var newMappers = domains.Select(s => new ServerPlugMap(server, s));
                 await context.ServerPlugMaps.AddRangeAsync(newMappers);
@@ -143,7 +146,7 @@ namespace Hangfire.JobDomains.Storage.Sqlite
         {
             using (var context = new SQLiteDBContext())
             {
-                var servers = context.Servers.Select(s => new ServerDefine(s.Name,s.PlugPath,s.Description));
+                var servers = context.Servers.Select(s => new ServerDefine(s.Name, s.PlugPath, s.Description));
                 return servers.ToList();
             }
         }
@@ -181,17 +184,20 @@ namespace Hangfire.JobDomains.Storage.Sqlite
                 var domain = define.GetDomain();
                 ClearDomainAsync(context, domain.Name);
                 var domainResult = await context.Domains.AddAsync(domain);
-                foreach (var assemblyOne in define.GetJobSets())
+                var assemblies = define.GetJobSets();
+                foreach (var assembly in assemblies)
                 {
-                    var assembly = assemblyOne.GetAssembly(domainResult.Entity.ID);
-                    var assemblyResult = await context.Assemblies.AddAsync(assembly);
-                    foreach (var jobOne in assemblyOne.Jobs)
+                    var assemblyOne = assembly.GetAssembly(domainResult.Entity.ID);
+                    var assemblyResult = await context.Assemblies.AddAsync(assemblyOne);
+                    var jobs = assembly.GetJobs();
+                    foreach (var job in jobs)
                     {
-                        var job = jobOne.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
-                        var jobResult = await context.Jobs.AddAsync(job);
-                        foreach (var constructorOne in jobOne.Constructors)
+                        var jobOne = job.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
+                        var jobResult = await context.Jobs.AddAsync(jobOne);
+                        var constructors = job.GetConstructors();
+                        foreach (var constructor in constructors)
                         {
-                            var paramers = constructorOne.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
+                            var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
                             await context.JobConstructorParameters.AddRangeAsync(paramers);
                         }
                     }
@@ -201,7 +207,7 @@ namespace Hangfire.JobDomains.Storage.Sqlite
             }
         }
 
-        void ClearDomainAsync(SQLiteDBContext context,string domainName)
+        void ClearDomainAsync(SQLiteDBContext context, string domainName)
         {
             var domain = context.Domains.SingleOrDefault(s => s.Name == domainName);
             if (domain == null) return;
@@ -217,32 +223,117 @@ namespace Hangfire.JobDomains.Storage.Sqlite
 
         public List<DomainDefine> GetAllDomains()
         {
-            throw new NotImplementedException();
+            using (var context = new SQLiteDBContext())
+            {
+                var domains = context.Domains.ToList();
+                return domains.Select(s => new DomainDefine(s.BasePath, s.Name, s.Description)).ToList();
+            }
         }
+
+        public List<AssemblyDefine> GetAssemblies(DomainDefine domainDefine)
+        {
+            using (var context = new SQLiteDBContext())
+            {
+                var domain = context.Domains.FirstOrDefault(s => s.Name == domainDefine.Name);
+                if (domain == null) return new List<AssemblyDefine>();
+                var assemblies = context.Assemblies.Where(s => s.DomainID == domain.ID);
+                return assemblies.Select(s => new AssemblyDefine(domainDefine, s.FileName, s.FullName, s.ShortName, s.Title, s.Description)).ToList();
+            }
+        }
+
+        public List<JobDefine> GetJobs(AssemblyDefine assemblyDefine)
+        {
+            using (var context = new SQLiteDBContext())
+            {
+                var domainDefine = assemblyDefine.Parent;
+                if (domainDefine == null) return new List<JobDefine>();
+
+                var domain = context.Domains.FirstOrDefault(s => s.Name == domainDefine.Name);
+                if (domain == null) return new List<JobDefine>();
+                var assembly = context.Assemblies.Where(s => s.DomainID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
+                if (assembly == null) return new List<JobDefine>();
+                var jobs = context.Jobs.Where(s => s.AssemblyID == assembly.ID);
+                return jobs.Select(s => new JobDefine(assemblyDefine, s.FullName, s.Name, s.Title, s.Description)).ToList();
+            }
+        }
+
+        public List<ConstructorDefine> GetConstructors(JobDefine jobDefine)
+        {
+            using (var context = new SQLiteDBContext())
+            {
+                var assemblyDefine = jobDefine.Parent;
+                if (assemblyDefine == null) return new List<ConstructorDefine>();
+                var domainDefine = assemblyDefine.Parent;
+                if (domainDefine == null) return new List<ConstructorDefine>();
+
+                var domain = context.Domains.FirstOrDefault(s => s.Name == assemblyDefine.Parent.Name);
+                if (domain == null) return new List<ConstructorDefine>();
+                var assembly = context.Assemblies.Where(s => s.DomainID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
+                if (assembly == null) return new List<ConstructorDefine>();
+                var job = context.Jobs.Where(s => s.AssemblyID == assembly.ID).FirstOrDefault(s => s.Name == jobDefine.Name);
+                if (job == null) return new List<ConstructorDefine>();
+                var paramerGroups = context.JobConstructorParameters.Where(s => s.JobID == job.ID).GroupBy(s => s.ConstructorGuid);
+                var constructors = new List<ConstructorDefine>();
+                foreach (var group in paramerGroups)
+                {
+                    var ctor = new ConstructorDefine();
+                    var count = group.Count();
+                    foreach (var item in group)
+                    {
+                        if (count == 1&& item.Name == string.Empty && item.Type == string.Empty)
+                        {
+                            continue;
+                        }
+                        ctor.Paramers.Add((item.Name, item.Type));
+                    }
+                    constructors.Add(ctor);
+                }
+                return constructors;
+            }
+        }
+
 
         public Dictionary<SysSettingKey, string> GetSysSetting()
         {
-            throw new NotImplementedException();
+            using (var context = new SQLiteDBContext())
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public bool SetSysSetting(SysSettingKey key, string value)
         {
-            throw new NotImplementedException();
+            using (var context = new SQLiteDBContext())
+            {
+                throw new NotImplementedException();
+
+            }
         }
 
         public Dictionary<int, string> GetJobCornSetting()
         {
-            throw new NotImplementedException();
+            using (var context = new SQLiteDBContext())
+            {
+                throw new NotImplementedException();
+
+            }
         }
 
         public bool AddJobCornSetting(int key, string value)
         {
-            throw new NotImplementedException();
+            using (var context = new SQLiteDBContext())
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public bool DeleteJobCornSetting(int key)
         {
-            throw new NotImplementedException();
+            using (var context = new SQLiteDBContext())
+            {
+                throw new NotImplementedException();
+
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using Hangfire.JobDomains.Storage;
 
 namespace Hangfire.JobDomains.Models
 {
@@ -34,24 +35,27 @@ namespace Hangfire.JobDomains.Models
         public DomainDefine(string path, string name , string description)
         {
             BasePath = path;
-            Name = name;
+            if (string.IsNullOrEmpty(name))
+            {
+                var index = path.LastIndexOf("\\");
+                Name = path.Substring(index + 1);
+            }
+            else {
+                Name = name;
+            }
             Description = description;
         }
 
-        public DomainDefine(string path, IEnumerable<AssemblyDefine> sets,string name="",string description="") : this(path)
+        public void SetJobSets(IEnumerable<AssemblyDefine> assemblyDefines)
         {
-            _jobSets = new List<AssemblyDefine>();
-            _jobSets.AddRange(sets);
-            if (string.IsNullOrEmpty(name) == false) Name = name;
-            Description = description;
+            if (assemblyDefines == null || assemblyDefines.Count() == 0) return;
+            _jobSets = new List<AssemblyDefine>(assemblyDefines);
         }
 
         public List<AssemblyDefine> GetJobSets()
         {
             if (_jobSets != null) return _jobSets;
-
-
-            return null;
+            return StorageService.Provider.GetAssemblies(this);
         }
         
     }

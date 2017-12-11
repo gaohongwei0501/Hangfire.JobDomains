@@ -20,9 +20,11 @@ namespace Host
         public void Configuration(IAppBuilder app)
         {
             // 有关如何配置应用程序的详细信息，请访问 http://go.microsoft.com/fwlink/?LinkID=316888
-            GlobalConfiguration.Configuration.UseSQLiteStorage(@"Data Source=E:\Hangfile.Sparepart.Lib\Data\Store.dat;Version=3;");
+            var filePath = @"E:\Hangfile.Sparepart.Lib";
+            var dataPath = @"Data Source=E:\Hangfile.Sparepart.Lib\Data\Store.dat;";//Version=3;
+            GlobalConfiguration.Configuration.UseSQLiteStorage(dataPath);
          //   app.UseDomains<LocationStorage>(@"E:\Hangfile.Sparepart.Lib");
-            app.UseDomains<Hangfire.JobDomains.Storage.Sqlite.SQLiteStorage>(@"E:\Hangfile.Sparepart.Lib");
+            app.UseDomains<Hangfire.JobDomains.Storage.Sqlite.SQLiteStorage>(filePath, dataPath);
             app.Run(context =>
             {
                 context.Response.Redirect("/HangfireDomain");

@@ -18,7 +18,7 @@ namespace Hangfire.JobDomains.Server
             if (string.IsNullOrEmpty(path)) return null;
             var queues=await InitStorage(path);
             var options = CreateServerOptions(queues);
-            StorageService.Provider.UpdateServerDomains(Environment.MachineName.ToLower(), queues);
+            await StorageService.Provider.UpdateServerDomains(Environment.MachineName.ToLower(), queues);
             return options;
         }
      
@@ -45,17 +45,8 @@ namespace Hangfire.JobDomains.Server
             var paths = Directory.GetDirectories(basePath);
             foreach (var path in paths)
             {
-                var files = Directory.GetFiles(path, "*.dll");
-                var assemblies = new List<AssemblyDefine>();
-                foreach (var assemblyFile in files)
-                {
-                    var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
-                    var jobs = ReadPrefabricationAssembly(assemblyItem);
-                    if (jobs.Count == 0) continue;
-                    var assemblyDefine = CreateAssemblyDefine(assemblyItem, jobs);
-                    assemblies.Add(assemblyDefine);
-                }
-                var define = new DomainDefine(path, assemblies);
+                var define = new DomainDefine(path);
+                LoadDomain(define);
                 await StorageService.Provider.AddDomainAsync(define);
                 queues.Add(define.Name);
             }
@@ -69,17 +60,32 @@ namespace Hangfire.JobDomains.Server
             return options;
         }
 
-        static AssemblyDefine CreateAssemblyDefine(Assembly define, List<JobDefine> jobs)
+        static void LoadDomain(DomainDefine define)
+        {
+            var files = Directory.GetFiles(define.BasePath, "*.dll");
+            var assemblies = new List<AssemblyDefine>();
+            foreach (var assemblyFile in files)
+            {
+                var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
+                var assemblyDefine = CreateAssemblyDefine(define, assemblyItem);
+                var jobs = ReadPrefabricationAssembly(assemblyDefine, assemblyItem);
+                assemblyDefine.SetJobs(jobs);
+                assemblies.Add(assemblyDefine);
+            }
+            define.SetJobSets(assemblies);
+        }
+
+        static AssemblyDefine CreateAssemblyDefine(DomainDefine domainDefine, Assembly define)
         {
             var file = define.Location;
             var fullName = define.FullName;
             var shortName = define.ManifestModule.Name.Replace(".dll", string.Empty);
             var title = define.ReadReflectionOnlyAssemblyAttribute<AssemblyTitleAttribute>();
             var description = define.ReadReflectionOnlyAssemblyAttribute<AssemblyDescriptionAttribute>();
-            return new AssemblyDefine(file, fullName, shortName, title, description, jobs);
+            return new AssemblyDefine(domainDefine, file, fullName, shortName, title, description);
         }
 
-        static List<JobDefine> ReadPrefabricationAssembly(Assembly assembly)
+        static List<JobDefine> ReadPrefabricationAssembly(AssemblyDefine assemblyDefine, Assembly assembly)
         {
             var list = new List<JobDefine>();
             var types = assembly.GetInterfaceTypes<IPrefabrication>();
@@ -87,7 +93,7 @@ namespace Hangfire.JobDomains.Server
             {
                 var attr = type.ReadReflectionOnlyTypeAttribute<NameplateAttribute>();
                 var constructors = GetConstructors(type);
-                var define = new JobDefine(type.FullName, type.Name, constructors, attr);
+                var define = new JobDefine(assemblyDefine, type.FullName, type.Name, constructors, attr);
                 list.Add(define);
             }
             return list;

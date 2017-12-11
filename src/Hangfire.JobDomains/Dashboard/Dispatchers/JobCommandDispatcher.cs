@@ -46,8 +46,8 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
 
             var set = StorageService.Provider.GetDomainDefines();
             TheDomain = set.SingleOrDefault(s => s.Name == domain);
-            TheAssembly = TheDomain == null ? null : TheDomain.JobSets.SingleOrDefault(s => s.ShortName == assembly);
-            TheJob = TheAssembly == null ? null : TheAssembly.Jobs.SingleOrDefault(s => s.Name == job);
+            TheAssembly = TheDomain == null ? null : TheDomain.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
+            TheJob = TheAssembly == null ? null : TheAssembly.GetJobs().SingleOrDefault(s => s.Name == job);
 
             if (TheJob == null) throw (new Exception("未正确定位到工作任务."));
             if (jobCmd == JobPageCommand.None) throw (new Exception("未正确定位到任务指令."));

@@ -127,13 +127,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hangfire.JobDomains.Interface\Hangfire.JobDomains.Interface.csproj">
+      <Project>{f0fc1aa5-7e4f-4c49-8412-4697b0f017ef}</Project>
+      <Name>Hangfire.JobDomains.Interface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Hangfire.JobDomains\Hangfire.JobDomains.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>
       <Name>Hangfire.JobDomains</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.7\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets" Condition="Exists('..\..\packages\SQLitePCLRaw.lib.e_sqlite3.linux.1.1.7\build\net35\SQLitePCLRaw.lib.e_sqlite3.linux.targets')" />
