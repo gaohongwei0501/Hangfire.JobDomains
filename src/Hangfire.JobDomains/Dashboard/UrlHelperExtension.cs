@@ -134,7 +134,7 @@ namespace Hangfire.JobDomains.Dashboard
         public static (string Name, string Link) CreateRoute(this UrlHelper Url, DomainDefine domain, AssemblyDefine assembly, JobDefine job)
         {
             var name = job.Title;
-            var link = JobPageRoute.Replace("(?<domain>.+)", domain.Name).Replace("(?<assembly>.+)", assembly.ShortName).Replace("(?<name>.+)", name).EscapeRoute();
+            var link = JobPageRoute.Replace("(?<domain>.+)", domain.Name).Replace("(?<assembly>.+)", assembly.ShortName).Replace("(?<name>.+)", job.Name).EscapeRoute();
             return (name, Url.To(link));
         }
 
