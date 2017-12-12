@@ -29,7 +29,7 @@ namespace Hangfire.JobDomains.Server
             InitStorage(path);
         }
 
-     
+
         public static bool ChangePath(string path)
         {
             try
@@ -64,16 +64,15 @@ namespace Hangfire.JobDomains.Server
                         var assemblyDefine = CreateAssemblyDefine(assemblyItem, jobs);
                         assemblies.Add(assemblyDefine);
                     }
-                    catch (FileLoadException FEX){
-                         //默认公用程序集不需要反射
+                    catch (FileLoadException FEX)
+                    {
+                        //默认公用程序集不需要反射
                     }
                 }
                 var define = new DomainDefine(path, assemblies);
                 StorageService.Provider.Add(path, define);
             }
         }
-
-  
 
         static AssemblyDefine CreateAssemblyDefine(Assembly define, List<JobDefine> jobs)
         {
@@ -91,9 +90,9 @@ namespace Hangfire.JobDomains.Server
             var types = assembly.GetInterfaceTypes<IPrefabrication>();
             foreach (var type in types)
             {
-                var attr = type.ReadReflectionOnlyTypeAttribute<NameplateAttribute>();
+                var attr = type.ReadReflectionNameplateAttribute();
                 var constructors = GetConstructors(type);
-                var define = new JobDefine(type.FullName, type.Name, constructors, attr);
+                var define = new JobDefine(type.FullName, type.Name, constructors, attr.Title, attr.Description);
                 list.Add(define);
             }
             return list;
@@ -107,7 +106,8 @@ namespace Hangfire.JobDomains.Server
             {
                 var paramers = item.GetParameters();
                 var one = new ConstructorDefine();
-                foreach (var par in paramers) {
+                foreach (var par in paramers)
+                {
                     one.Paramers.Add((par.Name, par.ParameterType.Name));
                 }
                 constructors.Add(one);

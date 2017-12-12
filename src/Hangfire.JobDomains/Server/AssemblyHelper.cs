@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hangfire.JobDomains.Interface;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -64,7 +65,7 @@ namespace Hangfire.JobDomains.Server
             {
                 foreach (var attr in attributes)
                 {
-                    if (attr.AttributeType == typeof(A))
+                    if (attr.AttributeType.FullName == typeof(A).FullName)
                     {
                         return attr.ConstructorArguments[0].Value.ToString();
                     }
@@ -73,20 +74,20 @@ namespace Hangfire.JobDomains.Server
             return string.Empty;
         }
 
-        public static A ReadReflectionOnlyTypeAttribute<A>(this Type type) where A : Attribute
+        public static (string Title,string Description) ReadReflectionNameplateAttribute(this Type type) 
         {
             var attributes = type.GetCustomAttributesData();
             if (attributes != null)
             {
                 foreach (var attr in attributes)
                 {
-                    if (attr.AttributeType == typeof(A))
+                    if (attr.AttributeType.FullName == typeof(NameplateAttribute).FullName)
                     {
-                        return attr as A;
+                        return (attr.ConstructorArguments[0].Value.ToString(), attr.ConstructorArguments[1].Value.ToString());
                     }
                 }
             }
-            return default(A);
+            return (string.Empty, string.Empty);
         }
 
     }

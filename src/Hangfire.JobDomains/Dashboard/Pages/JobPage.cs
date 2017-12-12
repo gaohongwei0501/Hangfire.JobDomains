@@ -25,7 +25,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         public JobPage(string domain, string assembly, string name)
         {
             FetchTitle = () => "任务详情";
-            FetchHeader = () => TheJob == null ? name : TheJob.Name;
+            FetchHeader = () => TheJob == null ? name : TheJob.Title;
             Sidebar = () => SidebarMenus.JobsMenu(domain, assembly, name);
 
             var set = StorageService.Provider.GetDomainDefines();
