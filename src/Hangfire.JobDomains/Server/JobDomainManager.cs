@@ -56,11 +56,17 @@ namespace Hangfire.JobDomains.Server
                 var assemblies = new List<AssemblyDefine>();
                 foreach (var assemblyFile in files)
                 {
-                    var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
-                    var jobs = ReadPrefabricationAssembly(assemblyItem);
-                    if (jobs.Count == 0) continue;
-                    var assemblyDefine =  CreateAssemblyDefine(assemblyItem, jobs);
-                    assemblies.Add(assemblyDefine);
+                    try
+                    {
+                        var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
+                        var jobs = ReadPrefabricationAssembly(assemblyItem);
+                        if (jobs.Count == 0) continue;
+                        var assemblyDefine = CreateAssemblyDefine(assemblyItem, jobs);
+                        assemblies.Add(assemblyDefine);
+                    }
+                    catch (FileLoadException FEX){
+                         //默认公用程序集不需要反射
+                    }
                 }
                 var define = new DomainDefine(path, assemblies);
                 StorageService.Provider.Add(path, define);
