@@ -58,6 +58,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
                 case JobPageCommand.Schedule: Schedule(start, period, paramers); break;
                 case JobPageCommand.Delay: Delay(start, paramers); break;
                 case JobPageCommand.Immediately: Immediately(paramers); break;
+                case JobPageCommand.Test: JobTest(paramers); break;
             }
 
             return new JsonData
@@ -66,6 +67,11 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
                 Message = "提交成功.",
                 Url = "",
             };
+        }
+
+        void JobTest(object[] paramers)
+        {
+            JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Schedule(DateTime start, int period, object[] paramers)

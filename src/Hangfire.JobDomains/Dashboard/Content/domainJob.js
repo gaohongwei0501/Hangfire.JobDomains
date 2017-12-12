@@ -38,6 +38,16 @@
                         if (params == null) return;
                         CommandConfirm(container,params);
                     });
+
+                $(this).on('click', '.js-domain-job-commands-test',
+                    function (e) {
+                        var $this = $(this);
+                        var cmd = $this.data('cmd');
+                        var params = BulidConfirmParam("任务测试", cmd, "", "", container);
+                        if (params == null) return;
+                        CommandConfirm(container, params);
+                    });
+
             });
 
         };
@@ -89,7 +99,7 @@
                 boby += '<div class="form-group"> <label   class="control-label">' + name
                     + ':</label><input type="text" class="form-control disabled" disabled="disabled" data-name="' + name + '" value="' + value + '" data-type="' + type+'"></div>'
             });
-            return { title: "排期执行任务", content: boby, cmd: cmd };
+            return { title: title, content: boby, cmd: cmd };
         }
 
         function CommandConfirm(panel,params) {
