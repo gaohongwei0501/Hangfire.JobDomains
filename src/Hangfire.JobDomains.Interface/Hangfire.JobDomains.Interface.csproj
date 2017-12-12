@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CrossDomainData.cs" />
     <Compile Include="IPrefabrication.cs" />
     <Compile Include="NameplateAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

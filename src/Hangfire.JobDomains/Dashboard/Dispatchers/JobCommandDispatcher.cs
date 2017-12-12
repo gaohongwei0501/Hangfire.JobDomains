@@ -70,7 +70,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
 
         void JobTest(object[] paramers)
         {
-            JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
+            JobInvoke.Test(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Schedule(DateTime start, int period, object[] paramers)
