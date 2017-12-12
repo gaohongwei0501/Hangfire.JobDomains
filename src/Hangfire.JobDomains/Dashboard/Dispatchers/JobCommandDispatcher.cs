@@ -42,7 +42,6 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             var period = await GetFromValue<int>("period", 0);
 
             JobData = await GetDictionaryValue("data");
-            if (JobData.Count == 0) throw (new Exception("提交任务操作参数不齐全."));
             var paramers = JobData == null ? null : JobData.Select(s => s.Value).ToArray();
 
             var set = StorageService.Provider.GetDomainDefines();
@@ -78,7 +77,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
         {
             if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
             if (JobCornSetting.Dictionary.Contains(period) == false) throw (new Exception("任务周期设置设置失败"));
-            RecurringJob.AddOrUpdate(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period));
+            RecurringJob.AddOrUpdate(TheJob.Title, () => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period));
         }
 
         void Delay(DateTime start, object[] paramers)
