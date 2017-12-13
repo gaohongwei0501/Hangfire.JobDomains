@@ -43,6 +43,7 @@
     <Compile Include="CrossDomainData.cs" />
     <Compile Include="IPrefabrication.cs" />
     <Compile Include="NameplateAttribute.cs" />
+    <Compile Include="PrefabricationActivator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
