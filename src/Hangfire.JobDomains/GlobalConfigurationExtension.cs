@@ -54,7 +54,11 @@ namespace Hangfire.JobDomains
             var connecting=  StorageService.Storage.SetConnectString(connectString);
             if (connecting == false) throw (new  Exception(" HangfireDomain 数据服务连接失败"));
 
-            app.UseHangfireServer();
+            var ops = new BackgroundJobServerOptions
+            {
+                WorkerCount = 1,
+            };
+            app.UseHangfireServer(ops);
             JobDomainManager.InitServer(path);
 
             app.UseHangfireDashboard();
@@ -74,7 +78,11 @@ namespace Hangfire.JobDomains
             var connecting = StorageService.Storage.SetConnectString(connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
 
-            app.UseHangfireServer();
+            var ops = new BackgroundJobServerOptions
+            {
+                WorkerCount = 1,
+            };
+            app.UseHangfireServer(ops);
             JobDomainManager.InitServer(path);
         }
 
