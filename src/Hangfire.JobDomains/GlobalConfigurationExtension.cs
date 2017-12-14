@@ -49,12 +49,12 @@ namespace Hangfire.JobDomains
         /// </summary>
         /// <param name="config">全局配置</param>
         /// <param name="path">插件路径</param>
-        public static void UseDomains<T>(this IAppBuilder app, string path, string connectString = "") where T : IDomainStorage, new()
+        public static void UseDomains<T>(this IAppBuilder app, string path, string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
             if (string.IsNullOrEmpty(path)) return;
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-            var fetchOptions = JobDomainManager.InitServer(path);
+            var fetchOptions = JobDomainManager.InitServer(path, workerCount);
             Task.WaitAny(fetchOptions);
             if(fetchOptions.IsFaulted) throw (fetchOptions.Exception);
             app.UseHangfireServer(fetchOptions.Result);
@@ -68,13 +68,12 @@ namespace Hangfire.JobDomains
         /// </summary>
         /// <param name="config"></param>
         /// <param name="path"></param>
-        public static void UseDomainsAtServer<T>(this IAppBuilder app, string path, string connectString) where T : IDomainStorage, new()
+        public static void UseDomainsAtServer<T>(this IAppBuilder app, string path, string connectString, int workerCount = 5) where T : IDomainStorage, new()
         {
             if (string.IsNullOrEmpty(path)) return;
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-
-            var options = JobDomainManager.InitServer(path);
+            var options = JobDomainManager.InitServer(path, workerCount);
             app.UseHangfireServer();
         }
 

@@ -46,7 +46,7 @@ namespace Hangfire.JobDomains.Server
             var Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
             try
             {
-                var args = new CrossDomainData { PluginDir = path, assemblyName = assemblyName, typeName = typeName, paramers = paramers };
+                var args = new CrossDomainData { PluginDir = path, assemblyName = assembly, typeName = job, paramers = paramers };
                 Domain.SetData("args", args);
                 Domain.DoCallBack(new CrossAppDomainDelegate(PrefabricationActivator.Dispatch));
             }
@@ -56,7 +56,7 @@ namespace Hangfire.JobDomains.Server
             }
         }
 
-        public static bool Test(string path, string assemblyName, string typeName, object[] paramers)
+        public static bool Test(string path, string assembly, string job, object[] paramers)
         {
             AppDomainSetup setup = new AppDomainSetup();
             setup.ApplicationBase = Path.GetDirectoryName(path);
@@ -67,7 +67,7 @@ namespace Hangfire.JobDomains.Server
             var Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
             try
             {
-                var args = new CrossDomainData {  PluginDir= path, assemblyName= assemblyName, typeName= typeName, paramers= paramers };
+                var args = new CrossDomainData {  PluginDir= path, assemblyName= assembly, typeName= job, paramers= paramers };
                 Domain.SetData("args", args);
                 Domain.DoCallBack(new CrossAppDomainDelegate(PrefabricationActivator.Test));
                 return (bool)Domain.GetData("result");

@@ -13,11 +13,11 @@ namespace Hangfire.JobDomains.Server
     internal class JobDomainManager
     {
 
-        public static async Task<BackgroundJobServerOptions>  InitServer(string path)
+        public static async Task<BackgroundJobServerOptions>  InitServer(string path, int workerCount)
         {
             if (string.IsNullOrEmpty(path)) return null;
             var queues=await InitStorage(path);
-            var options = CreateServerOptions(queues);
+            var options = CreateServerOptions(queues, workerCount);
             await StorageService.Provider.UpdateServerDomains(Environment.MachineName.ToLower(), queues);
             return options;
         }
@@ -53,10 +53,15 @@ namespace Hangfire.JobDomains.Server
             return queues;
         }
 
-        static BackgroundJobServerOptions CreateServerOptions(List<string> queues) {
+        static BackgroundJobServerOptions CreateServerOptions(List<string> queues, int workerCount)
+        {
             var Queues = new List<string> { "default", Environment.MachineName.ToLower() };
             Queues.AddRange(queues);
-            var options = new BackgroundJobServerOptions { Queues = Queues.ToArray() };
+            var options = new BackgroundJobServerOptions
+            {
+                WorkerCount = workerCount,
+                Queues = Queues.ToArray()
+            };
             return options;
         }
 
@@ -66,12 +71,19 @@ namespace Hangfire.JobDomains.Server
             var assemblies = new List<AssemblyDefine>();
             foreach (var assemblyFile in files)
             {
-                var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
-                var assemblyDefine = CreateAssemblyDefine(define, assemblyItem);
-                var jobs = ReadPrefabricationAssembly(assemblyDefine, assemblyItem);
-                if (jobs.Count == 0) continue;
-                assemblyDefine.SetJobs(jobs);
-                assemblies.Add(assemblyDefine);
+                try
+                {
+                    var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
+                    var assemblyDefine = CreateAssemblyDefine(define, assemblyItem);
+                    var jobs = ReadPrefabricationAssembly(assemblyDefine, assemblyItem);
+                    if (jobs.Count == 0) continue;
+                    assemblyDefine.SetJobs(jobs);
+                    assemblies.Add(assemblyDefine);
+                }
+                catch (FileLoadException)
+                {
+                    //默认公用程序集不需要反射
+                }
             }
             if (assemblies.Count == 0) return;
             define.SetJobSets(assemblies);
@@ -95,7 +107,7 @@ namespace Hangfire.JobDomains.Server
             {
                 var attr = type.ReadReflectionNameplateAttribute();
                 var constructors = GetConstructors(type);
-                var define = new JobDefine(assemblyDefine, type.FullName, type.Name, constructors, attr);
+                var define = new JobDefine(assemblyDefine, type.FullName, type.Name, constructors, attr.Title, attr.Description);
                 list.Add(define);
             }
             return list;

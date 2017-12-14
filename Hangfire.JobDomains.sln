@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2010
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{913D80B9-4D5F-46A2-967B-76D7174B55A9}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.Location", "src\Hangfire.JobDomains.Location\Hangfire.JobDomains.Storage.Location.csproj", "{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.Sqlite", "src\Hangfire.JobDomains..Storage.Sqlite\Hangfire.JobDomains.Storage.Sqlite.csproj", "{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.SqlServer", "src\Hangfire.JobDomains.Storage.SqlServer\Hangfire.JobDomains.Storage.SqlServer.csproj", "{1B78EC58-7D47-49E0-8BED-B178585A05AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B78EC58-7D47-49E0-8BED-B178585A05AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B78EC58-7D47-49E0-8BED-B178585A05AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B78EC58-7D47-49E0-8BED-B178585A05AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B78EC58-7D47-49E0-8BED-B178585A05AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{A6A13437-F3BE-4997-A2B0-D6FFF03BD623} = {44CA269D-E7C4-423A-9EBE-2FCF79EBF85C}
 		{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 		{582E67BE-0E5C-463C-A77C-DBA858E9E3F1} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
+		{1B78EC58-7D47-49E0-8BED-B178585A05AC} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE16536F-CDBB-4B00-9D4D-1A3B0C085462}

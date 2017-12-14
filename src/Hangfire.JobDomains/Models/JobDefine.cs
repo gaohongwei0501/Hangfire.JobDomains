@@ -21,10 +21,11 @@ namespace Hangfire.JobDomains.Models
             Parent = parent;
             FullName = fullname;
             Name = name;
-            Nameplate = new NameplateAttribute(title, description);
+            Title = string.IsNullOrEmpty(title) ? name : title;
+            Description= description;
         }
 
-        public JobDefine(AssemblyDefine parent, string fullname, string name, IEnumerable<ConstructorDefine> constructors , NameplateAttribute attr = null)
+        public JobDefine(AssemblyDefine parent, string fullname, string name, IEnumerable<ConstructorDefine> constructors, string title, string description)
         {
             if (constructors == null) throw (new Exception("任务类构造函数加载失败！"));
             _constructors = new List<ConstructorDefine>(constructors);
@@ -32,14 +33,11 @@ namespace Hangfire.JobDomains.Models
             Parent = parent;
             FullName = fullname;
             Name = name;
-            Constructors.AddRange(constructors);
-            Nameplate = attr;
+            Title = string.IsNullOrEmpty(title) ? name : title;
+            Description= description;
         }
 
-        /// <summary>
-        /// 任务描述属性
-        /// </summary>
-        NameplateAttribute Nameplate { get;  set; }
+
 
         /// <summary>
         /// 完全限定名
