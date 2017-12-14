@@ -1,5 +1,6 @@
 using Hangfire.JobDomains.Interface;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -24,10 +25,10 @@ namespace Hangfire.JobDomains.Loader {
 		/// </summary>
 		public event EventHandler PluginsUnloaded;
 
-		/// <summary>
-		/// Gets or sets the AppDomain into which the plug-ins are loaded.
-		/// </summary>
-		private AppDomain Domain { get; set; }
+        /// <summary>
+        /// Gets or sets the AppDomain into which the plug-ins are loaded.
+        /// </summary>
+        private AppDomain Domain { get; set; }
 		/// <summary>
 		/// Gets or sets the PluginLoader which is responsible for 
 		/// instantiating and returning objects from the AppDomain.
@@ -163,6 +164,7 @@ namespace Hangfire.JobDomains.Loader {
 
 			return success;
 		}
+       
 
 		/// <summary>
 		/// Creates the AppDomain used for loading plugins, as well as the sandbox and sponsor objects.

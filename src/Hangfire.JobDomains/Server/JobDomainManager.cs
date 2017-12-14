@@ -93,7 +93,7 @@ namespace Hangfire.JobDomains.Server
             var types = assembly.GetInterfaceTypes<IPrefabrication>();
             foreach (var type in types)
             {
-                var attr = type.ReadReflectionOnlyTypeAttribute<NameplateAttribute>();
+                var attr = type.ReadReflectionNameplateAttribute();
                 var constructors = GetConstructors(type);
                 var define = new JobDefine(assemblyDefine, type.FullName, type.Name, constructors, attr);
                 list.Add(define);
@@ -109,7 +109,8 @@ namespace Hangfire.JobDomains.Server
             {
                 var paramers = item.GetParameters();
                 var one = new ConstructorDefine();
-                foreach (var par in paramers) {
+                foreach (var par in paramers)
+                {
                     one.Paramers.Add((par.Name, par.ParameterType.Name));
                 }
                 constructors.Add(one);

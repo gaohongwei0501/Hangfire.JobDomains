@@ -23,7 +23,9 @@ namespace Hangfire.JobDomains.Dashboard
         [DescriptionAttribute("任务排期执行指令")]
         Delay,
         [DescriptionAttribute("任务周期执行指令")]
-        Schedule
+        Schedule,
+        [DescriptionAttribute("任务周期执行指令")]
+        Test,
     }
 
     internal enum DomainPageCommand

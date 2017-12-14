@@ -32,6 +32,7 @@ namespace Hangfire.JobDomains.Models
             Parent = parent;
             FullName = fullname;
             Name = name;
+            Constructors.AddRange(constructors);
             Nameplate = attr;
         }
 
@@ -58,23 +59,12 @@ namespace Hangfire.JobDomains.Models
         /// <summary>
         /// 标题 
         /// </summary>
-        public string Title {
-            get {
-                if (Nameplate == null) return Name;
-                return Nameplate.Title;
-            }
-        }
+        public string Title { get; private set; }
 
         /// <summary>
         /// 描述 
         /// </summary>
-        public string Description {
-            get
-            {
-                if (Nameplate == null) return string.Empty;
-                return Nameplate.Description;
-            }
-        }
+        public string Description { get; private set; }
 
         public List<ConstructorDefine> InnerConstructors { get { return _constructors; } }
 

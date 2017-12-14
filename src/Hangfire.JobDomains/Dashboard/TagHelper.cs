@@ -204,7 +204,19 @@ namespace Hangfire.JobDomains.Dashboard
             var jobCorns = StorageService.Provider.GetJobCornSetting();
             var bulider = new StringBuilder();
             var loadingText = "Loading...";
-            bulider.Append(@"<div class=""col-sm-5 pull-right"">
+
+            bulider.Append($@"
+                        <div class=""col-sm-2 pull-right"">
+                            <button class=""js-domain-job-commands-test btn btn-sm btn-danger"" 
+                                 data-cmd=""{ JobPageCommand.Test }"" data-loading-text=""{ loadingText }"" input-id=""{ id }""> 
+                                <span class=""glyphicon glyphicon-play-circle""></span> &nbsp;测试
+                            </button>
+                        </div>
+                      ");
+
+
+
+            bulider.Append(@"<div class=""col-sm-4 pull-right"">
                                <div class=""input-group  input-group-sm"" >
                                 <input type='text' class=""form-control date_cron_selector schedule_cron"" placeholder=""首次执行时间""   />
                                 <span class=""input-group-btn"">
@@ -227,7 +239,7 @@ namespace Hangfire.JobDomains.Dashboard
                                 <span class=""glyphicon glyphicon-play-circle""></span> &nbsp;立即执行
                             </button>
                         </div>
-                        <div class=""col-sm-5 pull-right"">
+                        <div class=""col-sm-4 pull-right"">
                             <div class=""input-group input-group-sm"">
                                 <input type=""text"" class=""form-control date_cron_selector delay_cron"" placeholder=""执行时间"" >
                                 <span class=""input-group-btn "">

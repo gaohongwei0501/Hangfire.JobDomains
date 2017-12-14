@@ -26,4 +26,6 @@ namespace Hangfire.JobDomains.Interface
         void Dispatch();
 
     }
+
+
 }

@@ -41,7 +41,6 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             var period = await GetFromValue<int>("period", 0);
 
             JobData = await GetDictionaryValue("data");
-           // if (JobData.Count == 0) throw (new Exception("提交任务操作参数不齐全."));
             var paramers = JobData == null ? null : JobData.Select(s => s.Value).ToArray();
 
             var set = StorageService.Provider.GetDomainDefines();
@@ -57,6 +56,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
                 case JobPageCommand.Schedule: Schedule(start, period, paramers); break;
                 case JobPageCommand.Delay: Delay(start, paramers); break;
                 case JobPageCommand.Immediately: Immediately(paramers); break;
+                case JobPageCommand.Test: JobTest(paramers); break;
             }
 
             return new JsonData
@@ -65,6 +65,11 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
                 Message = "提交成功.",
                 Url = "",
             };
+        }
+
+        void JobTest(object[] paramers)
+        {
+            JobInvoke.Test(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Schedule(DateTime start, int period, object[] paramers)

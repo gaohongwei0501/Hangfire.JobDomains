@@ -3,7 +3,9 @@ using Hangfire.JobDomains.Loader;
 using Hangfire.States;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,38 +37,47 @@ namespace Hangfire.JobDomains.Server
 
         public static void Invoke(string path, string assembly, string job, object[] paramers)
         {
-            using (PluginHost host = new PluginHost(path))
+            AppDomainSetup setup = new AppDomainSetup();
+            setup.ApplicationBase = Path.GetDirectoryName(path);
+            setup.ConfigurationFile = $"{path}\\App.config";
+            setup.PrivateBinPath = path;
+            setup.DisallowApplicationBaseProbing = false;
+            setup.DisallowBindingRedirects = false;
+            var Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
+            try
             {
-                if (host.LoadPlugins())
-                {
-                    Sponsor<object> objectFromPlugin = host.GetInstance(assembly, job, paramers);
-                    if (objectFromPlugin == null) throw (new Exception("任务类构造函数的参数未正确提供不能实例化，或任务类未继承 MarshalByRefObject 而不能被发现"));
-                    IPrefabrication instance = objectFromPlugin.Instance as IPrefabrication;
-                    instance.Dispatch();
-                }
-                else
-                {
-                    throw (new Exception("Plugin Not Been Loaded"));
-                }
+                var args = new CrossDomainData { PluginDir = path, assemblyName = assemblyName, typeName = typeName, paramers = paramers };
+                Domain.SetData("args", args);
+                Domain.DoCallBack(new CrossAppDomainDelegate(PrefabricationActivator.Dispatch));
+            }
+            finally
+            {
+                AppDomain.Unload(Domain);
             }
         }
 
-        public static bool Test(string path, string assembly, string job, object[] paramers)
+        public static bool Test(string path, string assemblyName, string typeName, object[] paramers)
         {
-            using (PluginHost host = new PluginHost(path))
+            AppDomainSetup setup = new AppDomainSetup();
+            setup.ApplicationBase = Path.GetDirectoryName(path);
+            setup.ConfigurationFile = $"{path}\\App.config";
+            setup.PrivateBinPath = path;
+            setup.DisallowApplicationBaseProbing = false;
+            setup.DisallowBindingRedirects = false;
+            var Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
+            try
             {
-                if (host.LoadPlugins())
-                {
-                    Sponsor<object> objectFromPlugin = host.GetInstance(assembly, job, paramers);
-                    if (objectFromPlugin == null) throw (new Exception("任务类构造函数的参数未正确提供不能实例化，或任务类未继承 MarshalByRefObject 而不能被发现"));
-                    IPrefabrication instance = objectFromPlugin.Instance as IPrefabrication;
-                    return instance.Test();
-                }
-                else
-                {
-                    throw (new Exception("no load"));
-                }
+                var args = new CrossDomainData {  PluginDir= path, assemblyName= assemblyName, typeName= typeName, paramers= paramers };
+                Domain.SetData("args", args);
+                Domain.DoCallBack(new CrossAppDomainDelegate(PrefabricationActivator.Test));
+                return (bool)Domain.GetData("result");
+            }
+            finally {
+                AppDomain.Unload(Domain);
             }
         }
+
     }
+
+
 }
