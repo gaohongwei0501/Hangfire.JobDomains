@@ -6,6 +6,7 @@ using System.Web;
 using Owin;
 using Hangfire.JobDomains;
 using Hangfire.SQLite;
+using Hangfire.MemoryStorage;
 using Hangfire;
 using System.Threading.Tasks;
 using Hangfire.JobDomains.Storage.Location;
@@ -20,6 +21,9 @@ namespace Host
         public void Configuration(IAppBuilder app)
         {
             // 有关如何配置应用程序的详细信息，请访问 http://go.microsoft.com/fwlink/?LinkID=316888
+            // GlobalConfiguration.Configuration.UseSQLiteStorage(@"Data Source=E:\Hangfile.Sparepart.Lib\Data\Store.dat;Version=3;");
+            GlobalConfiguration.Configuration.UseMemoryStorage();
+            app.UseDomains<LocationStorage>(@"E:\Hangfile.Sparepart.Lib");
             var filePath = @"E:\Hangfile.Sparepart.Lib";
             var dataPath = @"Data Source=E:\Hangfile.Sparepart.Lib\Data\Store.dat;";//Version=3;
             GlobalConfiguration.Configuration.UseSQLiteStorage(dataPath);
