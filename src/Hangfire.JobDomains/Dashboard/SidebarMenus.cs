@@ -38,7 +38,7 @@ namespace Hangfire.JobDomains.Dashboard
 
              menus.Add(page => new MenuItem("任务包列表", "#"));
 
-             var domains = StorageService.Provider.GetDomainDefines().OrderBy(s => s.Name);
+             var domains = StorageService.Provider.GetDomainDefines().OrderBy(s => s.Title);
 
              foreach (var one in domains)
              {
@@ -47,7 +47,7 @@ namespace Hangfire.JobDomains.Dashboard
                      var oneRoute = page.Url.CreateRoute(one);
                      return new MenuItem(oneRoute.Name, oneRoute.Link)
                      {
-                         Active = one.Name == current
+                         Active = one.Title == current
                      };
                  });
              }
@@ -84,7 +84,7 @@ namespace Hangfire.JobDomains.Dashboard
             var menus = new List<Func<RazorPage, MenuItem>>();
 
             var set = StorageService.Provider.GetDomainDefines();
-            var theDomain = set.SingleOrDefault(s => s.Name == d);
+            var theDomain = set.SingleOrDefault(s => s.Title == d);
             if (theDomain == null) return menus;
             var theSet = theDomain.GetJobSets().SingleOrDefault(s => s.ShortName == a);
             if (theSet == null) return menus;

@@ -9,95 +9,6 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Storage.SqlServer
 {
-    internal static class EntityMapper
-    {
-
-        public static Entities.Server Convert(this ServerDefine model)
-        {
-            return new Entities.Server
-            {
-                Name = model.Name,
-                PlugPath = model.PlugPath,
-                Description = model.Description,
-                CreatedAt = DateTime.Now,
-            };
-        }
-
-        public static Domain GetDomain(this DomainDefine model)
-        {
-            return new Domain
-            {
-                BasePath = model.BasePath,
-                Name = model.Name,
-                Description = model.Description,
-                CreatedAt = DateTime.Now,
-            };
-        }
-
-        public static Assembly GetAssembly(this AssemblyDefine model, int DomainID)
-        {
-            return new Assembly
-            {
-                DomainID = DomainID,
-                FullName = model.FullName,
-                FileName = model.FileName,
-                ShortName = model.ShortName,
-                Title = model.Title,
-                Description = model.Description,
-                CreatedAt = DateTime.Now,
-            };
-        }
-
-        public static Job GetJob(this JobDefine model, int DomainID, int AssemblyID)
-        {
-            return new Job
-            {
-                DomainID = DomainID,
-                AssemblyID = AssemblyID,
-                Name = model.Name,
-                FullName = model.FullName,
-                Title = model.Title,
-                Description = model.Description,
-                CreatedAt = DateTime.Now,
-            };
-        }
-
-        public static List<JobConstructorParameter> GetJobConstructorParameters(this ConstructorDefine one, int DomainID, int AssemblyID, int JobID)
-        {
-            var list = new List<JobConstructorParameter>();
-            if (one.Paramers.Count == 0)
-            {
-                var item = new JobConstructorParameter
-                {
-                    DomainID = DomainID,
-                    AssemblyID = AssemblyID,
-                    JobID = JobID,
-                    CreatedAt = DateTime.Now,
-                };
-                list.Add(item);
-                return list;
-            }
-
-            foreach (var par in one.Paramers)
-            {
-                var item = new JobConstructorParameter
-                {
-                    DomainID = DomainID,
-                    AssemblyID = AssemblyID,
-                    JobID = JobID,
-                    ConstructorGuid = Guid.NewGuid().ToString(),
-                    Name = par.Name,
-                    Type = par.Type,
-                    CreatedAt = DateTime.Now,
-                };
-                list.Add(item);
-            }
-            return list;
-        }
-
-
-    }
-
 
     public class SqlServerStorage : IDomainStorage
     {
@@ -110,13 +21,12 @@ namespace Hangfire.JobDomains.Storage.SqlServer
             }
         }
 
-        public bool SetConnectString(string nameOrConnectionString)
+        public bool AddService(string nameOrConnectionString)
         {
             if (nameOrConnectionString == null) throw new ArgumentNullException(nameof(nameOrConnectionString));
             SqlServerDBContext.ConnectionString = GetConnectionString(nameOrConnectionString) ;
-            return SqlServerDBContext .CanService();
+            return SqlServerDBContext.CanService();
         }
-
 
         private string GetConnectionString(string nameOrConnectionString)
         {
@@ -130,8 +40,7 @@ namespace Hangfire.JobDomains.Storage.SqlServer
                 return ConfigurationManager.ConnectionStrings[nameOrConnectionString].ConnectionString;
             }
 
-            throw new ArgumentException(
-                $"Could not find connection string with name '{nameOrConnectionString}' in application config file");
+            throw new ArgumentException($"Could not find connection string with name '{nameOrConnectionString}' in application config file");
         }
 
         private bool IsConnectionString(string nameOrConnectionString)
@@ -146,32 +55,36 @@ namespace Hangfire.JobDomains.Storage.SqlServer
             return connectionStringSetting != null;
         }
 
-        public async Task<bool> AddOrUpdateServerAsync(ServerDefine model)
+        public async Task<bool> AddOrUpdateServerAsync(ServerDefine model, List<string> domains)
         {
             if (model.Name != ServerName) throw (new Exception("服务器数据本身修改"));
-            using (var context = new SqlServerDBContext ())
+            using (var context = new SqlServerDBContext())
             {
-                var server = context.Servers.SingleOrDefault(s => s.Name == model.Name);
-                if (server != null) context.Servers.Remove(server);
-                await context.AddAsync(model.Convert());
-                var result = await context.SaveChangesAsync();
-                return result > 0;
-            }
-        }
+                using (var transaction = await context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        var server = context.Servers.SingleOrDefault(s => s.Name == model.Name);
+                        if (server != null) context.Servers.Remove(server);
+                        var mappers = context.ServerPlugMaps.Where(s => s.ServerName == model.Name);
+                        context.ServerPlugMaps.RemoveRange(mappers);
 
-        public async Task<bool> UpdateServerDomainMapAsync(string server, List<string> domains)
-        {
-            if (server != ServerName) throw (new Exception("服务器数据本身修改"));
-            using (var context = new SqlServerDBContext ())
-            {
-                var mappers = context.ServerPlugMaps.Where(s => s.ServerName == server);
-                context.ServerPlugMaps.RemoveRange(mappers);
-                var newMappers = domains.Select(s => new ServerPlugMap(server, s));
-                await context.ServerPlugMaps.AddRangeAsync(newMappers);
-                var result = await context.SaveChangesAsync();
-                return result > 0;
+                        await context.AddAsync(model.Convert());
+                        var newMappers = domains.Select(s => new ServerPlugin(model.Name, s));
+                        await context.ServerPlugMaps.AddRangeAsync(newMappers);
+
+                        var result = await context.SaveChangesAsync();
+                        transaction.Commit();
+                        return result > 0;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
             }
         }
+ 
 
         public List<ServerDefine> GetServers()
         {
@@ -200,51 +113,63 @@ namespace Hangfire.JobDomains.Storage.SqlServer
             }
         }
 
-        public bool IsDomainsEmpty()
-        {
-            using (var context = new SqlServerDBContext ())
-            {
-                return context.ServerPlugMaps.Where(s => s.ServerName == ServerName).Count() == 0;
-            }
-        }
 
         public async Task<bool> AddDomainAsync(DomainDefine define)
         {
-            using (var context = new SqlServerDBContext ())
+            using (var context = new SqlServerDBContext())
             {
-                var domain = define.GetDomain();
-                ClearDomainAsync(context, domain.Name);
-                var domainResult = await context.Domains.AddAsync(domain);
-                var assemblies = define.InnerJobSets;
-                if (assemblies != null) {  
-                    foreach (var assembly in assemblies)
+                using (var transaction = await context.Database.BeginTransactionAsync())
+                {
+                    try
                     {
-                        var assemblyOne = assembly.GetAssembly(domainResult.Entity.ID);
-                        var assemblyResult = await context.Assemblies.AddAsync(assemblyOne);
-                        var jobs = assembly.InnerJobs;
-                        if (jobs == null) continue;
-                        foreach (var job in jobs)
+                        var domain = define.GetDomain();
+                        ClearDomain(context, domain.Title);
+                        var domainResult = await context.Domains.AddAsync(domain);
+                        await context.SaveChangesAsync();
+
+                        var assemblies = define.InnerJobSets;
+                        if (assemblies != null)
                         {
-                            var jobOne = job.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
-                            var jobResult = await context.Jobs.AddAsync(jobOne);
-                            var constructors = job.InnerConstructors;
-                            if (constructors == null) continue;
-                            foreach (var constructor in constructors)
+                            foreach (var assembly in assemblies)
                             {
-                                var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
-                                await context.JobConstructorParameters.AddRangeAsync(paramers);
+                                var assemblyOne = assembly.GetAssembly(domainResult.Entity.ID);
+                                var assemblyResult = await context.Assemblies.AddAsync(assemblyOne);
+                                await context.SaveChangesAsync();
+
+                                var jobs = assembly.InnerJobs;
+                                if (jobs == null) continue;
+                                foreach (var job in jobs)
+                                {
+                                    var jobOne = job.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
+                                    var jobResult = await context.Jobs.AddAsync(jobOne);
+                                    await context.SaveChangesAsync();
+
+                                    var constructors = job.InnerConstructors;
+                                    if (constructors == null) continue;
+                                    foreach (var constructor in constructors)
+                                    {
+                                        var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
+                                        await context.JobConstructorParameters.AddRangeAsync(paramers);
+                                    }
+                                }
                             }
                         }
+
+                        var result =await context.SaveChangesAsync();
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
                     }
                 }
-                var result = await context.SaveChangesAsync();
-                return result > 0;
             }
         }
 
-        void ClearDomainAsync(SqlServerDBContext  context, string domainName)
+        void ClearDomain(SqlServerDBContext  context, string domainName)
         {
-            var domain = context.Domains.SingleOrDefault(s => s.Name == domainName);
+            var domain = context.Domains.SingleOrDefault(s => s.Title == domainName);
             if (domain == null) return;
             var assemblies = context.Assemblies.Where(s => s.DomainID == domain.ID);
             var jobs = context.Jobs.Where(s => s.DomainID == domain.ID);
@@ -261,7 +186,7 @@ namespace Hangfire.JobDomains.Storage.SqlServer
             using (var context = new SqlServerDBContext ())
             {
                 var domains = context.Domains.ToList();
-                return domains.Select(s => new DomainDefine(s.BasePath, s.Name, s.Description)).ToList();
+                return domains.Select(s => new DomainDefine(s.PathName,s.Title, s.Description)).ToList();
             }
         }
 
@@ -269,7 +194,7 @@ namespace Hangfire.JobDomains.Storage.SqlServer
         {
             using (var context = new SqlServerDBContext ())
             {
-                var domain = context.Domains.FirstOrDefault(s => s.Name == domainDefine.Name);
+                var domain = context.Domains.FirstOrDefault(s => s.Title == domainDefine.Title);
                 if (domain == null) return new List<AssemblyDefine>();
                 var assemblies = context.Assemblies.Where(s => s.DomainID == domain.ID);
                 return assemblies.Select(s => new AssemblyDefine(domainDefine, s.FileName, s.FullName, s.ShortName, s.Title, s.Description)).ToList();
@@ -283,7 +208,7 @@ namespace Hangfire.JobDomains.Storage.SqlServer
                 var domainDefine = assemblyDefine.Parent;
                 if (domainDefine == null) return new List<JobDefine>();
 
-                var domain = context.Domains.FirstOrDefault(s => s.Name == domainDefine.Name);
+                var domain = context.Domains.FirstOrDefault(s => s.Title == domainDefine.Title);
                 if (domain == null) return new List<JobDefine>();
                 var assembly = context.Assemblies.Where(s => s.DomainID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
                 if (assembly == null) return new List<JobDefine>();
@@ -294,14 +219,14 @@ namespace Hangfire.JobDomains.Storage.SqlServer
 
         public List<ConstructorDefine> GetConstructors(JobDefine jobDefine)
         {
-            using (var context = new SqlServerDBContext ())
+            using (var context = new SqlServerDBContext())
             {
                 var assemblyDefine = jobDefine.Parent;
                 if (assemblyDefine == null) return new List<ConstructorDefine>();
                 var domainDefine = assemblyDefine.Parent;
                 if (domainDefine == null) return new List<ConstructorDefine>();
 
-                var domain = context.Domains.FirstOrDefault(s => s.Name == assemblyDefine.Parent.Name);
+                var domain = context.Domains.FirstOrDefault(s => s.Title == assemblyDefine.Parent.Title);
                 if (domain == null) return new List<ConstructorDefine>();
                 var assembly = context.Assemblies.Where(s => s.DomainID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
                 if (assembly == null) return new List<ConstructorDefine>();
@@ -315,7 +240,7 @@ namespace Hangfire.JobDomains.Storage.SqlServer
                     var count = group.Count();
                     foreach (var item in group)
                     {
-                        if (count == 1&& item.Name == string.Empty && item.Type == string.Empty)
+                        if (count == 1 && item.Name == string.Empty && item.Type == string.Empty)
                         {
                             continue;
                         }
@@ -359,6 +284,7 @@ namespace Hangfire.JobDomains.Storage.SqlServer
             using (var context = new SqlServerDBContext ())
             {
                 throw new NotImplementedException();
+
             }
         }
 

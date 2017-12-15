@@ -8,11 +8,11 @@ namespace Hangfire.JobDomains.Storage.SqlServer.Entities
 {
     internal class Domain : SQLiteEntityBase
     {
+        public string PathName { get; set; }
 
-        public string Name { get; set; }
+        public string Title { get; set; }
 
         public string Description { get; set; }
 
-        public string BasePath { get; set; }
     }
 }

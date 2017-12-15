@@ -131,8 +131,8 @@ namespace Hangfire.JobDomains.Dashboard
         /// </summary>
         public static (string Name, string Link) CreateRoute(this UrlHelper Url , DomainDefine domain)
         {
-            var name = domain.Name;
-            var link = DomainPageRoute.Replace("(?<name>.+)", name).EscapeRoute();
+            var name = domain.Title;
+            var link = DomainPageRoute.Replace("(?<name>.+)", domain.PathName).EscapeRoute();
             return (name, Url.To(link));
         }
 
@@ -153,9 +153,8 @@ namespace Hangfire.JobDomains.Dashboard
         /// </summary>
         public static (string Name, string Link) CreateRoute(this UrlHelper Url, DomainDefine domain, AssemblyDefine assembly)
         {
-            var domainName = domain.Name;
             var name = assembly.Title;
-            var link = AssemblyPageRoute.Replace("(?<domain>.+)", domainName).Replace("(?<name>.+)", name).EscapeRoute();
+            var link = AssemblyPageRoute.Replace("(?<domain>.+)", domain.PathName).Replace("(?<name>.+)", assembly.ShortName).EscapeRoute();
             return (name, Url.To(link));
         }
 
@@ -179,7 +178,7 @@ namespace Hangfire.JobDomains.Dashboard
         public static (string Name, string Link) CreateRoute(this UrlHelper Url, DomainDefine domain, AssemblyDefine assembly, JobDefine job)
         {
             var name = job.Title;
-            var link = JobPageRoute.Replace("(?<domain>.+)", domain.Name).Replace("(?<assembly>.+)", assembly.ShortName).Replace("(?<name>.+)", job.Name).EscapeRoute();
+            var link = JobPageRoute.Replace("(?<domain>.+)", domain.PathName).Replace("(?<assembly>.+)", assembly.ShortName).Replace("(?<name>.+)", job.Name).EscapeRoute();
             return (name, Url.To(link));
         }
 

@@ -11,13 +11,14 @@ using Hangfire;
 using System.Threading.Tasks;
 using Hangfire.JobDomains.Storage.Location;
 using Hangfire.JobDomains.Storage.SqlServer;
+using Microsoft.Extensions.DependencyInjection;
 
 [assembly: OwinStartup(typeof(Host.Startup))]
 namespace Host
 {
     public class Startup
     {
-
+        
 
         public void Configuration(IAppBuilder app)
         {
@@ -31,12 +32,12 @@ namespace Host
             //  GlobalConfiguration.Configuration.UseSQLiteStorage(dataPath);
             //  app.UseDomains<Hangfire.JobDomains.Storage.Sqlite.SQLiteStorage>(filePath, dataPath);
 
-            var connectString = "";
+            var connectString = "ConnectionString";
             GlobalConfiguration.Configuration.UseSqlServerStorage(connectString);
-            app.UseDomains<SqlServerStorage>(filePath, connectString);
+
+            app.UseDomains<LocationStorage>(filePath, connectString);
 
             app.Run(context =>
-
             {
                 context.Response.Redirect("/HangfireDomain");
                 return context.Response.WriteAsync("Hello, world.");

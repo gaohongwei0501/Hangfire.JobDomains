@@ -8,13 +8,15 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Storage.SqlServer.Entities
 {
-    internal class ServerPlugMap: SQLiteEntityBase
+    internal class ServerPlugin: SQLiteEntityBase
     {
+        public ServerPlugin() { }
 
-        public ServerPlugMap(string server,string plug)
+        public ServerPlugin(string server,string plug)
         {
             ServerName = server;
             PlugName = plug;
+            CreatedAt = DateTime.Now;
         }
 
         public string ServerName { get; set; }

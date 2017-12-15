@@ -25,7 +25,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
             Sidebar = ()=>SidebarMenus.DomainsMenu(domain);
             var set = StorageService.Provider.GetDomainDefines();
-            TheDomain = set.SingleOrDefault(s => s.Name == domain);
+            TheDomain = set.SingleOrDefault(s => s.Title == domain);
             TheAssembly = TheDomain == null ? null : TheDomain.GetJobSets().SingleOrDefault(s => s.ShortName == name);
         }
 

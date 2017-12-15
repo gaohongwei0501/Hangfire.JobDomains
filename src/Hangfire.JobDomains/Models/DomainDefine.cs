@@ -17,9 +17,9 @@ namespace Hangfire.JobDomains.Models
     public class DomainDefine
     {
 
-        public string Name { get; private set; }
+        public string PathName { get; private set; }
 
-        public string BasePath { get; private set; }
+        public string Title { get; private set; }
 
         public string Description { get; private set; }
 
@@ -27,22 +27,14 @@ namespace Hangfire.JobDomains.Models
 
         public DomainDefine(string path)
         {
-            BasePath = path;
-            var index = path.LastIndexOf("\\");
-            Name = path.Substring(index + 1);
+            PathName = path;
+            Title = path;
         }
 
         public DomainDefine(string path, string name , string description)
         {
-            BasePath = path;
-            if (string.IsNullOrEmpty(name))
-            {
-                var index = path.LastIndexOf("\\");
-                Name = path.Substring(index + 1);
-            }
-            else {
-                Name = name;
-            }
+            PathName = path;
+            Title = string.IsNullOrEmpty(name) ? path : name;
             Description = description;
         }
 

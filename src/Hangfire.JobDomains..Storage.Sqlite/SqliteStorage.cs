@@ -26,8 +26,8 @@ namespace Hangfire.JobDomains.Storage.Sqlite
         {
             return new Domain
             {
-                BasePath = model.BasePath,
-                Name = model.Name,
+                BasePath = model.PathName,
+                Name = model.Title,
                 Description = model.Description,
                 CreatedAt = DateTime.Now,
             };
@@ -109,38 +109,32 @@ namespace Hangfire.JobDomains.Storage.Sqlite
             }
         }
 
-        public bool SetConnectString(string connectString)
+        public bool AddService(string connectString)
         {
             SQLiteDBContext.ConnectionString = connectString;
             return SQLiteDBContext.CanService();
         }
 
-        public async Task<bool> AddOrUpdateServerAsync(ServerDefine model)
+        public async Task<bool> AddOrUpdateServerAsync(ServerDefine model, List<string> domains)
         {
             if (model.Name != ServerName) throw (new Exception("服务器数据本身修改"));
             using (var context = new SQLiteDBContext())
             {
                 var server = context.Servers.SingleOrDefault(s => s.Name == model.Name);
                 if (server != null) context.Servers.Remove(server);
+                var mappers = context.ServerPlugMaps.Where(s => s.ServerName == model.Name);
+                context.ServerPlugMaps.RemoveRange(mappers);
+
                 await context.AddAsync(model.Convert());
+                var newMappers = domains.Select(s => new ServerPlugMap(model.Name, s));
+                await context.ServerPlugMaps.AddRangeAsync(newMappers);
+
                 var result = await context.SaveChangesAsync();
                 return result > 0;
             }
         }
 
-        public async Task<bool> UpdateServerDomainMapAsync(string server, List<string> domains)
-        {
-            if (server != ServerName) throw (new Exception("服务器数据本身修改"));
-            using (var context = new SQLiteDBContext())
-            {
-                var mappers = context.ServerPlugMaps.Where(s => s.ServerName == server);
-                context.ServerPlugMaps.RemoveRange(mappers);
-                var newMappers = domains.Select(s => new ServerPlugMap(server, s));
-                await context.ServerPlugMaps.AddRangeAsync(newMappers);
-                var result = await context.SaveChangesAsync();
-                return result > 0;
-            }
-        }
+   
 
         public List<ServerDefine> GetServers()
         {
@@ -238,7 +232,7 @@ namespace Hangfire.JobDomains.Storage.Sqlite
         {
             using (var context = new SQLiteDBContext())
             {
-                var domain = context.Domains.FirstOrDefault(s => s.Name == domainDefine.Name);
+                var domain = context.Domains.FirstOrDefault(s => s.Name == domainDefine.Title);
                 if (domain == null) return new List<AssemblyDefine>();
                 var assemblies = context.Assemblies.Where(s => s.DomainID == domain.ID);
                 return assemblies.Select(s => new AssemblyDefine(domainDefine, s.FileName, s.FullName, s.ShortName, s.Title, s.Description)).ToList();
@@ -252,7 +246,7 @@ namespace Hangfire.JobDomains.Storage.Sqlite
                 var domainDefine = assemblyDefine.Parent;
                 if (domainDefine == null) return new List<JobDefine>();
 
-                var domain = context.Domains.FirstOrDefault(s => s.Name == domainDefine.Name);
+                var domain = context.Domains.FirstOrDefault(s => s.Name == domainDefine.Title);
                 if (domain == null) return new List<JobDefine>();
                 var assembly = context.Assemblies.Where(s => s.DomainID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
                 if (assembly == null) return new List<JobDefine>();
@@ -270,7 +264,7 @@ namespace Hangfire.JobDomains.Storage.Sqlite
                 var domainDefine = assemblyDefine.Parent;
                 if (domainDefine == null) return new List<ConstructorDefine>();
 
-                var domain = context.Domains.FirstOrDefault(s => s.Name == assemblyDefine.Parent.Name);
+                var domain = context.Domains.FirstOrDefault(s => s.Name == assemblyDefine.Parent.Title);
                 if (domain == null) return new List<ConstructorDefine>();
                 var assembly = context.Assemblies.Where(s => s.DomainID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
                 if (assembly == null) return new List<ConstructorDefine>();

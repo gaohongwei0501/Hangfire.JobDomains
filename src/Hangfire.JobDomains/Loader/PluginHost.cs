@@ -171,17 +171,17 @@ namespace Hangfire.JobDomains.Loader {
 		/// </summary>
 		private void CreateDomain() {
 			if (Domain == null) {
-				// create another AppDomain for loading the plug-ins
-				AppDomainSetup setup = new AppDomainSetup();
-                setup.ApplicationBase = Path.GetDirectoryName(GetAssemblyPath());
-				
-				// plug-ins are isolated on the file system as well as the AppDomain
-				setup.PrivateBinPath = PluginPath;
+                // create another AppDomain for loading the plug-ins
+                AppDomainSetup setup = new AppDomainSetup
+                {
+                    ApplicationBase = Path.GetDirectoryName(GetAssemblyPath()),
+                    // plug-ins are isolated on the file system as well as the AppDomain
+                    PrivateBinPath = PluginPath,
+                    DisallowApplicationBaseProbing = false,
+                    DisallowBindingRedirects = false
+                };
 
-				setup.DisallowApplicationBaseProbing = false;
-				setup.DisallowBindingRedirects = false;
-
-				Domain = AppDomain.CreateDomain("Plugin AppDomain", null, setup);
+                Domain = AppDomain.CreateDomain("Plugin AppDomain", null, setup);
 			}
 
 			// instantiate PluginLoader in the other AppDomain
@@ -218,9 +218,9 @@ namespace Hangfire.JobDomains.Loader {
 				AppDomain.Unload(Domain);
 				Domain = null;
 
-				// raise the PluginsUnloaded event
-				if (PluginsUnloaded != null) PluginsUnloaded(null, EventArgs.Empty);
-			}
+                // raise the PluginsUnloaded event
+                PluginsUnloaded?.Invoke(null, EventArgs.Empty);
+            }
 		}
 
 		/// <summary>

@@ -21,11 +21,11 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         public DomainPage(string name) 
         {
             FetchTitle = () => Title;
-            FetchHeader = () => TheDomain == null ? name : TheDomain.Name;
+            FetchHeader = () => TheDomain == null ? name : TheDomain.Title;
 
             Sidebar = ()=>SidebarMenus.DomainsMenu(name);
             var set = StorageService.Provider.GetDomainDefines();
-            TheDomain = set.SingleOrDefault(s => s.Name == name);
+            TheDomain = set.SingleOrDefault(s => s.Title == name);
         }
 
         protected override bool Content()
@@ -34,7 +34,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
             WriteBar();
 
-            var servers = StorageService.Provider.GetServersByDomain(TheDomain.Name);
+            var servers = StorageService.Provider.GetServersByDomain(TheDomain.Title);
             var serverList = PageContent.Tag.ListLink(servers, Url.CreateServerRoute);
             var panel = PageContent.Tag.Panel("支持该服务的服务器", string.Empty, serverList);
             WriteLiteral(panel);

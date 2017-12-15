@@ -24,7 +24,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         protected override bool Content()
         {
             var set = StorageService.Provider.GetDomainDefines();
-            var list = set.OrderBy(s => s.Name);
+            var list = set.OrderBy(s => s.Title);
 
             PageContent.WritePagerPanel("工作域任务包", list, PageIndex, PageSize, d => Url.CreateRoute(d));
             return true;

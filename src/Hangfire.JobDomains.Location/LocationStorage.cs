@@ -18,14 +18,9 @@ namespace Hangfire.JobDomains.Storage.Location
         static ServerDefine Server { get; set; }
 
 
-        Task<bool> IDomainStorage.AddOrUpdateServerAsync(ServerDefine server)
+        Task<bool> IDomainStorage.AddOrUpdateServerAsync(ServerDefine server, List<string> domains)
         {
             Server = server;
-            return Task.FromResult(true);
-        }
-
-        public Task<bool> UpdateServerDomainMapAsync(string server, List<string> domains)
-        {
             return Task.FromResult(true);
         }
 
@@ -52,13 +47,13 @@ namespace Hangfire.JobDomains.Storage.Location
 
         static ConcurrentDictionary<string, DomainDefine> Storage = new ConcurrentDictionary<string, DomainDefine>();
 
-        public bool SetConnectString(string connectString) => true;
+        public bool AddService(string connectString) => true;
 
         public bool IsDomainsEmpty() => Storage.IsEmpty;
 
         Task<bool> IDomainStorage.AddDomainAsync(DomainDefine define)
         {
-            var result = Storage.TryAdd(define.BasePath, define);
+            var result = Storage.TryAdd(define.PathName, define);
             return Task.FromResult(result);
         }
 
@@ -72,7 +67,7 @@ namespace Hangfire.JobDomains.Storage.Location
         {
             if (domainDefine == null) return new List<AssemblyDefine>();
 
-            var domain = Storage.Select(s => s.Value).FirstOrDefault(s => s.Name == domainDefine.Name);
+            var domain = Storage.Select(s => s.Value).FirstOrDefault(s => s.Title == domainDefine.Title);
             return domain == null || domain.InnerJobSets == null ? new List<AssemblyDefine>() : domain.InnerJobSets;
         }
 
@@ -82,7 +77,7 @@ namespace Hangfire.JobDomains.Storage.Location
             var domainDefine = assemblyDefine.Parent;
             if (domainDefine == null) return new List<JobDefine>();
 
-            var domain = Storage.Select(s => s.Value).FirstOrDefault(s => s.Name == domainDefine.Name);
+            var domain = Storage.Select(s => s.Value).FirstOrDefault(s => s.Title == domainDefine.Title);
             if (domain == null) return new List<JobDefine>();
             var assembly = domain.GetJobSets().FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
             return assembly == null || assembly.InnerJobs == null ? new List<JobDefine>() : assembly.InnerJobs;
@@ -96,7 +91,7 @@ namespace Hangfire.JobDomains.Storage.Location
             var domainDefine = assemblyDefine.Parent;
             if (domainDefine == null) return new List<ConstructorDefine>();
 
-            var domain = Storage.Select(s => s.Value).FirstOrDefault(s => s.Name == domainDefine.Name);
+            var domain = Storage.Select(s => s.Value).FirstOrDefault(s => s.Title == domainDefine.Title);
             if (domain == null) return new List<ConstructorDefine>();
             var assembly = domain.GetJobSets().FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
             if (assembly == null) return new List<ConstructorDefine>();

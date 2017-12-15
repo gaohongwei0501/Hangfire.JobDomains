@@ -1,5 +1,7 @@
 ﻿using Hangfire.JobDomains.Storage.SqlServer.Entities;
+using Hangfire.JobDomains.Storage.SqlServer.TypeMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -11,20 +13,14 @@ namespace Hangfire.JobDomains.Storage.SqlServer
     internal class SqlServerDBContext : DbContext
     {
 
-        private static bool _created = false;
-
-        public SqlServerDBContext ()
+        public SqlServerDBContext()
         {
-            if (!_created)
-            {
-                _created = true;
-                Database.EnsureDeleted();
-                Database.EnsureCreated();
-            }
+          
         }
 
         public DbSet<Entities.Server> Servers { get; set; }
-        public DbSet<ServerPlugMap> ServerPlugMaps { get; set; }
+
+        public DbSet<ServerPlugin> ServerPlugMaps { get; set; }
 
         public DbSet<Domain> Domains { get; set; }
 
@@ -34,16 +30,15 @@ namespace Hangfire.JobDomains.Storage.SqlServer
 
         public DbSet<JobConstructorParameter> JobConstructorParameters { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Entities.Server>().ToTable("Hangfire.JobDomains.Server");
-            modelBuilder.Entity<ServerPlugMap>().ToTable("Hangfire.JobDomains.ServerPlugMap");
-            modelBuilder.Entity<Domain>().ToTable("Hangfire.JobDomains.Domain");
-            modelBuilder.Entity<Assembly>().ToTable("Hangfire.JobDomains.Assembly");
-            modelBuilder.Entity<Job>().ToTable("Hangfire.JobDomains.Job");
-            modelBuilder.Entity<JobConstructorParameter>().ToTable("Hangfire.JobDomains.JobConstructor");
+            modelBuilder.ApplyConfiguration<Entities.Server>(new ServerTypeMapper());
+            modelBuilder.ApplyConfiguration<Entities.ServerPlugin>(new ServerPluginMapper());
+            modelBuilder.ApplyConfiguration<Entities.Domain>(new DomainMapper());
+            modelBuilder.ApplyConfiguration<Entities.Assembly>(new AssemblyTypeMapper());
+            modelBuilder.ApplyConfiguration<Entities.Job>(new JobMapper());
+            modelBuilder.ApplyConfiguration<Entities.JobConstructorParameter>(new JobConstructorParameterMapper());
         }
 
         public static string ConnectionString { get; set; }
@@ -56,10 +51,12 @@ namespace Hangfire.JobDomains.Storage.SqlServer
 
         public static bool CanService()
         {
-            var db = new SqlServerDBContext ();
-            return db.Database.ProviderName != null;
+            using (var _context =new SqlServerDBContext())
+            {
+                _context.Database.Migrate();
+            }
+            return true;
         }
-
 
     }
 

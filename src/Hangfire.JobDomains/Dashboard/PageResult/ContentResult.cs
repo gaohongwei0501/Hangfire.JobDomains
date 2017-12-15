@@ -99,8 +99,8 @@ namespace Hangfire.JobDomains.Dashboard.PageResult
             var list = data.Skip(index).Take(size);
 
             var items = list.Select(d => {
-                var result = createItem(d);
-                return Tag.ListLinkItem(result.Name, result.Link);
+                var (Name, Link) = createItem(d);
+                return Tag.ListLinkItem(Name, Link);
             });
 
             var content = Tag.List(items);

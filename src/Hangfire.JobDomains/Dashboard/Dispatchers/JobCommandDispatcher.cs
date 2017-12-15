@@ -44,7 +44,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             var paramers = JobData == null ? null : JobData.Select(s => s.Value).ToArray();
 
             var set = StorageService.Provider.GetDomainDefines();
-            TheDomain = set.SingleOrDefault(s => s.Name == domain);
+            TheDomain = set.SingleOrDefault(s => s.Title == domain);
             TheAssembly = TheDomain == null ? null : TheDomain.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
             TheJob = TheAssembly == null ? null : TheAssembly.GetJobs().SingleOrDefault(s => s.Name == job);
 
@@ -69,7 +69,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
 
         void JobTest(object[] paramers)
         {
-            JobInvoke.Test(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
+            JobInvoke.Test(TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Schedule(DateTime start, int period, object[] paramers)
@@ -79,7 +79,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             if (set.ContainsKey(period) == false) throw (new Exception("任务周期设置设置失败"));
             // RecurringJob.AddOrUpdate(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period), queue: TheDomain.Name.ToLower());
             var delay = start - DateTime.Now;
-            JobInvoke.ScheduleEnqueued(delay, period, TheDomain.Name.ToLower(), TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
+            JobInvoke.ScheduleEnqueued(delay, period, TheDomain.Title.ToLower(), TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Delay(DateTime start, object[] paramers)
@@ -87,7 +87,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
             var delay = start - DateTime.Now;
             //  BackgroundJob.Schedule(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), delay);
-            JobInvoke.DelayEnqueued(delay, TheDomain.Name.ToLower(), TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
+            JobInvoke.DelayEnqueued(delay, TheDomain.Title.ToLower(), TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Immediately(object[] paramers)
@@ -95,7 +95,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             //IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             //EnqueuedState state = new Hangfire.States.EnqueuedState(TheDomain.Name.ToLower());
             //hangFireClient.Create<JobInvoke>(c => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), state);
-            JobInvoke.ImmediatelyEnqueued(TheDomain.Name.ToLower(), TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers);
+            JobInvoke.ImmediatelyEnqueued(TheDomain.Title.ToLower(), TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
     }

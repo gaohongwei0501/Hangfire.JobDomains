@@ -17,19 +17,16 @@ namespace Hangfire.JobDomains.Storage
         public bool SetStorage(IDomainStorage store,string connectString)
         {
             if (Storage == null) Storage = store;
-            return Storage.SetConnectString(connectString);
+            return Storage.AddService(connectString);
         }
 
-        public Task<bool> AddOrUpdateServerAsync(ServerDefine server)=> Storage.AddOrUpdateServerAsync(server);
-
-        public Task<bool> UpdateServerDomains(string server,List<string> domains) => Storage.UpdateServerDomainMapAsync(server, domains);
+        public Task<bool> AddOrUpdateServerAsync(ServerDefine server, List<string> domains) => Storage.AddOrUpdateServerAsync(server, domains);
 
         public List<ServerDefine> GetServers() => Storage.GetServers();
 
         public ServerDefine GetServer(string server) => Storage.GetServer(server);
 
         public List<string> GetServersByDomain(string domain) => Storage.GetServersByDomain(domain);
-
 
         public List<DomainDefine> GetDomainDefines() => Storage.GetAllDomains();
 
@@ -38,8 +35,6 @@ namespace Hangfire.JobDomains.Storage
         public List<JobDefine> GetJobs(AssemblyDefine assembly) => Storage.GetJobs(assembly);
 
         public List<ConstructorDefine> GetConstructors(JobDefine job) => Storage.GetConstructors(job);
-
-        public bool IsDomainsEmpty => Storage.IsDomainsEmpty();
 
         public Task<bool> AddDomainAsync(DomainDefine define) => Storage.AddDomainAsync(define);
 

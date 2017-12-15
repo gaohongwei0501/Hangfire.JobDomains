@@ -30,7 +30,7 @@ namespace Hangfire.JobDomains.Loader {
 		/// </summary>
 		public TextWriter Log {
 			get {
-				return (mLog != null) ? mLog.Instance : null;
+				return mLog?.Instance;
 			}
 			set {
 				mLog = (value != null) ? new Sponsor<TextWriter>(value) : null;
