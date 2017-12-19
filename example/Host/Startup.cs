@@ -10,7 +10,8 @@ using Hangfire.MemoryStorage;
 using Hangfire;
 using System.Threading.Tasks;
 using Hangfire.JobDomains.Storage.Location;
-using Hangfire.JobDomains.Storage.SqlServer;
+using Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer;
+using Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: OwinStartup(typeof(Host.Startup))]
