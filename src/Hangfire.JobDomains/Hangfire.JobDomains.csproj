@@ -67,8 +67,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dashboard\Pages\QueueListPage.cs" />
+    <Compile Include="Dashboard\Pages\QueuePage.cs" />
     <Compile Include="Dashboard\Pages\ServerPage.cs" />
     <Compile Include="Dashboard\Pages\ServerListPage.cs" />
+    <Compile Include="Models\QueueDefine.cs" />
     <Compile Include="Models\ServerDefine.cs" />
     <Compile Include="Models\SysSettingKey.cs" />
     <Compile Include="Server\AssemblyHelper.cs" />

@@ -26,14 +26,14 @@ namespace Host
             var filePath = @"E:\Hangfile.Sparepart.Lib";
             var dataPath = @"Data Source=E:\Hangfile.Sparepart.Lib\Data\Store.dat;";//Version=3;
 
-            //GlobalConfiguration.Configuration.UseMemoryStorage();
+            GlobalConfiguration.Configuration.UseMemoryStorage();
             //app.UseDomains<LocationStorage>(filePath);
 
             //  GlobalConfiguration.Configuration.UseSQLiteStorage(dataPath);
             //  app.UseDomains<Hangfire.JobDomains.Storage.Sqlite.SQLiteStorage>(filePath, dataPath);
 
             var connectString = "ConnectionString";
-            GlobalConfiguration.Configuration.UseSqlServerStorage(connectString);
+           // GlobalConfiguration.Configuration.UseSqlServerStorage(connectString);
 
             app.UseDomains<LocationStorage>(filePath, connectString);
 

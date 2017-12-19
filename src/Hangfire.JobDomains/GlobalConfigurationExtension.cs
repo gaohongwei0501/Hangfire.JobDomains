@@ -98,8 +98,13 @@ namespace Hangfire.JobDomains
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.MainPageRoute, x => new MainPage());
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.SystemPageRoute, x => new SystemPage());
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.BatchSchedulePageRoute, x => new BatchSchedulePage());
+
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.ServerListPageRoute, x => new  ServerListPage());
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.ServerPageRoute, x => UrlHelperExtension.CreateServerPage(x));
+
+            DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.QueueListPageRoute, x => new QueueListPage());
+            DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.QueuePageRoute, x => UrlHelperExtension.CreateQueuePage(x));
+
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.DomainPageRoute, x => UrlHelperExtension.CreateDomainPage(x));
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.AssemblyPageRoute, x => UrlHelperExtension.CreateAssemblyPage(x));
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.JobPageRoute, x => UrlHelperExtension.CreateJobPage(x));

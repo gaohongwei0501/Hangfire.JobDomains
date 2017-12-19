@@ -21,7 +21,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         public AssemblyPage(string domain, string name)
         {
             FetchTitle = () => $"{ (TheAssembly == null ? string.Empty : TheAssembly.ShortName) } 程序集任务定义详情";
-            FetchHeader = () => (TheAssembly == null ? string.Empty : TheAssembly.Title) ;
+            FetchHeader = () => $"任务集：{(TheAssembly == null ? string.Empty : TheAssembly.Title)}" ;
 
             Sidebar = ()=>SidebarMenus.DomainsMenu(domain);
             var set = StorageService.Provider.GetDomainDefines();

@@ -19,7 +19,11 @@ namespace Hangfire.JobDomains.Storage
 
         List<string> GetServersByDomain(string domain);
 
-     //   bool IsDomainsEmpty();
+        List<QueueDefine> GetQueues();
+
+        List<QueueDefine> GetQueuesByDomain(string domain) ;
+
+        QueueDefine GetQueue(string queue) ;
 
         bool AddService(string connectString);
 

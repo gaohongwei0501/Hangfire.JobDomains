@@ -7,34 +7,42 @@ using System.Reflection;
 using Hangfire.JobDomains.Interface;
 using Hangfire.JobDomains.Storage;
 using System.Threading.Tasks;
+using Common.Logging;
 
 namespace Hangfire.JobDomains.Server
 {
     internal class JobDomainManager
     {
 
+        static ILog loger = LogManager.GetLogger<JobDomainManager>();
+
         public static async Task<BackgroundJobServerOptions> InitServer(string path, int workerCount)
         {
             if (string.IsNullOrEmpty(path)) return null;
             var queues = await ScanServer(path);
-            var success = await UpdateServer(path, queues);
-            if (success == false) throw (new Exception(" 服务初始化失败! "));
-            var options = CreateServerOptions(queues, workerCount);
+            var server = await UpdateServer(path, queues);
+            var options = new BackgroundJobServerOptions
+            {
+                WorkerCount = workerCount,
+                Queues = server.Queues.Select(s=>s.Name).ToArray()
+            };
             return options;
         }
-     
-        static async Task<bool> UpdateServer(string path, List<string> queues)
+
+        static async Task<ServerDefine> UpdateServer(string path, List<string> queues)
         {
             try
             {
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
-                var server = new ServerDefine() { PlugPath= path };
-                return await StorageService.Provider.AddOrUpdateServerAsync(server, queues);
+                var server = new ServerDefine() { PlugPath = path };
+                var success = await StorageService.Provider.AddOrUpdateServerAsync(server, queues);
+                if (success) return StorageService.Provider.GetServer(server.Name);
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                loger.Error("服务初始化", ex);
             }
+            throw (new Exception(" 服务获取失败! "));
         }
 
         static async Task<List<string>> ScanServer(string basePath)
@@ -51,18 +59,6 @@ namespace Hangfire.JobDomains.Server
                 queues.Add(define.Title);
             }
             return queues;
-        }
-       
-        static BackgroundJobServerOptions CreateServerOptions(List<string> queues, int workerCount)
-        {
-            var Queues = new List<string> { "default", Environment.MachineName.ToLower() };
-            Queues.AddRange(queues);
-            var options = new BackgroundJobServerOptions
-            {
-                WorkerCount = workerCount,
-                Queues = Queues.ToArray()
-            };
-            return options;
         }
 
         static void LoadDomain(string basePath, DomainDefine define)

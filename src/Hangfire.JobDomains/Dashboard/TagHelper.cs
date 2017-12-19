@@ -49,15 +49,59 @@ namespace Hangfire.JobDomains.Dashboard
 
         public string Panel(string heading, string description, string content = "", string footer = "",string panelClass=""  ,string customAttr="")
         {
-            content = string.IsNullOrEmpty(content) ? string.Empty : $@"<div class=""panel-body""> {content} </div>";
-            footer = string.IsNullOrEmpty(footer) ? string.Empty : $@"<div class=""panel-footer clearfix "">  <div class=""pull-right""> { footer}  </div></div>";
-            description = string.IsNullOrEmpty(description) ? string.Empty : $@"<div class=""panel-body""><p>{ description }</p></div>";
-            return $@"<div class=""panel panel-info { panelClass }"" { customAttr }>
+            return Panel(heading, description, new List<string> { content }, new List<string> { footer }, panelClass, customAttr);
+
+            //content = string.IsNullOrEmpty(content) ? string.Empty : $@"<div class=""panel-body""> {content} </div>";
+            //footer = string.IsNullOrEmpty(footer) ? string.Empty : $@"<div class=""panel-footer clearfix "">  <div class=""pull-right""> { footer}  </div></div>";
+            //return $@"<div class=""panel panel-info { panelClass }"" { customAttr }>
+            //                  <div class=""panel-heading"">{ heading }</div>
+            //                  { description }
+            //                  { content  }
+            //                  { footer }
+            //            </div>";
+        }
+
+        public string Panel(string heading, string description, IEnumerable<string> contents, string footer, string panelClass = "", string customAttr = "")
+        {
+            return Panel(heading, description, contents, new List<string> { footer },  panelClass, customAttr);
+        }
+
+        public string Panel(string heading, string description, string content, IEnumerable<string> footers, string panelClass = "", string customAttr = "")
+        {
+            return Panel(heading, description,new List<string> { content }, footers, panelClass, customAttr);
+        }
+
+        public string Panel(string heading, string description,IEnumerable<string> contents, IEnumerable<string> footers, string panelClass = "", string customAttr = "")
+        {
+            var bulider = new StringBuilder();
+
+
+            bulider.Append($@"<div class=""panel panel-info { panelClass }"" { customAttr }>
                               <div class=""panel-heading"">{ heading }</div>
-                              { description }
-                              { content  }
-                              { footer }
-                        </div>";
+                            ");
+
+            bulider.Append(string.IsNullOrEmpty(description) ? string.Empty : $@"<div class=""panel-body""><p>{ description }</p></div>");
+
+            if (contents != null)
+            {
+                foreach (var content in contents)
+                {
+                    bulider.Append(string.IsNullOrEmpty(content) ? string.Empty : $@"<div class=""panel-body""> {content} </div>");
+                }
+            }
+
+            if (footers != null)
+            {
+                foreach (var footer in footers)
+                {
+                    bulider.Append(string.IsNullOrEmpty(footer) ? string.Empty : $@"<div class=""panel-footer clearfix""> {footer} </div>");
+                }
+            }
+
+
+            bulider.Append(@" </div>");
+
+            return bulider.ToString();
         }
 
 
@@ -82,8 +126,8 @@ namespace Hangfire.JobDomains.Dashboard
         public string ListLink<T>(IEnumerable<T> source, Func<T, (string Name, string Link)> CreateRoute)
         {
             return List<T>(source, one => {
-                var route = CreateRoute(one);
-                return ListLinkItem(route.Name, route.Link);
+                var (Name, Link) = CreateRoute(one);
+                return ListLinkItem(Name, Link);
             });
         }
 
@@ -135,13 +179,13 @@ namespace Hangfire.JobDomains.Dashboard
             return Input(id, labelText, placeholderText, "number", dataTag);
         }
 
-        public string InputDatebox(string id, string labelText, string placeholderText, string dataTag = "")
+        public string InputDatebox(string id, string labelText, string placeholderText, string className="", string dataTag = "")
         {
             return $@"
                     <div class=""form-group"">
-                        <label for=""{id}"" class=""control-label"">{labelText}</label>
-                        <div class='input-group date' id='{id}_datetimepicker'>
-                            <input type='text' class=""form-control"" placeholder=""{placeholderText}"" id=""{id}""  { dataTag }/>
+                        <label for=""{ id }"" class=""control-label"">{ labelText }</label>
+                        <div class='input-group date' id='{ id }_datetimepicker'>
+                            <input type='text' class=""form-control { className } "" placeholder=""{ placeholderText }"" id=""{id}""  { dataTag }/>
                             <span class=""input-group-addon"">
                                 <span class=""glyphicon glyphicon-calendar""></span>
                             </span>
@@ -198,58 +242,129 @@ namespace Hangfire.JobDomains.Dashboard
                         </div>
                     </div>";
         }
-       
+
+        public static string CreateJobScheduleParamers(this TagHelper Tag, string id, string domain,string sign)
+        {
+            var queues = StorageService.Provider.GetQueuesByDomain(domain);
+            var bulider = new StringBuilder();
+
+            bulider.Append($@" <div class=""form-group"">
+                            <label  class=""control-label"">周期任务标识</label>
+                            <input type='text' class=""form-control  schedule_sign "" placeholder=""周期任务标识 ""  value=""{ sign }"" />
+                    </div>");
+
+            bulider.Append($@"  <div class=""form-group"">
+                        <div class='input-group date' id=""{ id }_schedule_date_datetimepicker"" >
+                            <input type='text' class=""form-control  schedule_date "" placeholder=""首次执行时间 "" id=""{ id }_schedule_date"" />
+                            <span class=""input-group-addon"">
+                                <span class=""glyphicon glyphicon-calendar""></span>
+                            </span>
+                        </div>
+                    </div>");
+
+            bulider.Append($@"
+                               <div class=""input-group  input-group-sm"" >
+                                <input type=""text"" class=""form-control schedule_queue""  placeholder=""任务工作执行队列"">
+                                <span class=""input-group-btn"">
+                                    <button type=""button"" class=""btn btn-info btn-sm dropdown-toggle"" data-toggle=""dropdown"" aria-haspopup=""true"" aria-expanded=""false"">
+                                         队列 &nbsp; <span class=""caret""></span>
+                                    </button>
+                                    <ul class=""dropdown-menu"">");
+
+
+            foreach (var item in queues)
+            {
+                bulider.Append($@"<li><a href=""#""   class=""js-job-queue"" input-id=""{ id }"" data-name=""{ item.Name }""  >{ item.Name }</a></li>");
+            }
+
+            bulider.Append(@" </ul></span></div>");
+
+            return bulider.ToString();
+        }
+
         public static string CreateJobScheduleButtons(this TagHelper Tag , string id)
         {
             var jobCorns = StorageService.Provider.GetJobCornSetting();
             var bulider = new StringBuilder();
             var loadingText = "Loading...";
 
-            bulider.Append($@"
-                        <div class=""col-sm-2 pull-right"">
-                            <button class=""js-domain-job-commands-test btn btn-sm btn-danger"" 
-                                 data-cmd=""{ JobPageCommand.Test }"" data-loading-text=""{ loadingText }"" input-id=""{ id }""> 
-                                <span class=""glyphicon glyphicon-play-circle""></span> &nbsp;测试
-                            </button>
-                        </div>
-                      ");
-
-
-
-            bulider.Append(@"<div class=""col-sm-4 pull-right"">
-                               <div class=""input-group  input-group-sm"" >
-                                <input type='text' class=""form-control date_cron_selector schedule_cron"" placeholder=""首次执行时间""   />
-                                <span class=""input-group-btn"">
-                                    <button type=""button"" class=""btn btn-info btn-sm dropdown-toggle"" data-toggle=""dropdown"" aria-haspopup=""true"" aria-expanded=""false"">
-                                         周期执行 &nbsp; <span class=""caret""></span>
+            bulider.Append($@"<div class=""btn-group pull-right"" role=""group"" aria-label=""..."">
+                                   <button class=""js-domain-job-commands-delay  btn btn-default btn-sm btn-warning"" type=""button"" input-id=""{ id }"" 
+                                        data-cmd=""{ JobPageCommand.Delay }"" data-loading-text=""{ loadingText }"">
+                                        <span class=""glyphicon  glyphicon-play-circle ""></span> &nbsp; 排期执行
+                                    </button>
+                              
+                                <div class=""btn-group"" role=""group"">
+                        
+                                    <button type=""button"" class=""btn btn-success btn-sm dropdown-toggle"" data-toggle=""dropdown"" aria-haspopup=""true"" aria-expanded=""false"">
+                                       <span class=""glyphicon glyphicon-repeat""></span>  周期执行 &nbsp; <span class=""caret""></span>
                                     </button>
                                     <ul class=""dropdown-menu"">");
 
-
-            foreach (var item in jobCorns) {
+            foreach (var item in jobCorns)
+            {
                 bulider.Append($@"<li><a href=""#"" class=""js-domain-job-commands-schedule"" input-id=""{ id }"" data-schedule=""{ item.Key }""         
                                         data-cmd=""{ JobPageCommand.Schedule }"" data-loading-text=""{ loadingText }"">{ item.Value }</a></li>");
             }
 
-            bulider.Append(@" </ul></span></div></div>");
-            bulider.Append($@"
-                        <div class=""col-sm-2 pull-right"">
-                            <button class=""js-domain-job-commands-immediately btn btn-sm btn-success"" 
-                                 data-cmd=""{ JobPageCommand.Immediately }"" data-loading-text=""{ loadingText }"" input-id=""{ id }""> 
-                                <span class=""glyphicon glyphicon-play-circle""></span> &nbsp;立即执行
+            bulider.Append($@" </ul></div>
+                              <button class=""js-domain-job-commands-test btn btn-sm btn-danger"" 
+                                 data-cmd=""{ JobPageCommand.Test }"" data-loading-text=""{ loadingText }"" input-id=""{ id }""> 
+                                <span class=""glyphicon glyphicon-info-sign""></span> &nbsp;测试
                             </button>
-                        </div>
-                        <div class=""col-sm-4 pull-right"">
-                            <div class=""input-group input-group-sm"">
-                                <input type=""text"" class=""form-control date_cron_selector delay_cron"" placeholder=""执行时间"" >
-                                <span class=""input-group-btn "">
-                                    <button class=""js-domain-job-commands-delay  btn btn-default btn-sm btn-warning"" type=""button"" input-id=""{ id }"" 
-                                        data-cmd=""{ JobPageCommand.Delay }"" data-loading-text=""{ loadingText }"">
-                                        <span class=""glyphicon glyphicon-repeat""></span> &nbsp; 排期执行
-                                    </button>
-                                </span>
-                            </div>
-                        </div>");
+                            </div>");
+
+            //bulider.Append($@"
+            //            <div class=""col-sm-2 pull-right"">
+            //                <button class=""js-domain-job-commands-test btn btn-sm btn-danger"" 
+            //                     data-cmd=""{ JobPageCommand.Test }"" data-loading-text=""{ loadingText }"" input-id=""{ id }""> 
+            //                    <span class=""glyphicon glyphicon-play-circle""></span> &nbsp;测试
+            //                </button>
+            //            </div>
+            //          ");
+
+
+
+            //bulider.Append(@"<div class=""col-sm-4 pull-right"">
+            //                   <div class=""input-group  input-group-sm"" >
+            //                    <input type='text' class=""form-control date_cron_selector schedule_cron"" placeholder=""首次执行时间""   />
+            //                    <span class=""input-group-btn"">
+            //                        <button type=""button"" class=""btn btn-info btn-sm dropdown-toggle"" data-toggle=""dropdown"" aria-haspopup=""true"" aria-expanded=""false"">
+            //                             周期执行 &nbsp; <span class=""caret""></span>
+            //                        </button>
+            //                        <ul class=""dropdown-menu"">");
+
+
+            //foreach (var item in jobCorns) {
+            //    bulider.Append($@"<li><a href=""#"" class=""js-domain-job-commands-schedule"" input-id=""{ id }"" data-schedule=""{ item.Key }""         
+            //                            data-cmd=""{ JobPageCommand.Schedule }"" data-loading-text=""{ loadingText }"">{ item.Value }</a></li>");
+            //}
+
+            //bulider.Append(@" </ul></span></div></div>");
+
+            ////bulider.Append($@"
+            ////            <div class=""col-sm-2 pull-right"">
+            ////                <button class=""js-domain-job-commands-immediately btn btn-sm btn-success"" 
+            ////                     data-cmd=""{ JobPageCommand.Immediately }"" data-loading-text=""{ loadingText }"" input-id=""{ id }""> 
+            ////                    <span class=""glyphicon glyphicon-play-circle""></span> &nbsp;立即执行
+            ////                </button>
+            ////            </div>
+            ////          ");
+
+
+            //bulider.Append($@"
+                       
+            //            <div class=""col-sm-4 pull-right"">
+            //                <div class=""input-group input-group-sm"">
+            //                    <input type=""text"" class=""form-control date_cron_selector delay_cron"" placeholder=""执行时间"" >
+            //                    <span class=""input-group-btn "">
+            //                        <button class=""js-domain-job-commands-delay  btn btn-default btn-sm btn-warning"" type=""button"" input-id=""{ id }"" 
+            //                            data-cmd=""{ JobPageCommand.Delay }"" data-loading-text=""{ loadingText }"">
+            //                            <span class=""glyphicon glyphicon-repeat""></span> &nbsp; 排期执行
+            //                        </button>
+            //                    </span>
+            //                </div>
+            //            </div>");
             return bulider.ToString();
         }
 

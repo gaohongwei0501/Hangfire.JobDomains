@@ -14,76 +14,74 @@ namespace Hangfire.JobDomains.Server
 {
     internal class JobInvoke
     {
-        public static void ScheduleEnqueued(TimeSpan delay, int period, string queue, string pluginName, string assembly, string job, object[] paramers)
+        public static void ScheduleEnqueued(TimeSpan delay, int period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
         {
-            BackgroundJob.Schedule(() => RecurringInvoke(period, queue, pluginName, assembly, job, paramers), delay);
+            BackgroundJob.Schedule(() => RecurringInvoke(period, queue, jobSign, pluginName, assembly, job, paramers), delay);
         }
 
-        public static void DelayEnqueued(TimeSpan delay, string queue, string pluginName, string assembly, string job, object[] paramers )
+        public static void DelayEnqueued(TimeSpan delay, string queue, string pluginName, string assembly, string job, object[] paramers)
         {
             BackgroundJob.Schedule(() => ImmediatelyEnqueued(queue, pluginName, assembly, job, paramers), delay);
         }
 
-        public static void ImmediatelyEnqueued(string queue,string pluginName, string assembly, string job, object[] paramers)
+        public static void ImmediatelyEnqueued(string queue, string pluginName, string assembly, string job, object[] paramers)
         {
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
             hangFireClient.Create<JobInvoke>(c => Invoke(pluginName, assembly, job, paramers), state);
         }
 
-        public static void RecurringInvoke(int period, string queue, string pluginName, string assembly, string job, object[] paramers)
+        public static void RecurringInvoke(int period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
         {
-            RecurringJob.AddOrUpdate(() => Invoke(pluginName, assembly, job, paramers), Cron.MinuteInterval(period), queue: queue);
+            RecurringJob.AddOrUpdate(jobSign, () => Invoke(pluginName, assembly, job, paramers), Cron.MinuteInterval(period), queue: queue);
         }
 
         public static void Invoke(string pluginName, string assembly, string job, object[] paramers)
         {
-            AppDomainSetup setup = new AppDomainSetup();
-            setup.ApplicationBase = Path.GetDirectoryName(pluginName);
-            setup.ConfigurationFile = $"{pluginName}\\App.config";
-            setup.PrivateBinPath = pluginName;
-            setup.DisallowApplicationBaseProbing = false;
-            setup.DisallowBindingRedirects = false;
-            var Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
+            DomainInvoke<bool>(pluginName, assembly, job, paramers, PrefabricationActivator.Dispatch, domain => true);
+        }
+
+
+        public static void Test(string queue, string pluginName, string assembly, string job, object[] paramers)
+        {
+            IBackgroundJobClient hangFireClient = new BackgroundJobClient();
+            EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
+            hangFireClient.Create<JobInvoke>(c => TestInvoke(pluginName, assembly, job, paramers), state);
+        }
+
+        public static bool TestInvoke(string pluginName, string assembly, string job, object[] paramers)
+        {
+            return DomainInvoke<bool>(pluginName, assembly, job, paramers, PrefabricationActivator.Test, domain => (bool)domain.GetData("result"));
+        }
+
+
+        static T DomainInvoke<T>(string pluginName, string assembly, string job, object[] paramers, Action act, Func<AppDomain, T> GetResult)
+        {
+            AppDomain Domain = null;
             try
             {
-                var server = StorageService.Provider.GetServer(Environment.MachineName) ;
+                var server = StorageService.Provider.GetServer(Environment.MachineName.ToLower());
                 var path = $"{ server.PlugPath }//{ pluginName }";
-                if (Directory.Exists(path)) throw (new Exception("此服务器不支持该插件"));
+                AppDomainSetup setup = new AppDomainSetup
+                {
+                    ApplicationBase = Path.GetDirectoryName(path),
+                    ConfigurationFile = $"{path}\\App.config",
+                    PrivateBinPath = path,
+                    DisallowApplicationBaseProbing = false,
+                    DisallowBindingRedirects = false
+                };
+                Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
+                if (Directory.Exists(path) == false) throw (new Exception("此服务器不支持该插件"));
                 var args = new CrossDomainData { PluginDir = path, assemblyName = assembly, typeName = job, paramers = paramers };
                 Domain.SetData("args", args);
-                Domain.DoCallBack(new CrossAppDomainDelegate(PrefabricationActivator.Dispatch));
+                Domain.DoCallBack(new CrossAppDomainDelegate(act));
+                return GetResult(Domain);
             }
             finally
             {
-                AppDomain.Unload(Domain);
+                if (Domain != null) AppDomain.Unload(Domain);
             }
         }
-
-        public static bool Test(string pluginName, string assembly, string job, object[] paramers)
-        {
-            AppDomainSetup setup = new AppDomainSetup();
-            setup.ApplicationBase = Path.GetDirectoryName(pluginName);
-            setup.ConfigurationFile = $"{pluginName}\\App.config";
-            setup.PrivateBinPath = pluginName;
-            setup.DisallowApplicationBaseProbing = false;
-            setup.DisallowBindingRedirects = false;
-            var Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
-            try
-            {
-                var server = StorageService.Provider.GetServer(Environment.MachineName);
-                var path = $"{ server.PlugPath }//{ pluginName }";
-                if (Directory.Exists(path)) throw (new Exception("此服务器不支持该插件"));
-                var args = new CrossDomainData {  PluginDir= path, assemblyName = assembly, typeName= job, paramers= paramers };
-                Domain.SetData("args", args);
-                Domain.DoCallBack(new CrossAppDomainDelegate(PrefabricationActivator.Test));
-                return (bool)Domain.GetData("result");
-            }
-            finally {
-                AppDomain.Unload(Domain);
-            }
-        }
-
     }
 
 

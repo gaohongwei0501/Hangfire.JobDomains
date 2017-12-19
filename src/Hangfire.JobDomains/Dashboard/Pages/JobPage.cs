@@ -25,13 +25,13 @@ namespace Hangfire.JobDomains.Dashboard.Pages
         public JobPage(string domain, string assembly, string name)
         {
             FetchTitle = () => "任务详情";
-            FetchHeader = () => TheJob == null ? name : TheJob.Title;
+            FetchHeader = () =>$"任务：{(TheJob == null ? name : TheJob.Title)}";
             Sidebar = () => SidebarMenus.JobsMenu(domain, assembly, name);
 
             var set = StorageService.Provider.GetDomainDefines();
             TheDomain = set.SingleOrDefault(s => s.Title == domain);
-            TheAssembly = TheDomain == null ? null : TheDomain.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
-            TheJob = TheAssembly == null ? null : TheAssembly.GetJobs().SingleOrDefault(s => s.Name == name);
+            TheAssembly = TheDomain?.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
+            TheJob = TheAssembly?.GetJobs().SingleOrDefault(s => s.Name == name);
         }
 
         protected override bool Content()
@@ -42,12 +42,12 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
         void WriteBar()
         {
-            var mainRoute = Url.CreateRoute();
+            var (Name, Link) = Url.CreateRoute();
             var domainRoute = Url.CreateRoute(TheDomain);
             var assemblyRoute = Url.CreateRoute(TheDomain, TheAssembly);
 
             var bar = $@"<ol class='breadcrumb'>
-                          <li><a href='{ mainRoute.Link }'>{ mainRoute.Name }</a></li>
+                          <li><a href='{ Link }'>{ Name }</a></li>
                           <li><a href='{ domainRoute.Link }'>{ domainRoute.Name }</a></li>
                           <li><a href='{ assemblyRoute.Link }'>{ assemblyRoute.Name }</a></li>
                           <li class='active'><a href='#'>{ Url.CreateRoute(TheDomain, TheAssembly, TheJob).Name }</a></li>
@@ -91,7 +91,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
                     }
                     else if (parameterInfo.Type == typeof(DateTime).Name)
                     {
-                        inputs.Append(PageContent.Tag.InputDatebox(parameterId, name, parameterInfo.Name, dataTag));
+                        inputs.Append(PageContent.Tag.InputDatebox(parameterId, name, parameterInfo.Name,"" ,dataTag));
                     }
                     else if (parameterInfo.Type == typeof(bool).Name)
                     {
@@ -104,8 +104,9 @@ namespace Hangfire.JobDomains.Dashboard.Pages
                 }
 
                 var heading = $"{TheJob.Name}({title.ToString().TrimEnd(',')})";
+                var cmdParamers = PageContent.Tag.CreateJobScheduleParamers(id, TheDomain.PathName, TheJob.Title);
                 var cmdButtons = PageContent.Tag.CreateJobScheduleButtons(id);
-                var panel = PageContent.Tag.Panel(heading, "", inputs.ToString(), cmdButtons, "js-domain-job", customAttr);
+                var panel = PageContent.Tag.Panel(heading, "", inputs.ToString(), new List<string> { cmdParamers, cmdButtons } , "js-domain-job", customAttr);
                 WriteLiteral(panel);
             }
 

@@ -17,10 +17,14 @@ namespace Hangfire.JobDomains.Storage.Location
 
         static ServerDefine Server { get; set; }
 
-
         Task<bool> IDomainStorage.AddOrUpdateServerAsync(ServerDefine server, List<string> domains)
         {
             Server = server;
+            Server.Queues = new List<QueueDefine>();
+            QueueDefine def = new QueueDefine { Name = "default", Description = "默认队列", Title = "默认队列" };
+            QueueDefine loacl = new QueueDefine { Name = Environment.MachineName.ToLower(), Description = "服务器队列", Title = $"{Environment.MachineName}机器队列" };
+            Server.Queues.Add(def);
+            Server.Queues.Add(loacl);
             return Task.FromResult(true);
         }
 
@@ -42,6 +46,28 @@ namespace Hangfire.JobDomains.Storage.Location
         }
 
         #endregion
+
+        #region QueueDefine
+
+        public List<QueueDefine> GetQueues()
+        {
+            return Server.Queues;
+        }
+
+        public QueueDefine GetQueue(string queueName)
+        {
+            var queue = Server.Queues.FirstOrDefault(s => s.Name == queueName);
+            if (queue.Servers == null) queue.Servers = new List<ServerDefine> { Server };
+            return queue;
+        }
+
+        public List<QueueDefine> GetQueuesByDomain(string domain)
+        {
+            return Server.Queues;
+        }
+
+        #endregion
+
 
         #region DomainDefine
 

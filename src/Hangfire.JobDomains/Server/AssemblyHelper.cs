@@ -30,7 +30,7 @@ namespace Hangfire.JobDomains.Server
             {
                 if (type.IsClass && !type.IsAbstract
                     && type.GetInterfaces().Any(@interface => @interface.GUID == interfaceType.GUID)
-                    && typeof(MarshalByRefObject).IsAssignableFrom(type))
+                   )
                 {
                     findedTypes.Add(type);
                 }

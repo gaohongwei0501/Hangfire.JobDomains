@@ -10,22 +10,19 @@
 
             $('.js-domain-job').each(function () {
                 var container = this;
+                $(this).on('click', '.js-job-queue',
+                    function (e) {
+                        var $this = $(this);
+                        var name = $this.data('name');
+                        $(".schedule_queue", container).val(name);
+                    });
 
                 $(this).on('click', '.js-domain-job-commands-schedule',
                     function (e) {
                         var $this = $(this);
                         var cmd = $this.data('cmd');
                         var period = $this.data("schedule");
-                        var params = BulidConfirmParam("周期执行任务", cmd, ".schedule_cron", period, container);
-                        if (params == null) return;
-                        CommandConfirm(container,params);
-                    });
-
-                $(this).on('click', '.js-domain-job-commands-immediately',
-                    function (e) {
-                        var $this = $(this);
-                        var cmd = $this.data('cmd');
-                        var params = BulidConfirmParam("立即执行任务", cmd, "", "", container);
+                        var params = BulidConfirmParam("周期任务", cmd,  period, container);
                         if (params == null) return;
                         CommandConfirm(container,params);
                     });
@@ -34,7 +31,7 @@
                     function (e) {
                         var $this = $(this);
                         var cmd = $this.data('cmd');
-                        var params = BulidConfirmParam("周期执行任务", cmd, ".delay_cron", "", container);
+                        var params = BulidConfirmParam("排期任务", cmd,  "", container);
                         if (params == null) return;
                         CommandConfirm(container,params);
                     });
@@ -43,7 +40,7 @@
                     function (e) {
                         var $this = $(this);
                         var cmd = $this.data('cmd');
-                        var params = BulidConfirmParam("任务测试", cmd, "", "", container);
+                        var params = BulidConfirmParam("测试任务", cmd, "", container);
                         if (params == null) return;
                         CommandConfirm(container, params);
                     });
@@ -70,27 +67,44 @@
                 message + '</span></div></div>').insertAfter(heading);
         }
 
-        function BulidConfirmParam(title, cmd, cron, period, panel) {
+        function BulidConfirmParam(title, cmd, period, panel) {
             $(".panel-error", panel).remove();
             $(".panel-info", panel).remove();
             $(".panel-success", panel).remove();
 
             var funcName = $(".panel-heading", panel).html();
-            var cronValue = cron == "" ? "" : $(cron, panel).val();
-
-            if (cron != "" && cronValue == "") {
+            var cronValue = $(".schedule_date", panel).val();
+            var queueValue = $(".schedule_queue", panel).val();
+            var signValue = $(".schedule_sign", panel).val();
+            
+            if (cronValue == "") {
                 DomainJob.AlertError(panel, "执行时间未正确设置");
+                return null;
+            }
+
+            if (queueValue == "") {
+                DomainJob.AlertError(panel, "执行队列未正确设置");
                 return null;
             }
 
             var job = '<div class="form-group"> <label  class="control-label">执行任务:</label>'
                 + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobname" value="' + funcName + '"></div>'
+
             var startTime = '<div class="form-group"> <label  class="control-label">执行时间:</label>'
                 + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobstarttime" value="' + cronValue + '"></div>'
+
+            var jobSign = '<div class="form-group"> <label  class="control-label">周期任务标识:</label>'
+                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobsign" value="' + signValue + '"></div>'
+
+            var queue = '<div class="form-group"> <label  class="control-label">执行队列:</label>'
+                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="queuename" value="' + queueValue + '"></div>'
+
+
             var periodTime = '<div class="form-group"> <label class="control-label">执行周期（分钟）:</label>'
                 + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobperiodtime" value="' + period + '"></div>'
 
-            var boby = job + (cron == "" ? "" : startTime) + (period == "" ? "" : periodTime);
+            var boby = job + startTime + (period == "" ? "" : jobSign) + queue + (period == "" ? "" : periodTime);
+
             $(".panel-body", panel).find("input").each(function () {
                 var $input = $(this);
                 var name = $input.data("name");
@@ -118,6 +132,8 @@
             var data = [];
             var inputs = model.find(".content").find("input");
             var starttime = "";
+            var queue = "";
+            var sign = "";
             var period = 0;
             for (var i = 0; i < inputs.length;i++)
             {
@@ -127,9 +143,19 @@
                 if (name == "jobname") {
                     continue;
                 }
+                if (name == "jobsign") {
+
+                    sign = value;
+                    continue;
+                }
                 if (name == "jobstarttime") {
 
                     starttime = value;
+                    continue;
+                }
+                if (name == "queuename") {
+
+                    queue = value;
                     continue;
                 }
                 if (name == "jobperiodtime") {
@@ -140,7 +166,7 @@
                 data.push({ name: name, type: type, value: value });
             }
 
-            var send = { cmd: params.cmd, domain: domain, assembly: assembly, job: job, start: starttime, period: period, data: data };
+            var send = { cmd: params.cmd, domain: domain, assembly: assembly, job: job, start: starttime, queue: queue, sign: sign, period: period, data: data };
 
             //每次都将监听先关闭，防止多次监听发生，确保只有一次监听
             model.find(".cancel").off("click")

@@ -1,4 +1,5 @@
-﻿using Hangfire.JobDomains.Interface;
+﻿using Common.Logging;
+using Hangfire.JobDomains.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,37 +11,49 @@ namespace TestDLL
 {
 
     [Nameplate("测试任务", "这是一个测试任务")]
-    public class HelloWorld : MarshalByRefObject,IPrefabrication
+    public class HelloWorld :IPrefabrication
     {
-        private string Owner { get; set; }
+        static ILog loger = LogManager.GetLogger<HelloWorld>();
+
+        private string People { get; set; }
 
         private DateTime Time { get; set; } = DateTime.MinValue;
 
         public HelloWorld() : this(" I ") { }
 
-        public HelloWorld(string owner) : this(owner,DateTime.Now) { }
+        public HelloWorld(string people) : this(people,DateTime.Now) { }
 
-        public HelloWorld(string owner, DateTime time) : this(time, owner) { }
+        public HelloWorld(string people, DateTime time) : this(time, people) { }
 
-        public HelloWorld(DateTime time,string owner)
+        public HelloWorld(DateTime time,string people)
         {
-            Owner = owner;
+            People = people;
             Time = time;
         }
 
-        public string Invoke(string name)
+        string SayStyle
         {
-            return $"{Time}| {Owner} say :HelloWorld ,{ name }!";
+            get
+            {
+                if (Time < DateTime.Now)
+                {
+                    return " said ";
+                }
+                else {
+                    return " will say ";
+                }
+            }
         }
 
         public bool Test()
         {
+            loger.Info($"测试任务|Test :On { Time } I { SayStyle } :HelloWorld ,{ People } !");
             return true;
         }
 
         public void Dispatch()
         {
-            Console.WriteLine($" {Time}| I say :HelloWorld ,{Owner}!");
+            loger.Info($"测试任务|Dispatch :On { Time } I { SayStyle } :HelloWorld ,{ People } !");
         }
     }
 

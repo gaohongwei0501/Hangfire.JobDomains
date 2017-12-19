@@ -28,6 +28,12 @@ namespace Hangfire.JobDomains.Storage
 
         public List<string> GetServersByDomain(string domain) => Storage.GetServersByDomain(domain);
 
+        public List<QueueDefine> GetQueues() => Storage.GetQueues();
+
+        public List<QueueDefine> GetQueuesByDomain(string domain) => Storage.GetQueuesByDomain(  domain);
+
+        public QueueDefine GetQueue(string queue) => Storage.GetQueue(queue);
+
         public List<DomainDefine> GetDomainDefines() => Storage.GetAllDomains();
 
         public List<AssemblyDefine> GetAssemblies(DomainDefine domain) => Storage.GetAssemblies(domain);

@@ -13,11 +13,6 @@ namespace Hangfire.JobDomains.Storage.SqlServer
     internal class SqlServerDBContext : DbContext
     {
 
-        public SqlServerDBContext()
-        {
-          
-        }
-
         public DbSet<Entities.Server> Servers { get; set; }
 
         public DbSet<ServerPlugin> ServerPlugMaps { get; set; }
@@ -32,13 +27,13 @@ namespace Hangfire.JobDomains.Storage.SqlServer
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration<Entities.Server>(new ServerTypeMapper());
             modelBuilder.ApplyConfiguration<Entities.ServerPlugin>(new ServerPluginMapper());
             modelBuilder.ApplyConfiguration<Entities.Domain>(new DomainMapper());
             modelBuilder.ApplyConfiguration<Entities.Assembly>(new AssemblyTypeMapper());
             modelBuilder.ApplyConfiguration<Entities.Job>(new JobMapper());
             modelBuilder.ApplyConfiguration<Entities.JobConstructorParameter>(new JobConstructorParameterMapper());
+            base.OnModelCreating(modelBuilder);
         }
 
         public static string ConnectionString { get; set; }

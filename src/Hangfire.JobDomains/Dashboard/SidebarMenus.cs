@@ -14,53 +14,31 @@ namespace Hangfire.JobDomains.Dashboard
     internal class SidebarMenus 
     {
 
-        public static Func<List<Func<RazorPage, MenuItem>>> DefaultMenu = () =>
-        {
-            var menus = new List<Func<RazorPage, MenuItem>>();
-
-            Func<RazorPage, (string Name, string Link), MenuItem> CreatePageMenu = (page, route) => new MenuItem(route.Name, route.Link)
-            {
-                Active = page.RequestPath.StartsWith(route.Link)
-            };
-
-            menus.Add(page => CreatePageMenu(page, page.Url.CreateRoute()));
-            menus.Add(page => CreatePageMenu(page, page.Url.CreateServerListRoute()));
-            menus.Add(page => CreatePageMenu(page, page.Url.CreateSystemRoute()));
-            menus.Add(page => CreatePageMenu(page, page.Url.CreateBatchRoute()));
-         
-            return menus;
-        };
-
-        public static Func<string, List<Func<RazorPage, MenuItem>>> DomainsMenu = (current) =>
+        private static Func<List<Func<RazorPage, MenuItem>>> defaultMenu = () =>
          {
-
              var menus = new List<Func<RazorPage, MenuItem>>();
 
-             menus.Add(page => new MenuItem("任务包列表", "#"));
-
-             var domains = StorageService.Provider.GetDomainDefines().OrderBy(s => s.Title);
-
-             foreach (var one in domains)
+             MenuItem CreatePageMenu(RazorPage page, (string Name, string Link) route) => new MenuItem(route.Name, route.Link)
              {
-                 menus.Add(page =>
-                 {
-                     var oneRoute = page.Url.CreateRoute(one);
-                     return new MenuItem(oneRoute.Name, oneRoute.Link)
-                     {
-                         Active = one.Title == current
-                     };
-                 });
-             }
+                 Active = page.RequestPath.StartsWith(route.Link)
+             };
+
+             menus.Add(page => CreatePageMenu(page, page.Url.CreateRoute()));
+             menus.Add(page => CreatePageMenu(page, page.Url.CreateServerListRoute()));
+             menus.Add(page => CreatePageMenu(page, page.Url.CreateQueueListRoute()));
+             menus.Add(page => CreatePageMenu(page, page.Url.CreateSystemRoute()));
+             menus.Add(page => CreatePageMenu(page, page.Url.CreateBatchRoute()));
+
              return menus;
          };
-
 
         public static Func<string, List<Func<RazorPage, MenuItem>>> ServersMenu = (current) =>
         {
 
-            var menus = new List<Func<RazorPage, MenuItem>>();
-
-            menus.Add(page => new MenuItem("服务器列表", "#"));
+            var menus = new List<Func<RazorPage, MenuItem>>
+            {
+                page => new MenuItem("服务器列表", "#")
+            };
 
             var servers = StorageService.Provider.GetServers().OrderBy(s => s.Name);
 
@@ -68,8 +46,8 @@ namespace Hangfire.JobDomains.Dashboard
             {
                 menus.Add(page =>
                 {
-                    var oneRoute = page.Url.CreateServerRoute(one);
-                    return new MenuItem(oneRoute.Name, oneRoute.Link)
+                    var (Name, Link) = page.Url.CreateServerRoute(one);
+                    return new MenuItem(Name, Link)
                     {
                         Active = one.Name == current
                     };
@@ -77,6 +55,55 @@ namespace Hangfire.JobDomains.Dashboard
             }
             return menus;
         };
+
+        private static Func<string, List<Func<RazorPage, MenuItem>>> queuesMenu = (current) =>
+         {
+
+             var menus = new List<Func<RazorPage, MenuItem>>
+             {
+                 page => new MenuItem("队列列表", "#")
+             };
+
+             var queues = StorageService.Provider.GetQueues().OrderBy(s => s.Name);
+
+             foreach (var one in queues)
+             {
+                 menus.Add(page =>
+                 {
+                     var (Name, Link) = page.Url.CreateQueueRoute(one);
+                     return new MenuItem(Name, Link)
+                     {
+                         Active = one.Name == current
+                     };
+                 });
+             }
+             return menus;
+         };
+
+        public static Func<string, List<Func<RazorPage, MenuItem>>> DomainsMenu = (current) =>
+        {
+
+            var menus = new List<Func<RazorPage, MenuItem>>
+            {
+                page => new MenuItem("任务包列表", "#")
+            };
+
+            var domains = StorageService.Provider.GetDomainDefines().OrderBy(s => s.Title);
+
+            foreach (var one in domains)
+            {
+                menus.Add(page =>
+                {
+                    var (Name, Link) = page.Url.CreateRoute(one);
+                    return new MenuItem(Name, Link)
+                    {
+                        Active = one.Title == current
+                    };
+                });
+            }
+            return menus;
+        };
+
 
         public static Func<string, string, string, List<Func<RazorPage, MenuItem>>> JobsMenu = (d, a, j) =>
         {
@@ -91,8 +118,8 @@ namespace Hangfire.JobDomains.Dashboard
 
             menus.Add(page =>
             {
-                var route = page.Url.CreateRoute(theDomain, theSet);
-                return new MenuItem($"{ theSet.Title } 任务列表", route.Link)
+                var (Name, Link) = page.Url.CreateRoute(theDomain, theSet);
+                return new MenuItem($"{ theSet.Title } 任务列表", Link)
                 {
                     Active = false
                 };
@@ -103,15 +130,17 @@ namespace Hangfire.JobDomains.Dashboard
             {
                 menus.Add(page =>
                 {
-                    var route = page.Url.CreateRoute(theDomain, theSet, one);
-                    return new MenuItem(route.Name, route.Link)
+                    var (Name, Link) = page.Url.CreateRoute(theDomain, theSet, one);
+                    return new MenuItem(Name, Link)
                     {
-                        Active = page.RequestPath.StartsWith(route.Link)
+                        Active = page.RequestPath.StartsWith(Link)
                     };
                 });
             }
             return menus;
         };
 
+        public static Func<List<Func<RazorPage, MenuItem>>> DefaultMenu { get => defaultMenu; set => defaultMenu = value; }
+        public static Func<string, List<Func<RazorPage, MenuItem>>> QueuesMenu { get => queuesMenu; set => queuesMenu = value; }
     }
 }

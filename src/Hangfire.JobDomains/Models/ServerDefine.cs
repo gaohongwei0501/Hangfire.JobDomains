@@ -27,6 +27,8 @@ namespace Hangfire.JobDomains.Models
 
         public List<DomainDefine> Domains { get; set; }
 
+        public List<QueueDefine> Queues { get; set; }
+
     }
 
 

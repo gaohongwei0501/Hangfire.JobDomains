@@ -122,6 +122,52 @@ namespace Hangfire.JobDomains.Dashboard
 
         #endregion
 
+        #region QueueListPage
+
+        public const string QueueListPageRoute = "/domains/queues";
+
+        /// <summary>
+        /// DomainPage CreateRoute
+        /// </summary>
+        public static (string Name, string Link) CreateQueueListRoute(this UrlHelper Url)
+        {
+            var name = QueueListPage.Title;
+            var link = QueueListPageRoute;
+            return (name, Url.To(link));
+        }
+
+        #endregion
+
+        #region QueuePage
+
+        public const string QueuePageRoute = "/domains/queue-(?<name>.+)";
+
+        /// <summary>
+        /// DomainPage CreateRoute
+        /// </summary>
+        public static (string Name, string Link) CreateQueueRoute(this UrlHelper Url, QueueDefine queue)
+        {
+            var name = queue.Name;
+            var link = QueuePageRoute.Replace("(?<name>.+)", name).EscapeRoute();
+            return (name, Url.To(link));
+        }
+
+        public static (string Name, string Link) CreateQueueRoute(this UrlHelper Url, string queueName)
+        {
+            var name = queueName;
+            var link = QueuePageRoute.Replace("(?<name>.+)", queueName).EscapeRoute();
+            return (name, Url.To(link));
+        }
+
+        public static QueuePage CreateQueuePage(Match match)
+        {
+            var name = match.Groups["name"];
+            return new QueuePage(name.EscapeNomal());
+        }
+
+        #endregion
+
+
         #region DomainPage
 
         public const string DomainPageRoute = "/domains/domain-(?<name>.+)";
