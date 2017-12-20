@@ -20,11 +20,13 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
         protected override bool Content()
         {
-            var list = StorageService.Provider.GetServers();
+            var list = StorageService.Provider.GetServers(this.Storage);
             var content = PageContent.Tag.ListLink(list, Url.CreateServerRoute);
             var panel = PageContent.Tag.Panel("服务器列表", string.Empty, content);
             WriteLiteral(panel);
             return true;
         }
+
+    
     }
 }

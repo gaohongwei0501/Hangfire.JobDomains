@@ -14,35 +14,39 @@ namespace Hangfire.JobDomains.Server
     internal class JobDomainManager
     {
 
+        public static string ServerName => Environment.MachineName.ToLower();
+
         static ILog loger = LogManager.GetLogger<JobDomainManager>();
 
         public static async Task<BackgroundJobServerOptions> InitServer(string path, int workerCount)
         {
             if (string.IsNullOrEmpty(path)) return null;
-            var queues = await ScanServer(path);
-            var server = await UpdateServer(path, queues);
+            var domains = await ScanServer(path);
+            await UpdateServer(path, domains);
+
+            var queues = StorageService.Provider.GetQueues(null, ServerName);
             var options = new BackgroundJobServerOptions
             {
                 WorkerCount = workerCount,
-                Queues = server.Queues.Select(s=>s.Name).ToArray()
+                Queues = queues.Select(s => s.Name).ToArray()
             };
             return options;
         }
 
-        static async Task<ServerDefine> UpdateServer(string path, List<string> queues)
+        static async Task UpdateServer(string path, List<string> domains)
         {
             try
             {
                 if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
-                var server = new ServerDefine() { PlugPath = path };
-                var success = await StorageService.Provider.AddOrUpdateServerAsync(server, queues);
-                if (success) return StorageService.Provider.GetServer(server.Name);
+                var server = new ServerDefine(ServerName) { PlugPath = path };
+                var success = await StorageService.Provider.AddOrUpdateServerAsync(server, domains);
+                if (success) return;
             }
             catch (Exception ex)
             {
                 loger.Error("服务初始化", ex);
             }
-            throw (new Exception(" 服务获取失败! "));
+            throw (new Exception(" 服务更新失败! "));
         }
 
         static async Task<List<string>> ScanServer(string basePath)

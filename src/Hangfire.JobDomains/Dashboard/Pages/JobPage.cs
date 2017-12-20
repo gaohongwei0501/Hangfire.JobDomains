@@ -68,6 +68,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             var structures = TheJob.GetConstructors();
 
             var customAttr=$@" data-domain=""{ TheDomain.Title }""  data-assembly=""{ TheAssembly.ShortName }"" data-job=""{ TheJob.Name }""  data-url=""{Url.To(UrlHelperExtension.JobCommandRoute)}"" ";
+            var queues = StorageService.Provider.GetQueuesByDomain(this.Storage, TheDomain.PathName);
 
             foreach (var structure in structures)
             {
@@ -104,7 +105,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
                 }
 
                 var heading = $"{TheJob.Name}({title.ToString().TrimEnd(',')})";
-                var cmdParamers = PageContent.Tag.CreateJobScheduleParamers(id, TheDomain.PathName, TheJob.Title);
+                var cmdParamers = PageContent.Tag.CreateJobScheduleParamers(queues, id, TheJob.Title);
                 var cmdButtons = PageContent.Tag.CreateJobScheduleButtons(id);
                 var panel = PageContent.Tag.Panel(heading, "", inputs.ToString(), new List<string> { cmdParamers, cmdButtons } , "js-domain-job", customAttr);
                 WriteLiteral(panel);

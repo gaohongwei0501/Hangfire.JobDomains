@@ -1,29 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities
 {
-    public class ServerPlugin: SQLiteEntityBase
+    public class ServerQueue : SQLiteEntityBase
     {
-        public ServerPlugin() { }
+        public ServerQueue() { }
 
-        public ServerPlugin(string server,string plug)
+        public ServerQueue(string server, string queue)
         {
             ServerName = server;
-            PlugName = plug;
+            QueueName = queue;
             CreatedAt = DateTime.Now;
         }
 
         public string ServerName { get; set; }
 
-        public string PlugName { get; set; }
+        public string QueueName { get; set; }
 
     }
-
-   
 }

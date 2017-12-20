@@ -10,6 +10,7 @@ namespace Hangfire.JobDomains.Storage
 
     public interface IDomainStorage
     {
+        bool AddService(string connectString);
 
         Task<bool> AddOrUpdateServerAsync(ServerDefine server, List<string> domains);
 
@@ -19,13 +20,11 @@ namespace Hangfire.JobDomains.Storage
 
         List<string> GetServersByDomain(string domain);
 
-        List<QueueDefine> GetQueues();
+        List<string> GetServersByQueue(string queue);
 
-        List<QueueDefine> GetQueuesByDomain(string domain) ;
+        List<QueueDefine> GetCustomerQueues();
 
-        QueueDefine GetQueue(string queue) ;
-
-        bool AddService(string connectString);
+        List<QueueDefine> GetCustomerQueues(string server);
 
         List<DomainDefine> GetAllDomains();
 

@@ -60,7 +60,7 @@ namespace Hangfire.JobDomains.Server
             AppDomain Domain = null;
             try
             {
-                var server = StorageService.Provider.GetServer(Environment.MachineName.ToLower());
+                var server = StorageService.Provider.GetServer(null, JobDomainManager.ServerName);
                 var path = $"{ server.PlugPath }//{ pluginName }";
                 AppDomainSetup setup = new AppDomainSetup
                 {

@@ -20,7 +20,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
         protected override bool Content()
         {
-            var list = StorageService.Provider.GetQueues();
+            var list = StorageService.Provider.GetQueues(this.Storage);
             var content = PageContent.Tag.ListLink(list, Url.CreateQueueRoute);
             var panel = PageContent.Tag.Panel("队列列表", string.Empty, content);
             WriteLiteral(panel);

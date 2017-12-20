@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hangfire.JobDomains.Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace Hangfire.JobDomains.Models
     public class ServerDefine
     {
 
-        public ServerDefine() { }
+        public ServerDefine(string name) { Name = name; }
 
         public ServerDefine(string name, string path, string description = "")
         {
@@ -19,7 +20,7 @@ namespace Hangfire.JobDomains.Models
             PlugPath = path;
         }
 
-        public string Name { get; private set; } = Environment.MachineName.ToLower();
+        public string Name { get; private set; } 
 
         public string Description { get; set; }
 

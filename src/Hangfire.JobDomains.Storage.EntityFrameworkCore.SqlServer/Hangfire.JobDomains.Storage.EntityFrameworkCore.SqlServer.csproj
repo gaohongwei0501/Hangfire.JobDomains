@@ -129,6 +129,7 @@
     <Compile Include="TypeMapper\JobConstructorParameter.cs" />
     <Compile Include="TypeMapper\JobMapper.cs" />
     <Compile Include="TypeMapper\ServerPluginMapper.cs" />
+    <Compile Include="TypeMapper\ServerQueueMapper.cs" />
     <Compile Include="TypeMapper\ServerTypeMapper.cs" />
   </ItemGroup>
   <ItemGroup>

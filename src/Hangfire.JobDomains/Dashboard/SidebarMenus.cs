@@ -10,67 +10,45 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Dashboard
 {
-    
-    internal class SidebarMenus 
+
+    internal class SidebarMenus
     {
 
-        private static Func<List<Func<RazorPage, MenuItem>>> defaultMenu = () =>
-         {
-             var menus = new List<Func<RazorPage, MenuItem>>();
-
-             MenuItem CreatePageMenu(RazorPage page, (string Name, string Link) route) => new MenuItem(route.Name, route.Link)
-             {
-                 Active = page.RequestPath.StartsWith(route.Link)
-             };
-
-             menus.Add(page => CreatePageMenu(page, page.Url.CreateRoute()));
-             menus.Add(page => CreatePageMenu(page, page.Url.CreateServerListRoute()));
-             menus.Add(page => CreatePageMenu(page, page.Url.CreateQueueListRoute()));
-             menus.Add(page => CreatePageMenu(page, page.Url.CreateSystemRoute()));
-             menus.Add(page => CreatePageMenu(page, page.Url.CreateBatchRoute()));
-
-             return menus;
-         };
-
-        public static Func<string, List<Func<RazorPage, MenuItem>>> ServersMenu = (current) =>
+        public static Func<List<Func<RazorPage, MenuItem>>> DefaultMenu = () =>
         {
+            var menus = new List<Func<RazorPage, MenuItem>>();
 
-            var menus = new List<Func<RazorPage, MenuItem>>
+            MenuItem CreatePageMenu(RazorPage page, (string Name, string Link) route) => new MenuItem(route.Name, route.Link)
             {
-                page => new MenuItem("服务器列表", "#")
+                Active = page.RequestPath.StartsWith(route.Link)
             };
 
-            var servers = StorageService.Provider.GetServers().OrderBy(s => s.Name);
+            menus.Add(page => CreatePageMenu(page, page.Url.CreateRoute()));
+            menus.Add(page => CreatePageMenu(page, page.Url.CreateServerListRoute()));
+            menus.Add(page => CreatePageMenu(page, page.Url.CreateQueueListRoute()));
+            menus.Add(page => CreatePageMenu(page, page.Url.CreateSystemRoute()));
+            menus.Add(page => CreatePageMenu(page, page.Url.CreateBatchRoute()));
 
-            foreach (var one in servers)
-            {
-                menus.Add(page =>
-                {
-                    var (Name, Link) = page.Url.CreateServerRoute(one);
-                    return new MenuItem(Name, Link)
-                    {
-                        Active = one.Name == current
-                    };
-                });
-            }
             return menus;
         };
 
-        private static Func<string, List<Func<RazorPage, MenuItem>>> queuesMenu = (current) =>
+        public static Func<RazorPage, string, List<Func<RazorPage, MenuItem>>> ServersMenu = (master, current) =>
          {
-
              var menus = new List<Func<RazorPage, MenuItem>>
              {
-                 page => new MenuItem("队列列表", "#")
+                page =>{
+                      var (Name, Link) = page.Url.CreateServerListRoute();
+                      return   new MenuItem(Name, Link);
+                }
              };
+ 
+             var servers = StorageService.Provider.GetServers(master.Storage).OrderBy(s => s.Name);
 
-             var queues = StorageService.Provider.GetQueues().OrderBy(s => s.Name);
-
-             foreach (var one in queues)
+             foreach (var one in servers)
              {
                  menus.Add(page =>
                  {
-                     var (Name, Link) = page.Url.CreateQueueRoute(one);
+                     var (Name, Link) = page.Url.CreateServerRoute(one);
                      return new MenuItem(Name, Link)
                      {
                          Active = one.Name == current
@@ -79,6 +57,33 @@ namespace Hangfire.JobDomains.Dashboard
              }
              return menus;
          };
+
+        public static Func<RazorPage,string, List<Func<RazorPage, MenuItem>>> QueuesMenu = (master,current) =>
+        {
+
+            var menus = new List<Func<RazorPage, MenuItem>>
+             {
+                 page =>{
+                      var (Name, Link) = page.Url.CreateQueueListRoute();
+                      return  new MenuItem(Name, Link);
+                }
+             };
+
+            var queues = StorageService.Provider.GetQueues(master.Storage).OrderBy(s => s.Name);
+
+            foreach (var one in queues)
+            {
+                menus.Add(page =>
+                {
+                    var (Name, Link) = page.Url.CreateQueueRoute(one);
+                    return new MenuItem(Name, Link)
+                    {
+                        Active = one.Name == current
+                    };
+                });
+            }
+            return menus;
+        };
 
         public static Func<string, List<Func<RazorPage, MenuItem>>> DomainsMenu = (current) =>
         {
@@ -140,7 +145,5 @@ namespace Hangfire.JobDomains.Dashboard
             return menus;
         };
 
-        public static Func<List<Func<RazorPage, MenuItem>>> DefaultMenu { get => defaultMenu; set => defaultMenu = value; }
-        public static Func<string, List<Func<RazorPage, MenuItem>>> QueuesMenu { get => queuesMenu; set => queuesMenu = value; }
     }
 }

@@ -14,7 +14,7 @@ namespace Hangfire.JobDomains.Storage
 
         static IDomainStorage Storage { get; set; }
 
-        public bool SetStorage(IDomainStorage store,string connectString)
+        public bool SetStorage(IDomainStorage store, string connectString)
         {
             if (Storage == null) Storage = store;
             return Storage.AddService(connectString);
@@ -22,17 +22,119 @@ namespace Hangfire.JobDomains.Storage
 
         public Task<bool> AddOrUpdateServerAsync(ServerDefine server, List<string> domains) => Storage.AddOrUpdateServerAsync(server, domains);
 
-        public List<ServerDefine> GetServers() => Storage.GetServers();
+        public List<ServerDefine> GetServers(Hangfire.JobStorage hangfireStorage)
+        {
+            var monitor = hangfireStorage.GetMonitoringApi();
+            var activeServers = monitor.Servers();
+            var actives = activeServers.Select(s => SubServerName(s.Name)).ToList();
 
-        public ServerDefine GetServer(string server) => Storage.GetServer(server);
+            var servers = Storage.GetServers();
+            return servers.Where(s=> actives.Contains(s.Name)).ToList();
+        }
+
+        string SubServerName(string server)
+        {
+            var index = server.IndexOf(":");
+            return index > 0 ? server.Substring(0, index) : server;
+        }
+
+        public List<string> GetServersByQueue(Hangfire.JobStorage hangfireStorage, string queue)
+        {
+            var monitor = hangfireStorage.GetMonitoringApi();
+            var servers = monitor.Servers();
+            var serverNames = servers.Select(s=>SubServerName(s.Name)).Distinct();
+            if (queue == "default") return new List<string>();
+            if (serverNames.Contains(queue)) return new List<string> { queue };
+            return Storage.GetServersByQueue(queue);
+        }
+
+
+        public ServerDefine GetServer(Hangfire.JobStorage hangfireStorage, string serverName)
+        {
+            var Server = Storage.GetServer(serverName);
+            Server.Queues = GetQueues(hangfireStorage, serverName);
+            return Server;
+        }
 
         public List<string> GetServersByDomain(string domain) => Storage.GetServersByDomain(domain);
 
-        public List<QueueDefine> GetQueues() => Storage.GetQueues();
+        public List<QueueDefine> GetQueues(Hangfire.JobStorage hangfireStorage)
+        {
+            var queues = GetActiveServerQueues(hangfireStorage).ToList();
+            var customerQueues = Storage.GetCustomerQueues();
+            queues.AddRange(customerQueues);
+            return queues;
+        }
 
-        public List<QueueDefine> GetQueuesByDomain(string domain) => Storage.GetQueuesByDomain(  domain);
+        public List<QueueDefine> GetQueues(Hangfire.JobStorage hangfireStorage, string serverName)
+        {
+            QueueDefine loacl = new QueueDefine { Name = serverName, Description = "服务器队列" };
+            var queues = Storage.GetCustomerQueues(serverName);
+            queues.Add(QueueDefine.defaultValue);
+            queues.Add(loacl);
+            if (hangfireStorage != null) {
+                var actives = GetActiveServerQueues(hangfireStorage, serverName);
+                foreach (var queue in queues)
+                {
+                    var one = actives.FirstOrDefault(s=>s.Name== queue.Name);
+                    if (one != null) { queue.IsActive = true; }
+                }
+            }
+            return queues;
+        }
 
-        public QueueDefine GetQueue(string queue) => Storage.GetQueue(queue);
+        IEnumerable<QueueDefine> GetActiveServerQueues(Hangfire.JobStorage hangfireStorage, string serverName)
+        {
+            var monitor = hangfireStorage.GetMonitoringApi();
+            var server = monitor.Servers().FirstOrDefault(s => SubServerName(s.Name) == serverName);
+            
+            return server.Queues.Where(s => s != "default").Select(s => new QueueDefine { Name = s, Description = "服务器队列", IsActive = true });
+        }
+
+        IEnumerable<QueueDefine> GetActiveServerQueues(Hangfire.JobStorage hangfireStorage)
+        {
+            var monitor = hangfireStorage.GetMonitoringApi();
+            var servers = monitor.Servers().ToList();
+            var list = new List<string>();
+            servers.ForEach(s => list.AddRange(s.Queues));
+            return list.Distinct().Where(s => s != "default").Select(s => new QueueDefine { Name = s, Description = "服务器队列" });
+        }
+
+        public IEnumerable<string> GetQueuesByDomain(Hangfire.JobStorage hangfireStorage, string domainName)
+        {
+            var domainServers = GetServersByDomain(domainName);
+            var monitor = hangfireStorage.GetMonitoringApi();
+            var activeServers = monitor.Servers();
+
+            #region 激活的【任务服务器】（可以执行指定插件的任务服务器）的队列集
+
+            var activeDomainServers = activeServers.Where(s => domainServers.Contains(SubServerName(s.Name))).ToList();
+            var domainQueues = new List<string>();
+            activeDomainServers.ForEach(s => domainQueues.AddRange(s.Queues));
+            var domainDistincts = domainQueues.Distinct().Where(s => s != "default");
+
+            #endregion
+
+            #region 激活的非【任务服务器】的队列集
+
+            var otherActiveDomainServers = activeServers.Where(s => domainServers.Contains(SubServerName(s.Name)) == false).ToList();
+            var otherQueues = new List<string>();
+            otherActiveDomainServers.ForEach(s => otherQueues.AddRange(s.Queues));
+            var otherDistincts = otherQueues.Distinct();
+
+            #endregion
+
+            return domainDistincts.Where(s => otherDistincts.Contains(s) == false);
+        }
+
+        public QueueDefine GetQueue(Hangfire.JobStorage hangfireStorage, string queueName)
+        {
+            if (queueName == "default") return QueueDefine.defaultValue;
+            var queues = GetActiveServerQueues(hangfireStorage);
+            var queue = queues.FirstOrDefault(s => s.Name == queueName);
+            if (queue == null) queue = new QueueDefine { Name = queueName, Description = "自定义队列" };
+            return queue;
+        }
 
         public List<DomainDefine> GetDomainDefines() => Storage.GetAllDomains();
 

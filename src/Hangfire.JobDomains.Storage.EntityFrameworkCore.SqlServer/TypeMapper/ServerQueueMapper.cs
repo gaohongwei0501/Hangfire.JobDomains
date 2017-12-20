@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
 {
 
-    internal class ServerPluginMapper : IEntityTypeConfiguration<EntityFrameworkCore.Entities.ServerPlugin>
+    internal class ServerQueueMapper : IEntityTypeConfiguration<EntityFrameworkCore.Entities.ServerQueue>
     {
-        public void Configure(EntityTypeBuilder<EntityFrameworkCore.Entities.ServerPlugin> builder)
+        public void Configure(EntityTypeBuilder<EntityFrameworkCore.Entities.ServerQueue> builder)
         {
             // Primary Key
             builder.HasKey(t => t.ID);
@@ -20,10 +20,9 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
             builder.Property(t => t.ID).UseSqlServerIdentityColumn();
 
             builder.Property(t => t.ServerName).IsRequired().HasMaxLength(50);
-            builder.Property(t => t.PlugName).IsRequired().HasMaxLength(50);
+            builder.Property(t => t.QueueName).IsRequired().HasMaxLength(50);
 
-            builder.ToTable("Hangfire.JobDomains.ServerPlugin");
+            builder.ToTable("Hangfire.JobDomains.ServerQueue");
         }
     }
-
 }

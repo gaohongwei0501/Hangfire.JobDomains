@@ -9,15 +9,12 @@ namespace Hangfire.JobDomains.Models
     public class QueueDefine
     {
 
+        public static QueueDefine defaultValue = new QueueDefine { Name = "default", Description = "默认队列", IsActive = true };
+
         /// <summary>
         /// 名称
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// 标题
-        /// </summary>
-        public string Title { get; set; }
 
         /// <summary>
         /// 描述
@@ -25,9 +22,9 @@ namespace Hangfire.JobDomains.Models
         public string Description { get; set; }
 
         /// <summary>
-        /// 服务器
+        /// 是否激活
         /// </summary>
-        public List<ServerDefine> Servers { get; set; }
+        public bool IsActive { get; set; } = false;
 
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 {
-    internal static class EntityAndModelMapper
+    internal static class ModelMapper
     {
 
         public static Entities.Server Convert(this ServerDefine model)
@@ -97,6 +97,14 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
             return list;
         }
 
-
+        public static Entities.Queue Convert(this QueueDefine model)
+        {
+            return new Queue
+            {
+                Name = model.Name,
+                Description = model.Description,
+                CreatedAt = DateTime.Now,
+            };
+        }
     }
 }

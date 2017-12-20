@@ -243,9 +243,8 @@ namespace Hangfire.JobDomains.Dashboard
                     </div>";
         }
 
-        public static string CreateJobScheduleParamers(this TagHelper Tag, string id, string domain,string sign)
+        public static string CreateJobScheduleParamers(this TagHelper Tag, IEnumerable<string> queues, string id, string sign)
         {
-            var queues = StorageService.Provider.GetQueuesByDomain(domain);
             var bulider = new StringBuilder();
 
             bulider.Append($@" <div class=""form-group"">
@@ -267,14 +266,14 @@ namespace Hangfire.JobDomains.Dashboard
                                 <input type=""text"" class=""form-control schedule_queue""  placeholder=""任务工作执行队列"">
                                 <span class=""input-group-btn"">
                                     <button type=""button"" class=""btn btn-info btn-sm dropdown-toggle"" data-toggle=""dropdown"" aria-haspopup=""true"" aria-expanded=""false"">
-                                         队列 &nbsp; <span class=""caret""></span>
+                                         推荐队列 &nbsp; <span class=""caret""></span>
                                     </button>
                                     <ul class=""dropdown-menu"">");
 
 
             foreach (var item in queues)
             {
-                bulider.Append($@"<li><a href=""#""   class=""js-job-queue"" input-id=""{ id }"" data-name=""{ item.Name }""  >{ item.Name }</a></li>");
+                bulider.Append($@"<li><a href=""#""   class=""js-job-queue"" input-id=""{ id }"" data-name=""{ item }""  >{ item }</a></li>");
             }
 
             bulider.Append(@" </ul></span></div>");

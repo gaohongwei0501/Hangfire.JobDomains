@@ -26,7 +26,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             Sidebar = ()=>SidebarMenus.DomainsMenu(domain);
             var set = StorageService.Provider.GetDomainDefines();
             TheDomain = set.SingleOrDefault(s => s.Title == domain);
-            TheAssembly = TheDomain == null ? null : TheDomain.GetJobSets().SingleOrDefault(s => s.ShortName == name);
+            TheAssembly = TheDomain?.GetJobSets().SingleOrDefault(s => s.ShortName == name);
         }
 
         protected override bool Content()
@@ -37,10 +37,10 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
         void WriteBar()
         {
-            var mainRoute = Url.CreateRoute();
+            var (Name, Link) = Url.CreateRoute();
             var domainRoute = Url.CreateRoute(TheDomain);
             var bar = $@"<ol class='breadcrumb'>
-                          <li><a href='{ mainRoute.Link }'>{ mainRoute.Name }</a></li>
+                          <li><a href='{ Link }'>{ Name }</a></li>
                           <li><a href='{ domainRoute.Link }'>{ domainRoute.Name }</a></li>
                           <li class='active'><a href='#'>{ Url.CreateRoute(TheDomain, TheAssembly).Name }</a></li>
                         </ol>";

@@ -13,8 +13,6 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
     public abstract class EFCoreStorage : IDomainStorage
     {
 
-        string ServerName => Environment.MachineName.ToLower();
-
         public abstract EFCoreDBContext GetContext();
 
         public abstract bool AddService(string nameOrConnectionString);
@@ -50,7 +48,6 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         public async Task<bool> AddOrUpdateServerAsync(ServerDefine model, List<string> domains)
         {
-            if (model.Name != ServerName) throw (new Exception("服务器数据本身修改"));
             using (var context = GetContext())
             {
                 using (var transaction = await context.Database.BeginTransactionAsync())
@@ -59,12 +56,12 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
                     {
                         var server = context.Servers.SingleOrDefault(s => s.Name == model.Name);
                         if (server != null) context.Servers.Remove(server);
-                        var mappers = context.ServerPlugMaps.Where(s => s.ServerName == model.Name);
-                        context.ServerPlugMaps.RemoveRange(mappers);
+                        var mappers = context.ServerPlugs.Where(s => s.ServerName == model.Name);
+                        context.ServerPlugs.RemoveRange(mappers);
 
-                        await context.AddAsync(model.Convert());
+                        await context.Servers.AddAsync(model.Convert());
                         var newMappers = domains.Select(s => new ServerPlugin(model.Name, s));
-                        await context.ServerPlugMaps.AddRangeAsync(newMappers);
+                        await context.ServerPlugs.AddRangeAsync(newMappers);
 
                         var result = await context.SaveChangesAsync();
                         transaction.Commit();
@@ -101,7 +98,16 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
         {
             using (var context = GetContext())
             {
-                var servers = context.ServerPlugMaps.Where(s => s.PlugName == domain).Select(s => s.ServerName);
+                var servers = context.ServerPlugs.Where(s => s.PlugName == domain).Select(s => s.ServerName);
+                return servers.ToList();
+            }
+        }
+
+        public List<string> GetServersByQueue(string queue)
+        {
+            using (var context = GetContext())
+            {
+                var servers = context.ServerQueues.Where(s => s.QueueName == queue).Select(s => s.ServerName);
                 return servers.ToList();
             }
         }
@@ -110,25 +116,27 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         #region QueueDefine
 
-        public List<QueueDefine> GetQueues()
+        public List<QueueDefine> GetCustomerQueues()
         {
-            throw new NotImplementedException();
+            using (var context = GetContext())
+            {
+                var servers = context.ServerQueues.Select(s=>s.QueueName).Distinct().Select(s => new QueueDefine { Name = s, Description = "自定义队列" });
+                return servers.ToList();
+            }
         }
 
-        public List<QueueDefine> GetQueuesByDomain(string domain)
+        public List<QueueDefine> GetCustomerQueues(string server)
         {
-            throw new NotImplementedException();
-        }
-
-        public QueueDefine GetQueue(string queue)
-        {
-            throw new NotImplementedException();
+            using (var context = GetContext())
+            {
+                var servers = context.ServerQueues.Where(s => s.ServerName == server).Select(s =>new QueueDefine {  Name=s.QueueName, Description="自定义队列" } );
+                return servers.ToList();
+            }
         }
 
         #endregion
 
         #region DomainDefine
-
 
         public async Task<bool> AddDomainAsync(DomainDefine define)
         {

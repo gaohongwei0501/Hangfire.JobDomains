@@ -13,7 +13,11 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
     {
         public DbSet<Entities.Server> Servers { get; set; }
 
-        public DbSet<ServerPlugin> ServerPlugMaps { get; set; }
+        public DbSet<Queue> Queues { get; set; }
+
+        public DbSet<ServerPlugin> ServerPlugs { get; set; }
+
+        public DbSet<ServerQueue> ServerQueues { get; set; }
 
         public DbSet<Domain> Domains { get; set; }
 
