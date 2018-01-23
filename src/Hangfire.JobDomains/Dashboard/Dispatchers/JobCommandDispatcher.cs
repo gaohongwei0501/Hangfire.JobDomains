@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Dashboard.Dispatchers
 {
+
+
+
     internal class JobCommandDispatcher : CommandDispatcher<JsonData>
     {
 

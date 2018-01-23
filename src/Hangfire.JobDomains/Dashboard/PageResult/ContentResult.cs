@@ -58,7 +58,7 @@ namespace Hangfire.JobDomains.Dashboard.PageResult
             Page.HtmlWrite("\r\n</div>\r\n");
             Page.HtmlWrite("\r\n</div>\r\n");
 
-            WriteStyleFile(Page.Url.To("/cssex/jobdomain"));
+            WriteStyleFile(Page.Url.To("/cssex/domainStyle"));
 
             var loadingMessage = "加载中...";
             var loading = Tag.CreateLoadingWall(loadingMessage);

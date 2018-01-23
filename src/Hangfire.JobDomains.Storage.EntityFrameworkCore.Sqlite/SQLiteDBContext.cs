@@ -27,13 +27,14 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Entities.Server>().ToTable("Hangfire.JobDomains.Server");
-            modelBuilder.Entity<Entities.ServerPlugin>().ToTable("Hangfire.JobDomains.ServerPlugin");
-            modelBuilder.Entity<Entities.ServerQueue>().ToTable("Hangfire.JobDomains.ServerQueue");
-            modelBuilder.Entity<Entities.Domain>().ToTable("Hangfire.JobDomains.Domain");
-            modelBuilder.Entity<Entities.Assembly>().ToTable("Hangfire.JobDomains.Assembly");
-            modelBuilder.Entity<Entities.Job>().ToTable("Hangfire.JobDomains.Job");
-            modelBuilder.Entity<Entities.JobConstructorParameter>().ToTable("Hangfire.JobDomains.JobConstructor");
+            modelBuilder.Entity<Entities.Server>().ToTable("JobDomains.Server", "Hangfire");
+            modelBuilder.Entity<Entities.ServerPlugin>().ToTable("JobDomains.ServerPlugin", "Hangfire");
+            modelBuilder.Entity<Entities.ServerQueue>().ToTable("JobDomains.ServerQueue", "Hangfire");
+            modelBuilder.Entity<Entities.Queue>().ToTable("JobDomains.Queue", "Hangfire");
+            modelBuilder.Entity<Entities.Domain>().ToTable("JobDomains.Domain", "Hangfire");
+            modelBuilder.Entity<Entities.Assembly>().ToTable("JobDomains.Assembly", "Hangfire");
+            modelBuilder.Entity<Entities.Job>().ToTable("JobDomains.Job", "Hangfire");
+            modelBuilder.Entity<Entities.JobConstructorParameter>().ToTable("JobDomains.JobConstructor", "Hangfire");
         }
 
         public static string ConnectionString { get; set; }

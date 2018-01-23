@@ -14,13 +14,15 @@ namespace Hangfire.JobDomains.Storage
 
         static IDomainStorage Storage { get; set; }
 
+        public Task<bool> ClearServer(string serverName)=> Storage.ClearServer(serverName);
+
         public bool SetStorage(IDomainStorage store, string connectString)
         {
             if (Storage == null) Storage = store;
             return Storage.AddService(connectString);
         }
 
-        public Task<bool> AddOrUpdateServerAsync(ServerDefine server, List<string> domains) => Storage.AddOrUpdateServerAsync(server, domains);
+        public Task<bool> AddOrUpdateServerAsync(ServerDefine server, List<string> pluginNames) => Storage.AddOrUpdateServerAsync(server, pluginNames);
 
         public List<ServerDefine> GetServers(Hangfire.JobStorage hangfireStorage)
         {
@@ -56,6 +58,11 @@ namespace Hangfire.JobDomains.Storage
             return Server;
         }
 
+        public ServerDefine GetServer( string serverName)
+        {
+            return Storage.GetServer(serverName);
+        }
+
         public List<string> GetServersByDomain(string domain) => Storage.GetServersByDomain(domain);
 
         public List<QueueDefine> GetQueues(Hangfire.JobStorage hangfireStorage)
@@ -66,9 +73,15 @@ namespace Hangfire.JobDomains.Storage
             return queues;
         }
 
+        public QueueDefine GetSelfQueue(string serverName)
+        {
+            QueueDefine loacl = new QueueDefine { Name = $"{serverName}_SelfQueue".ToLower(), Description = "服务器队列" };
+            return loacl;
+        }
+
         public List<QueueDefine> GetQueues(Hangfire.JobStorage hangfireStorage, string serverName)
         {
-            QueueDefine loacl = new QueueDefine { Name = serverName, Description = "服务器队列" };
+            QueueDefine loacl = GetSelfQueue(serverName);
             var queues = Storage.GetCustomerQueues(serverName);
             queues.Add(QueueDefine.defaultValue);
             queues.Add(loacl);
@@ -87,7 +100,7 @@ namespace Hangfire.JobDomains.Storage
         {
             var monitor = hangfireStorage.GetMonitoringApi();
             var server = monitor.Servers().FirstOrDefault(s => SubServerName(s.Name) == serverName);
-            
+            if (server == null) return new List<QueueDefine>();
             return server.Queues.Where(s => s != "default").Select(s => new QueueDefine { Name = s, Description = "服务器队列", IsActive = true });
         }
 

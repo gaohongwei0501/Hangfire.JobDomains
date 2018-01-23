@@ -20,9 +20,14 @@ namespace Hangfire.JobDomains.Server
 
         public static async Task<BackgroundJobServerOptions> InitServer(string path, int workerCount)
         {
-            if (string.IsNullOrEmpty(path)) return null;
-            var domains = await ScanServer(path);
-            await UpdateServer(path, domains);
+            if (string.IsNullOrEmpty(path)) {
+                var server=  StorageService.Provider.GetServer(ServerName);
+                if (server != null) path = server.PlugPath;
+            }
+            else
+            {
+                await UpdateServer(path);
+            }
 
             var queues = StorageService.Provider.GetQueues(null, ServerName);
             var options = new BackgroundJobServerOptions
@@ -33,13 +38,20 @@ namespace Hangfire.JobDomains.Server
             return options;
         }
 
-        static async Task UpdateServer(string path, List<string> domains)
+        public static async Task Restart(string path)
+        {
+            await UpdateServer(path);
+            //暂时只支持 web 站重启
+            File.SetLastWriteTime($"{AppDomain.CurrentDomain.BaseDirectory}\\Web.config", System.DateTime.Now);
+        }
+
+        public static async Task UpdateServer(string path)
         {
             try
             {
-                if (Directory.Exists(path) == false) Directory.CreateDirectory(path);
+                var plugins = await ScanServer(path);
                 var server = new ServerDefine(ServerName) { PlugPath = path };
-                var success = await StorageService.Provider.AddOrUpdateServerAsync(server, domains);
+                var success = await StorageService.Provider.AddOrUpdateServerAsync(server, plugins);
                 if (success) return;
             }
             catch (Exception ex)
@@ -51,6 +63,7 @@ namespace Hangfire.JobDomains.Server
 
         static async Task<List<string>> ScanServer(string basePath)
         {
+            if (Directory.Exists(basePath) == false) Directory.CreateDirectory(basePath);
             var queues = new List<string>();
             var paths = Directory.GetDirectories(basePath);
             foreach (var path in paths)

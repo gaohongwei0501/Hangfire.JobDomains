@@ -199,6 +199,10 @@
       <Project>{1b78ec58-7d47-49e0-8bed-b178585a05ac}</Project>
       <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore\Hangfire.JobDomains.Storage.EntityFrameworkCore.csproj">
+      <Project>{fde585ef-195f-4512-b84f-b2e7b3d2f6be}</Project>
+      <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.JobDomains.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>
       <Name>Hangfire.JobDomains</Name>

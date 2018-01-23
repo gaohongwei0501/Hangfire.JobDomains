@@ -245,11 +245,12 @@ namespace Hangfire.JobDomains.Dashboard
 
         #endregion
 
-        #region JobCommandPage
+        #region CommandPage
 
-        // public const string JobCommandPageRoute = "/domains/command-job-(?<cmd>.+)-job-(?<name>.+)-assembly-(?<assembly>.+)-domain-(?<domain>.+)";
         public const string JobCommandRoute = "/domains/command-job";
-        
+
+        public const string ServerCommandRoute = "/domains/command-server";
+
         #endregion
 
     }

@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dashboard\Dispatchers\ServerCommandDispatcher.cs" />
     <Compile Include="Dashboard\Pages\QueueListPage.cs" />
     <Compile Include="Dashboard\Pages\QueuePage.cs" />
     <Compile Include="Dashboard\Pages\ServerPage.cs" />
@@ -111,7 +112,6 @@
     <Compile Include="Storage\StorageService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -121,11 +121,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Dashboard\Content\domainJob.js" />
+    <EmbeddedResource Include="Dashboard\Content\domainScript.js" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Dashboard\Content\image\loading.gif" />
-    <EmbeddedResource Include="Dashboard\Content\JobDomains.css" />
+    <EmbeddedResource Include="Dashboard\Content\domainStyle.css" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

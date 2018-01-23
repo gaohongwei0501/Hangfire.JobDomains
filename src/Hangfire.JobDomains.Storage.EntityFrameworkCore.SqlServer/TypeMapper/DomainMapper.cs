@@ -21,7 +21,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
             builder.Property(t => t.Title).IsRequired().HasMaxLength(50);
             builder.Property(t => t.Description).HasMaxLength(200);
 
-            builder.ToTable("Hangfire.JobDomains.Domain");
+            builder.ToTable("JobDomains.Domain", "Hangfire");
         }
     }
 }

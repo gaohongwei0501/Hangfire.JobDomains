@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 namespace Hangfire.JobDomains.Dashboard
 {
 
+    /// <summary>
+    /// JobPage 页面指令
+    /// </summary>
     internal enum JobPageCommand
     {
         /// <summary>
@@ -28,6 +31,25 @@ namespace Hangfire.JobDomains.Dashboard
         Test,
     }
 
+    /// <summary>
+    /// ServerPage 页面指令
+    /// </summary>
+    internal enum ServerPageCommand
+    {
+        /// <summary>
+        /// 默认值
+        /// </summary>
+        [DescriptionAttribute("未知预制指令")]
+        None,
+        [DescriptionAttribute("路径编辑")]
+        EditPath,
+
+    }
+
+
+    /// <summary>
+    /// DomainPage 页面指令
+    /// </summary>
     internal enum DomainPageCommand
     {
         [DescriptionAttribute("未知预制指令")]

@@ -12,7 +12,9 @@ namespace Hangfire.JobDomains.Storage
     {
         bool AddService(string connectString);
 
-        Task<bool> AddOrUpdateServerAsync(ServerDefine server, List<string> domains);
+        Task<bool> ClearServer(string serverName);
+
+        Task<bool> AddOrUpdateServerAsync(ServerDefine server, List<string> pluginNames);
 
         List<ServerDefine> GetServers();
 

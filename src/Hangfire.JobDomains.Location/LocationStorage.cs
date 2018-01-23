@@ -17,7 +17,14 @@ namespace Hangfire.JobDomains.Storage.Location
 
         static ServerDefine Server { get; set; }
 
-        Task<bool> IDomainStorage.AddOrUpdateServerAsync(ServerDefine server, List<string> domains)
+        public Task<bool> ClearServer(string serverName)
+        {
+            Server = new ServerDefine (serverName) { Description="未配置的服务器" };
+            return Task.FromResult(true);
+        }
+
+
+        public Task<bool> AddOrUpdateServerAsync(ServerDefine server, List<string> pluginNames)
         {
             Server = server;
             return Task.FromResult(true);
@@ -158,7 +165,8 @@ namespace Hangfire.JobDomains.Storage.Location
             return jobCornSetting.DeleteValue(key);
         }
 
- 
+       
+
 
 
         #endregion

@@ -145,18 +145,18 @@ namespace Hangfire.JobDomains.Dashboard
             return $@"<div class=""list-group"">  {bulider}  </div>";
         }
        
-        public string ListItem(string content,string badge="")
+        public string ListItem(string content,string badge="" ,string data="")
         {
             badge = string.IsNullOrEmpty(badge) ? string.Empty:$@"<span class=""badge"">{badge}</span>";
-            return $@" <div href="""" class=""list-group-item "" >{badge}{content}</div> ";
+            return $@" <div href="""" class=""list-group-item "" {data} >{badge}{content}</div> ";
         }
 
      
-        public string ListLinkItem(string content, string url, string badge = "", bool active = false)
+        public string ListLinkItem(string content, string url, string badge = "", string data = "", bool active = false)
         {
             badge = string.IsNullOrEmpty(badge) ? string.Empty : $@"<span class=""badge"">{badge}</span>";
             var activeStr = active ? "active" : "";
-            return $@"<a href=""{ url }"" class=""list-group-item {activeStr}"" >{badge}{content}</a> ";
+            return $@"<a href=""{ url }"" class=""list-group-item {activeStr}""  {data}>{badge}{content}</a> ";
         }
 
         protected string Input(string id, string labelText, string placeholderText, string inputtype,string dataTag="")
@@ -367,11 +367,16 @@ namespace Hangfire.JobDomains.Dashboard
             return bulider.ToString();
         }
 
+        public static string CreateDescription(this TagHelper Tag, string description) {
+
+            return description;
+        }
+
         public static string CreateServerList(this TagHelper Tag, ServerDefine define)
         {
             var bulider = new StringBuilder();
             bulider.Append(Tag.ListItem($" 服务名器：{define.Name}"));
-            bulider.Append(Tag.ListItem($" 插件位置：{define.PlugPath}", "编辑"));
+            bulider.Append(Tag.ListItem($" 插件位置：{define.PlugPath}",  $"<span class='js-server-path-set cmd-link' data-cmd='{ServerPageCommand.EditPath}' >编辑</span>"));
             return Tag.List(bulider.ToString());
         }
 

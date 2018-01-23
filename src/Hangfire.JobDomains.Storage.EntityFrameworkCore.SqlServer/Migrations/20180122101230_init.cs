@@ -5,12 +5,16 @@ using System.Collections.Generic;
 
 namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
 {
-    public partial class Initial : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "Hangfire");
+
             migrationBuilder.CreateTable(
-                name: "Hangfire.JobDomains.Assembly",
+                name: "JobDomains.Assembly",
+                schema: "Hangfire",
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
@@ -25,11 +29,12 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hangfire.JobDomains.Assembly", x => x.ID);
+                    table.PrimaryKey("PK_JobDomains.Assembly", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Hangfire.JobDomains.Domain",
+                name: "JobDomains.Domain",
+                schema: "Hangfire",
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
@@ -41,11 +46,12 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hangfire.JobDomains.Domain", x => x.ID);
+                    table.PrimaryKey("PK_JobDomains.Domain", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Hangfire.JobDomains.Job",
+                name: "JobDomains.Job",
+                schema: "Hangfire",
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
@@ -60,11 +66,12 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hangfire.JobDomains.Job", x => x.ID);
+                    table.PrimaryKey("PK_JobDomains.Job", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Hangfire.JobDomains.JobConstructorParameter",
+                name: "JobDomains.JobConstructorParameter",
+                schema: "Hangfire",
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
@@ -79,11 +86,26 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hangfire.JobDomains.JobConstructorParameter", x => x.ID);
+                    table.PrimaryKey("PK_JobDomains.JobConstructorParameter", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Hangfire.JobDomains.Server",
+                name: "JobDomains.Queue",
+                schema: "Hangfire",
+                columns: table => new
+                {
+                    Name = table.Column<string>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Description = table.Column<string>(maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobDomains.Queue", x => x.Name);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JobDomains.Server",
+                schema: "Hangfire",
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
@@ -95,11 +117,12 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hangfire.JobDomains.Server", x => x.ID);
+                    table.PrimaryKey("PK_JobDomains.Server", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Hangfire.JobDomains.ServerPlugin",
+                name: "JobDomains.ServerPlugin",
+                schema: "Hangfire",
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
@@ -110,29 +133,59 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Hangfire.JobDomains.ServerPlugin", x => x.ID);
+                    table.PrimaryKey("PK_JobDomains.ServerPlugin", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JobDomains.ServerQueue",
+                schema: "Hangfire",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    QueueName = table.Column<string>(maxLength: 50, nullable: false),
+                    ServerName = table.Column<string>(maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobDomains.ServerQueue", x => x.ID);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Hangfire.JobDomains.Assembly");
+                name: "JobDomains.Assembly",
+                schema: "Hangfire");
 
             migrationBuilder.DropTable(
-                name: "Hangfire.JobDomains.Domain");
+                name: "JobDomains.Domain",
+                schema: "Hangfire");
 
             migrationBuilder.DropTable(
-                name: "Hangfire.JobDomains.Job");
+                name: "JobDomains.Job",
+                schema: "Hangfire");
 
             migrationBuilder.DropTable(
-                name: "Hangfire.JobDomains.JobConstructorParameter");
+                name: "JobDomains.JobConstructorParameter",
+                schema: "Hangfire");
 
             migrationBuilder.DropTable(
-                name: "Hangfire.JobDomains.Server");
+                name: "JobDomains.Queue",
+                schema: "Hangfire");
 
             migrationBuilder.DropTable(
-                name: "Hangfire.JobDomains.ServerPlugin");
+                name: "JobDomains.Server",
+                schema: "Hangfire");
+
+            migrationBuilder.DropTable(
+                name: "JobDomains.ServerPlugin",
+                schema: "Hangfire");
+
+            migrationBuilder.DropTable(
+                name: "JobDomains.ServerQueue",
+                schema: "Hangfire");
         }
     }
 }

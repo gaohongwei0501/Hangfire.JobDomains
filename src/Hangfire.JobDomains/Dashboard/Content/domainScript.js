@@ -49,24 +49,6 @@
 
         };
 
-        DomainJob.AlertError = function (panel, message) {
-            var heading = $(".panel-heading", panel);
-            $('<div class="panel-body panel-error"><div class="alert alert-danger"><a class="close" data-dismiss="alert">×</a><strong>错误! </strong><span>' +
-                message + '</span></div></div>').insertAfter(heading);
-        }
-
-        DomainJob.AlertInfo = function (panel, message) {
-            var heading = $(".panel-heading", panel);
-            $('<div class="panel-body panel-info"><div class="alert alert-info"><a class="close" data-dismiss="alert">×</a><span>' +
-                message + '</span></div></div>').insertAfter(heading);
-        }
-
-        DomainJob.AlertSuccess = function (panel, message) {
-            var heading = $(".panel-heading", panel);
-            $('<div class="panel-body panel-success"><div class="alert alert-success"><a class="close" data-dismiss="alert">×</a><strong>成功! </strong><span>' +
-                message + '</span></div></div>').insertAfter(heading);
-        }
-
         function BulidConfirmParam(title, cmd, period, panel) {
             $(".panel-error", panel).remove();
             $(".panel-info", panel).remove();
@@ -78,12 +60,12 @@
             var signValue = $(".schedule_sign", panel).val();
             
             if (cronValue == "") {
-                DomainJob.AlertError(panel, "执行时间未正确设置");
+                AlertError(panel, "执行时间未正确设置");
                 return null;
             }
 
             if (queueValue == "") {
-                DomainJob.AlertError(panel, "执行队列未正确设置");
+                AlertError(panel, "执行队列未正确设置");
                 return null;
             }
 
@@ -177,35 +159,127 @@
                     hideModal();
                     $('#command_confirm_model').modal('hide');
                     if (result.IsSuccess)
-                        DomainJob.AlertSuccess(panel, result.Message);
+                        AlertSuccess(panel, result.Message);
                     else
-                        DomainJob.AlertError(panel, result.Message);
+                        AlertError(panel, result.Message);
                 }).fail(function (xhr, status, error) {
                     hideModal();
-                    DomainJob.AlertError(panel, "There was an error. " + error);
+                    AlertError(panel, "There was an error. " + error);
                 });
             })
 
             model.find(".cancel").on("click", function () {
-                DomainJob.AlertInfo(panel, "任务取消提交");
+                AlertInfo(panel, "任务取消提交");
             })
         }
-
-        function hideModal() {
-            $('#LoadingWall').modal('hide');
-        }
-
-        function showModal() {
-            $('#LoadingWall').modal({ backdrop: 'static', keyboard: false });
-        }  
 
         return DomainJob;
 
     })();
 
+    hangfire.DomainServer = (function () {
+
+        function DomainServer() {
+            this._initialize();
+        }
+
+        DomainServer.prototype._initialize = function () {
+            $('.js-server-path-set').click(function () {
+                var panel = $(this).parents(".panel");
+
+                $(".panel-error", panel).remove();
+                $(".panel-info", panel).remove();
+                $(".panel-success", panel).remove();
+
+                var cmd = $(this).data("cmd");
+                EditConfirm(panel, cmd);
+            });
+        }
+
+        function EditConfirm(panel, cmd) {
+
+            var server = $(panel).data("server");
+            var old = $(panel).data("path");
+            var url = $(panel).data("url");
+
+            var title = "设置服务器插件路径";
+            var serverName = '<div class="form-group"> <label  class="control-label">服务器名称:</label>'
+                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="server" value="' + server + '"></div>'
+            var oldPath = '<div class="form-group"> <label  class="control-label">原路径:</label>'
+                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="queuename" value="' + old + '"></div>'
+            var newPath = '<div class="form-group"> <label  class="control-label">新路径:</label>'
+                + '<input type="text" class="form-control newPath" data-name="path" value=""></div>'
+
+            var content = serverName + oldPath + newPath;
+
+            var model = $("#command_confirm_model");
+            model.find(".title").html(title);
+            model.find(".content").html(content);
+            model.find(".cancel").html("取消");
+            model.find(".ok").html("确认提交");
+
+            var options = {};
+            $('#command_confirm_model').modal(options);
+
+            //每次都将监听先关闭，防止多次监听发生，确保只有一次监听
+            model.find(".cancel").off("click")
+            model.find(".ok").off("click")
+            model.find(".ok").on("click", function () {
+                showModal();
+                var path = $(".newPath","#command_confirm_model").val();
+                var send = { cmd: cmd, server: server, path: path };
+                $.post(url, send, function (result) {
+                    hideModal();
+                    $('#command_confirm_model').modal('hide');
+                    if (result.IsSuccess)
+                        AlertSuccess(panel, result.Message);
+                    else
+                        AlertError(panel, result.Message);
+                }).fail(function (xhr, status, error) {
+                    hideModal();
+                    AlertError(panel, "There was an error. " + error);
+                });
+            })
+
+            model.find(".cancel").on("click", function () {
+                AlertInfo(panel, "取消提交");
+            })
+        }
+
+        return DomainServer;
+
+    })();
+
+    function hideModal() {
+        $('#LoadingWall').modal('hide');
+    }
+
+    function showModal() {
+        $('#LoadingWall').modal({ backdrop: 'static', keyboard: false });
+    }  
+
+    function  AlertError  (panel, message) {
+        var heading = $(".panel-heading", panel);
+        $('<div class="panel-body panel-error"><div class="alert alert-danger"><a class="close" data-dismiss="alert">×</a><strong>错误! </strong><span>' +
+            message + '</span></div></div>').insertAfter(heading);
+    }
+
+    function   AlertInfo  (panel, message) {
+        var heading = $(".panel-heading", panel);
+        $('<div class="panel-body panel-info"><div class="alert alert-info"><a class="close" data-dismiss="alert">×</a><span>' +
+            message + '</span></div></div>').insertAfter(heading);
+    }
+
+    function AlertSuccess  (panel, message) {
+        var heading = $(".panel-heading", panel);
+        $('<div class="panel-body panel-success"><div class="alert alert-success"><a class="close" data-dismiss="alert">×</a><strong>成功! </strong><span>' +
+            message + '</span></div></div>').insertAfter(heading);
+    }
+
+
 })(window.Hangfire = window.Hangfire || {});
 
-function jobDoStart() {
+function jobScriptStart() {
     Hangfire.domainJob = new Hangfire.DomainJob();
     var link = document.createElement('link');
     link.setAttribute("rel", "stylesheet");
@@ -223,6 +297,10 @@ function jobDoStart() {
                 $('.date_cron_selector').datetimepicker();
             });
     });
+}
+
+function serverScriptStart() {
+    Hangfire.domainServer = new Hangfire.DomainServer();
 }
 
 

@@ -19,7 +19,9 @@ using System.Net;
 
 namespace Hangfire.JobDomains
 {
-
+    /// <summary>
+    /// 运行模式
+    /// </summary>
     public enum HangfireDomainMode
     {
         /// <summary>
@@ -31,7 +33,7 @@ namespace Hangfire.JobDomains
         /// </summary>
         Client,
         /// <summary>
-        /// 单机模式
+        /// 共存模式
         /// </summary>
         All
     }
@@ -40,59 +42,65 @@ namespace Hangfire.JobDomains
     {
 
         /// <summary>
-        /// 
+        /// 运行模式
         /// </summary>
-        public static HangfireDomainMode GlobalMode { get; private set; }
+        internal static HangfireDomainMode GlobalMode { get;  set; } = HangfireDomainMode.Client;
 
         /// <summary>
         /// 任务域服务（单机模式）
         /// </summary>
-        /// <param name="config">全局配置</param>
-        /// <param name="path">插件路径</param>
-        public static void UseDomains<T>(this IAppBuilder app, string path, string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
+        public static void UseDomains<T>(this IAppBuilder app, string path = "", string controllerName = "/HangfireDomain", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
-            if (string.IsNullOrEmpty(path)) return;
-            var connecting = StorageService.Provider.SetStorage(new T(), connectString);
-            if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-            var fetchOptions = JobDomainManager.InitServer(path, workerCount);
-            Task.WaitAny(fetchOptions);
-            if(fetchOptions.IsFaulted) throw (fetchOptions.Exception);
-            app.UseHangfireServer(fetchOptions.Result);
-            app.UseHangfireDashboard("/HangfireDomain");
-            InitRoute();
-
+            GlobalMode = HangfireDomainMode.All;
+            app.InitDomainsAtServer<T>(path, connectString, workerCount);
+            app.InitDomainsAtClient<T>(controllerName, connectString);
         }
 
         /// <summary>
         /// 任务域服务(服务器模式）
         /// </summary>
-        /// <param name="config"></param>
-        /// <param name="path"></param>
-        public static void UseDomainsAtServer<T>(this IAppBuilder app, string path, string connectString, int workerCount = 5) where T : IDomainStorage, new()
+        public static void UseDomainsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
-            if (string.IsNullOrEmpty(path)) return;
-            var connecting = StorageService.Provider.SetStorage(new T(), connectString);
-            if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-            var options = JobDomainManager.InitServer(path, workerCount);
-            app.UseHangfireServer();
+            GlobalMode = HangfireDomainMode.Server;
+            app.InitDomainsAtServer<T>(path, connectString, workerCount);
         }
 
         /// <summary>
         /// 任务域服务（客户端模式）
         /// </summary>
-        public static void UseDomainsAtClient<T>(this IAppBuilder app, string connectString) where T : IDomainStorage, new()
+        public static void UseDomainsAtClient<T>(this IAppBuilder app, string controllerName = "/HangfireDomain", string connectString = "") where T : IDomainStorage, new()
+        {
+            GlobalMode = HangfireDomainMode.Client;
+            app.InitDomainsAtClient<T>(controllerName, connectString);
+            InitLocalRoute();
+        }
+
+
+        static void InitDomainsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-
-            app.UseHangfireDashboard("/HangfireDomain");
-            InitRoute();
+            var fetchOptions = JobDomainManager.InitServer(path, workerCount);
+            Task.WaitAny(fetchOptions);
+            if (fetchOptions.IsFaulted) throw (fetchOptions.Exception);
+            app.UseHangfireServer(fetchOptions.Result);
         }
+
+        static void InitDomainsAtClient<T>(this IAppBuilder app, string controllerName= "/HangfireDomain", string connectString = "") where T : IDomainStorage, new()
+        {
+            var connecting = StorageService.Provider.SetStorage(new T(), connectString);
+            if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
+            app.UseHangfireDashboard(controllerName);
+            InitRoute();
+            InitLocalRoute();
+        }
+
 
         public static void InitRoute()
         {
-            DashboardRoutes.Routes.Add("/jsex/domainJob", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.JobDomains.Dashboard.Content.domainJob.js"));
-            DashboardRoutes.Routes.Add("/cssex/jobdomain", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.JobDomains.Dashboard.Content.JobDomains.css"));
+
+            DashboardRoutes.Routes.Add("/jsex/domainScript", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.JobDomains.Dashboard.Content.domainScript.js"));
+            DashboardRoutes.Routes.Add("/cssex/domainStyle", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.JobDomains.Dashboard.Content.domainStyle.css"));
             DashboardRoutes.Routes.Add("/image/loading.gif", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.JobDomains.Dashboard.Content.image.loading.gif"));
 
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.MainPageRoute, x => new MainPage());
@@ -108,11 +116,25 @@ namespace Hangfire.JobDomains
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.DomainPageRoute, x => UrlHelperExtension.CreateDomainPage(x));
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.AssemblyPageRoute, x => UrlHelperExtension.CreateAssemblyPage(x));
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.JobPageRoute, x => UrlHelperExtension.CreateJobPage(x));
+
             DashboardRoutes.Routes.Add(UrlHelperExtension.JobCommandRoute, new JobCommandDispatcher());
+            DashboardRoutes.Routes.Add(UrlHelperExtension.ServerCommandRoute, new ServerCommandDispatcher());
 
             NavigationMenu.Items.Add(page => new MenuItem(MainPage.Title, page.Url.To(UrlHelperExtension.MainPageRoute))
             {
                 Active = page.RequestPath.StartsWith(UrlHelperExtension.MainPageRoute)
+            });
+        }
+
+        public static void InitLocalRoute()
+        {
+            if (GlobalMode == HangfireDomainMode.Client) return;
+
+            var link = UrlHelperExtension.ServerPageRoute.Replace("(?<name>.+)", JobDomainManager.ServerName);
+
+            NavigationMenu.Items.Add(page => new MenuItem("本机服务", page.Url.To(link))
+            {
+                Active =  false
             });
         }
 

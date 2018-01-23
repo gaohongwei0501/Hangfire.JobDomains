@@ -112,8 +112,8 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             }
 
             WriteLiteral(PageContent.Tag.CreateCommandComfirmBox());
-            PageContent.WriteScriptFile(Url.To("/jsex/domainJob"));
-            PageContent.WriteScript(@"jobDoStart();");
+            PageContent.WriteScriptFile(Url.To("/jsex/domainScript"));
+            PageContent.WriteScript(@"jobScriptStart();");
             return true;
         }
 

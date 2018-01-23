@@ -46,7 +46,45 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         #region ServerDefine
 
-        public async Task<bool> AddOrUpdateServerAsync(ServerDefine model, List<string> domains)
+
+        public async Task<bool> ClearServer(string serverName)
+        {
+            using (var context = GetContext())
+            {
+                using (var transaction = await context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        var server = context.Servers.SingleOrDefault(s => s.Name == serverName);
+                        if (server == null) {
+                            await context.Servers.AddAsync(new Entities.Server {
+                                Name = serverName,
+                                CreatedAt = DateTime.Now,
+                                Description = "未初始化配置的任务服务器",
+                                PlugPath = "",
+                            });
+                        }
+
+                        var plugs = context.ServerPlugs.Where(s => s.ServerName == serverName);
+                        context.ServerPlugs.RemoveRange(plugs);
+
+                        var queues = context.ServerQueues.Where(s => s.ServerName == serverName);
+                        context.ServerPlugs.RemoveRange(plugs);
+
+                        var result = await context.SaveChangesAsync();
+                        transaction.Commit();
+                        return result > 0;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+
+        public async Task<bool> AddOrUpdateServerAsync(ServerDefine model, List<string> pluginNames)
         {
             using (var context = GetContext())
             {
@@ -56,12 +94,16 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
                     {
                         var server = context.Servers.SingleOrDefault(s => s.Name == model.Name);
                         if (server != null) context.Servers.Remove(server);
-                        var mappers = context.ServerPlugs.Where(s => s.ServerName == model.Name);
-                        context.ServerPlugs.RemoveRange(mappers);
+
+                        var plugs = context.ServerPlugs.Where(s => s.ServerName == model.Name);
+                        context.ServerPlugs.RemoveRange(plugs);
+
+                        var queues = context.ServerQueues.Where(s => s.ServerName == model.Name);
+                        context.ServerPlugs.RemoveRange(plugs);
 
                         await context.Servers.AddAsync(model.Convert());
-                        var newMappers = domains.Select(s => new ServerPlugin(model.Name, s));
-                        await context.ServerPlugs.AddRangeAsync(newMappers);
+                        var plugins = pluginNames.Select(s => new ServerPlugin(model.Name, s));
+                        await context.ServerPlugs.AddRangeAsync(plugins);
 
                         var result = await context.SaveChangesAsync();
                         transaction.Commit();
@@ -299,11 +341,15 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         public Dictionary<int, string> GetJobCornSetting()
         {
-            using (var context = GetContext())
-            {
-                throw new NotImplementedException();
-
-            }
+            var dic = new Dictionary<int, string>();
+            dic.Add(1, "一分钟");
+            dic.Add(5, "五分钟");
+            dic.Add(10, "十分钟");
+            return dic;
+            //using (var context = GetContext())
+            //{
+            //    throw new NotImplementedException();
+            //}
         }
 
         public bool AddJobCornSetting(int key, string value)

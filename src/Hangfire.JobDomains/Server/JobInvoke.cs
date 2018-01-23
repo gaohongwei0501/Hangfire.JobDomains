@@ -28,7 +28,7 @@ namespace Hangfire.JobDomains.Server
         {
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
-            hangFireClient.Create<JobInvoke>(c => Invoke(pluginName, assembly, job, paramers), state);
+            hangFireClient.Create(() => Invoke(pluginName, assembly, job, paramers), state);
         }
 
         public static void RecurringInvoke(int period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
@@ -46,7 +46,7 @@ namespace Hangfire.JobDomains.Server
         {
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
-            hangFireClient.Create<JobInvoke>(c => TestInvoke(pluginName, assembly, job, paramers), state);
+            hangFireClient.Create(() => TestInvoke(pluginName, assembly, job, paramers), state);
         }
 
         public static bool TestInvoke(string pluginName, string assembly, string job, object[] paramers)
