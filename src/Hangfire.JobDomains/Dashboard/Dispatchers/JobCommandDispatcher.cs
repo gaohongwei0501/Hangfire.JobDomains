@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using  CronExpressionDescriptor;
 
 namespace Hangfire.JobDomains.Dashboard.Dispatchers
 {
@@ -40,8 +41,8 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             var assembly = await GetFromValue("assembly");
             var job = await GetFromValue("job");
 
-            var start = await GetFromValue<DateTime>("start",DateTime.MinValue);
-            var period = await GetFromValue<int>("period", 0);
+            var start = await GetFromValue<DateTime>("start", DateTime.MinValue);
+            var period = await GetFromValue("period");
             var queue = (await GetFromValue("queue")).ToLower();
             var jobSign = await GetFromValue("sign");
 
@@ -58,7 +59,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
 
             switch (jobCmd)
             {
-                case JobPageCommand.Schedule: Schedule(queue,start, period, jobSign, paramers); break;
+                case JobPageCommand.Schedule: Schedule(queue, start, period, jobSign, paramers); break;
                 case JobPageCommand.Delay: Delay(queue, start, paramers); break;
                 case JobPageCommand.Immediately: JobTest(queue, paramers); break;
                 case JobPageCommand.Test: JobTest(queue, paramers); break;
@@ -72,16 +73,28 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             };
         }
 
-        void JobTest(string queue,object[] paramers)
+        void JobTest(string queue, object[] paramers)
         {
             JobInvoke.Test(queue, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
-        void Schedule(string queue, DateTime start, int period, string jobSign, object[] paramers)
+        bool IsPeriod(string period) {
+            try
+            {
+                ExpressionDescriptor.GetDescription(period);
+                return true;
+            }
+            catch {
+                return false;
+            }
+        }
+
+
+        void Schedule(string queue, DateTime start, string period, string jobSign, object[] paramers)
         {
+            if(IsPeriod(period)==false) throw (new Exception("任务周期不能被识别"));
             if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
             var set = StorageService.Provider.GetJobCornSetting();
-            if (set.ContainsKey(period) == false) throw (new Exception("任务周期设置设置失败"));
             // RecurringJob.AddOrUpdate(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period), queue: TheDomain.Name.ToLower());
             var delay = start - DateTime.Now;
             JobInvoke.ScheduleEnqueued(delay, period, queue, jobSign, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);

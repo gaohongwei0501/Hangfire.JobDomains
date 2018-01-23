@@ -17,75 +17,79 @@
                         $(".schedule_queue", container).val(name);
                     });
 
-                $(this).on('click', '.js-domain-job-commands-schedule',
-                    function (e) {
-                        var $this = $(this);
-                        var cmd = $this.data('cmd');
-                        var period = $this.data("schedule");
-                        var params = BulidConfirmParam("周期任务", cmd,  period, container);
-                        if (params == null) return;
-                        CommandConfirm(container,params);
-                    });
 
-                $(this).on('click', '.js-domain-job-commands-delay',
+                $(this).on('click', '.js-domain-job-commands-create',
                     function (e) {
                         var $this = $(this);
                         var cmd = $this.data('cmd');
-                        var params = BulidConfirmParam("排期任务", cmd,  "", container);
-                        if (params == null) return;
-                        CommandConfirm(container,params);
-                    });
-
-                $(this).on('click', '.js-domain-job-commands-test',
-                    function (e) {
-                        var $this = $(this);
-                        var cmd = $this.data('cmd');
-                        var params = BulidConfirmParam("测试任务", cmd, "", container);
+                        var name = $this.text();
+                        var params = BulidConfirmParam(name, cmd, container);
                         if (params == null) return;
                         CommandConfirm(container, params);
-                    });
+                 });
 
             });
-
         };
 
-        function BulidConfirmParam(title, cmd, period, panel) {
+        var Delay = "Delay";
+        var Schedule = "Schedule";
+        var Test = "Test";
+
+        function BulidConfirmParam(title, cmd,  panel) {
             $(".panel-error", panel).remove();
             $(".panel-info", panel).remove();
             $(".panel-success", panel).remove();
 
             var funcName = $(".panel-heading", panel).html();
-            var cronValue = $(".schedule_date", panel).val();
+            var startValue = $(".schedule_date", panel).val();
             var queueValue = $(".schedule_queue", panel).val();
             var signValue = $(".schedule_sign", panel).val();
-            
-            if (cronValue == "") {
-                AlertError(panel, "执行时间未正确设置");
-                return null;
-            }
+            var periodValue = $(".schedule_period", panel).val();
 
             if (queueValue == "") {
-                AlertError(panel, "执行队列未正确设置");
+                AlertError(panel, "任务执行队列未正确设置");
                 return null;
+            }
+            else if (cmd == Schedule) {
+                if (periodValue == "") {
+                    AlertError(panel, "任务执行周期未正确设置");
+                    return null;
+                }
+
+                if (signValue == "") {
+                    AlertError(panel, "任务计划标识未正确设置");
+                    return null;
+                }
+            }
+            else if (cmd == Delay)
+            {
+                if (startValue == "") {
+                    AlertError(panel, "任务执行时间未正确设置");
+                    return null;
+                }
             }
 
             var job = '<div class="form-group"> <label  class="control-label">执行任务:</label>'
                 + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobname" value="' + funcName + '"></div>'
 
-            var startTime = '<div class="form-group"> <label  class="control-label">执行时间:</label>'
-                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobstarttime" value="' + cronValue + '"></div>'
-
+            var queue = '<div class="form-group"> <label  class="control-label">执行队列:</label>'
+                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="queuename" value="' + queueValue + '"></div>'
+          
             var jobSign = '<div class="form-group"> <label  class="control-label">周期任务标识:</label>'
                 + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobsign" value="' + signValue + '"></div>'
 
-            var queue = '<div class="form-group"> <label  class="control-label">执行队列:</label>'
-                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="queuename" value="' + queueValue + '"></div>'
+            var jobPeriod = '<div class="form-group"> <label  class="control-label">周期任务周期:</label>'
+                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobperiod" value="' + periodValue + '"></div>'
 
+            var startTime = '<div class="form-group"> <label  class="control-label">执行时间:</label>'
+                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobstarttime" value="' + startValue + '"></div>'
 
-            var periodTime = '<div class="form-group"> <label class="control-label">执行周期（分钟）:</label>'
-                + '<input type="text" class="form-control disabled" disabled="disabled" data-name="jobperiodtime" value="' + period + '"></div>'
-
-            var boby = job + startTime + (period == "" ? "" : jobSign) + queue + (period == "" ? "" : periodTime);
+            var boby = job  + queue ;
+            if (cmd == Schedule) {
+                boby += jobSign + jobPeriod;
+            } else if (cmd == Delay){
+                boby += startTime;
+            }
 
             $(".panel-body", panel).find("input").each(function () {
                 var $input = $(this);
@@ -126,12 +130,10 @@
                     continue;
                 }
                 if (name == "jobsign") {
-
                     sign = value;
                     continue;
                 }
                 if (name == "jobstarttime") {
-
                     starttime = value;
                     continue;
                 }
@@ -140,7 +142,7 @@
                     queue = value;
                     continue;
                 }
-                if (name == "jobperiodtime") {
+                if (name == "jobperiod") {
                     period = value;
                     continue;
                 }

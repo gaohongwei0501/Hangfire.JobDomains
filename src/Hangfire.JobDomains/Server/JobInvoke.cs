@@ -14,7 +14,7 @@ namespace Hangfire.JobDomains.Server
 {
     internal class JobInvoke
     {
-        public static void ScheduleEnqueued(TimeSpan delay, int period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
+        public static void ScheduleEnqueued(TimeSpan delay, string period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
         {
             BackgroundJob.Schedule(() => RecurringInvoke(period, queue, jobSign, pluginName, assembly, job, paramers), delay);
         }
@@ -31,16 +31,15 @@ namespace Hangfire.JobDomains.Server
             hangFireClient.Create(() => Invoke(pluginName, assembly, job, paramers), state);
         }
 
-        public static void RecurringInvoke(int period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
+        public static void RecurringInvoke(string period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
         {
-            RecurringJob.AddOrUpdate(jobSign, () => Invoke(pluginName, assembly, job, paramers), Cron.MinuteInterval(period), queue: queue);
+            RecurringJob.AddOrUpdate(jobSign, () => Invoke(pluginName, assembly, job, paramers), period, queue: queue);
         }
 
         public static void Invoke(string pluginName, string assembly, string job, object[] paramers)
         {
             DomainInvoke<bool>(pluginName, assembly, job, paramers, PrefabricationActivator.Dispatch, domain => true);
         }
-
 
         public static void Test(string queue, string pluginName, string assembly, string job, object[] paramers)
         {
