@@ -1,5 +1,4 @@
-﻿using Hangfire.JobDomains.Loader;
-using Hangfire.JobDomains.Interface;
+﻿using Hangfire.JobDomains.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;

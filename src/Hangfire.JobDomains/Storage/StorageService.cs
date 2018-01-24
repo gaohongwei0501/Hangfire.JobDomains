@@ -159,30 +159,7 @@ namespace Hangfire.JobDomains.Storage
 
         public Task<bool> AddDomainAsync(DomainDefine define) => Storage.AddDomainAsync(define);
 
-        public Dictionary<SysSettingKey, string> GetSysSetting()
-        {
-            return Storage.GetSysSetting();
-        }
-
-        public bool SetSysSetting(SysSettingKey key,string value)
-        {
-            return Storage.SetSysSetting(key, value);
-        }
-
-        public Dictionary<int, string> GetJobCornSetting()
-        {
-            return Storage.GetJobCornSetting();
-        }
-
-        public bool AddJobCornSetting(int key, string value)
-        {
-            return Storage.AddJobCornSetting(key, value);
-        }
-
-        public bool DeleteJobCornSetting(int key)
-        {
-            return Storage.DeleteJobCornSetting(key);
-        }
+       
 
     }
 

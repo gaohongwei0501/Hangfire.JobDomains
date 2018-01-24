@@ -187,10 +187,6 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Location\Hangfire.JobDomains.Storage.Location.csproj">
-      <Project>{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}</Project>
-      <Name>Hangfire.JobDomains.Storage.Location</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory.csproj">
       <Project>{db8dba62-3792-4448-b799-c6bf0347cb83}</Project>
       <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory</Name>

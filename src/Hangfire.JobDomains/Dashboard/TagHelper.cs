@@ -288,7 +288,6 @@ namespace Hangfire.JobDomains.Dashboard
 
         public static string CreateJobScheduleButtons(this TagHelper Tag , string id)
         {
-            var jobCorns = StorageService.Provider.GetJobCornSetting();
             var bulider = new StringBuilder();
             var loadingText = "Loading...";
 
@@ -356,22 +355,7 @@ namespace Hangfire.JobDomains.Dashboard
 
         static Dictionary<SysSettingKey, string> SysSettingDescriptions = new Dictionary<SysSettingKey, string>();
 
-        public static string CreateSysList(this  TagHelper Tag)
-        {
-            var bulider = new StringBuilder();
-            if (SysSettingDescriptions.Count == 0) ReadDescriptions();
-            Array arrays = Enum.GetValues(typeof(SysSettingKey));
-            var cache = StorageService.Provider.GetSysSetting();
-            for (int i = 0; i < arrays.LongLength; i++)
-            {
-                var key = (SysSettingKey)arrays.GetValue(i);
-                var value = cache[key];
-                var name = SysSettingDescriptions[key];
-                bulider.Append(Tag.ListItem($"{name}：{value}", "编辑"));
-            }
-            return Tag.List(bulider.ToString());
-        }
-
+      
         static void ReadDescriptions()
         {
             Type SysSettingType = typeof(SysSettingKey);

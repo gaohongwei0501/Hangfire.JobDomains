@@ -38,17 +38,6 @@ namespace Hangfire.JobDomains.Storage
 
         Task<bool> AddDomainAsync(DomainDefine define);
 
-        Dictionary<SysSettingKey, string> GetSysSetting();
-
-        bool SetSysSetting(SysSettingKey key, string value);
-
-        Dictionary<int, string> GetJobCornSetting();
-
-        bool AddJobCornSetting(int key, string value);
-
-        bool DeleteJobCornSetting(int key);
-
-
     }
 
 }

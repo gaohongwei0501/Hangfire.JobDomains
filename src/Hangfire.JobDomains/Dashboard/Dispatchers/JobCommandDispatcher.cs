@@ -94,8 +94,6 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
         {
             if(IsPeriod(period)==false) throw (new Exception("任务周期不能被识别"));
             if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
-            var set = StorageService.Provider.GetJobCornSetting();
-            // RecurringJob.AddOrUpdate(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), Cron.MinuteInterval(period), queue: TheDomain.Name.ToLower());
             var delay = start - DateTime.Now;
             JobInvoke.ScheduleEnqueued(delay, period, queue, jobSign, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }

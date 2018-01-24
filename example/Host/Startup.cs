@@ -9,7 +9,6 @@ using Hangfire.SQLite;
 using Hangfire.MemoryStorage;
 using Hangfire;
 using System.Threading.Tasks;
-using Hangfire.JobDomains.Storage.Location;
 using Hangfire.JobDomains.Storage.EntityFrameworkCore;
 using Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer;
 using Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite;
