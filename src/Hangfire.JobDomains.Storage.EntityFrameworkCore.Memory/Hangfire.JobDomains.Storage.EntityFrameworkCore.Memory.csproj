@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1B78EC58-7D47-49E0-8BED-B178585A05AC}</ProjectGuid>
+    <ProjectGuid>{DB8DBA62-3792-4448-B799-C6BF0347CB83}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer</RootNamespace>
-    <AssemblyName>Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer</AssemblyName>
+    <RootNamespace>Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory</RootNamespace>
+    <AssemblyName>Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -39,23 +39,14 @@
     <Reference Include="Microsoft.EntityFrameworkCore, Version=2.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.EntityFrameworkCore.2.0.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.EntityFrameworkCore.Design, Version=2.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.EntityFrameworkCore.Design.2.0.1\lib\net461\Microsoft.EntityFrameworkCore.Design.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.EntityFrameworkCore.Relational, Version=2.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.EntityFrameworkCore.Relational.2.0.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Relational.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.EntityFrameworkCore.SqlServer, Version=2.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.EntityFrameworkCore.SqlServer.2.0.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.SqlServer.dll</HintPath>
+    <Reference Include="Microsoft.EntityFrameworkCore.InMemory, Version=2.0.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.EntityFrameworkCore.InMemory.2.0.1\lib\netstandard2.0\Microsoft.EntityFrameworkCore.InMemory.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.Caching.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Caching.Memory, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.Caching.Memory.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Caching.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Extensions.Configuration.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.DependencyInjection.2.0.0\lib\netstandard2.0\Microsoft.Extensions.DependencyInjection.dll</HintPath>
@@ -87,11 +78,7 @@
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SqlClient, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Data.SqlClient.4.4.0\lib\net461\System.Data.SqlClient.dll</HintPath>
-    </Reference>
     <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.2.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Diagnostics.DiagnosticSource.4.4.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
@@ -121,29 +108,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoMigration.cs" />
-    <Compile Include="Migrations\20180122101230_init.cs" />
-    <Compile Include="Migrations\20180122101230_init.designer.cs">
-      <DependentUpon>20180122101230_init.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\SqlServerDBContextModelSnapshot.cs" />
-    <Compile Include="TypeMapper\AssemblyTypeMapper.cs" />
+    <Compile Include="MemoryDBContext.cs" />
+    <Compile Include="MemoryStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlServerDBContext.cs" />
-    <Compile Include="SqlServerStorage.cs" />
-    <Compile Include="TypeMapper\DomainMapper.cs" />
-    <Compile Include="TypeMapper\JobConstructorParameter.cs" />
-    <Compile Include="TypeMapper\JobMapper.cs" />
-    <Compile Include="TypeMapper\QueueMapper.cs" />
-    <Compile Include="TypeMapper\ServerPluginMapper.cs" />
-    <Compile Include="TypeMapper\ServerQueueMapper.cs" />
-    <Compile Include="TypeMapper\ServerTypeMapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hangfire.JobDomains.Interface\Hangfire.JobDomains.Interface.csproj">
-      <Project>{f0fc1aa5-7e4f-4c49-8412-4697b0f017ef}</Project>
-      <Name>Hangfire.JobDomains.Interface</Name>
-    </ProjectReference>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Hangfire.JobDomains.Storage.EntityFrameworkCore\Hangfire.JobDomains.Storage.EntityFrameworkCore.csproj">
       <Project>{fde585ef-195f-4512-b84f-b2e7b3d2f6be}</Project>
       <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore</Name>
@@ -153,16 +126,5 @@
       <Name>Hangfire.JobDomains</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <Content Include="App.config" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>App.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>App.config</DependentUpon>
-    </None>
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

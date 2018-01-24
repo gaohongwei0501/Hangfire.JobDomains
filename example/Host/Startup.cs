@@ -10,6 +10,7 @@ using Hangfire.MemoryStorage;
 using Hangfire;
 using System.Threading.Tasks;
 using Hangfire.JobDomains.Storage.Location;
+using Hangfire.JobDomains.Storage.EntityFrameworkCore;
 using Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer;
 using Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,18 +26,19 @@ namespace Host
             var filePath = @"E:\Hangfile.Sparepart.Lib";
             var dataPath = @"Data Source=E:\Hangfile.Sparepart.Lib\Data\Store.dat;";//Version=3;
 
-            //  GlobalConfiguration.Configuration.UseMemoryStorage();
-            //  app.UseDomains<LocationStorage>(filePath);
+            GlobalConfiguration.Configuration.UseMemoryStorage();
+            var LoadAsyc = app.UseDomains<Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory.MemoryStorage>(filePath);
 
             //  GlobalConfiguration.Configuration.UseSQLiteStorage(dataPath);
             //  app.UseDomains<Hangfire.JobDomains.Storage.Sqlite.SQLiteStorage>(filePath, dataPath);
 
-            var dataConnectString = "ConnectionString";
-            GlobalConfiguration.Configuration.UseSqlServerStorage(dataConnectString);
+            //var dataConnectString = "ConnectionString";
+            //GlobalConfiguration.Configuration.UseSqlServerStorage(dataConnectString);
 
-            //app.UseDomains<LocationStorage>(filePath, connectString);
-            app.UseDomains<SqlServerStorage>(connectString: dataConnectString);
+            ////app.UseDomains<LocationStorage>(filePath, connectString);
+            //var LoadAsyc = app.UseDomains<SqlServerStorage>(connectString: dataConnectString);
 
+            Task.WaitAll(LoadAsyc);
             app.Run(context =>
             {
                 context.Response.Redirect("/HangfireDomain");

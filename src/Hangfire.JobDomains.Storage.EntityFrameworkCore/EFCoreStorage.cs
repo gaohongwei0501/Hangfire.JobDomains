@@ -1,4 +1,5 @@
-﻿using Hangfire.JobDomains.Models;
+﻿using Common.Logging;
+using Hangfire.JobDomains.Models;
 using Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,57 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
     public abstract class EFCoreStorage : IDomainStorage
     {
+        static ILog loger = LogManager.GetLogger<EFCoreStorage>();
 
         public abstract EFCoreDBContext GetContext();
+
+        public abstract bool TransactionEnable { get; }
+
+
+        public async Task<T> TryTransaction<T>( Func<EFCoreDBContext, Task<T>> NomalBack, Func<T> ExceptionBack)
+        {
+
+            using (var context = GetContext())
+            {
+                if (TransactionEnable)
+                {
+                    using (var transaction = await context.Database.BeginTransactionAsync())
+                    {
+                        try
+                        {
+                            var result = await NomalBack(context);
+                            transaction.Commit();
+                            return result;
+                        }
+                        catch (Exception ex)
+                        {
+                            loger.Error(ex);
+                            if (ExceptionBack == null) ExceptionBack = () => default(T);
+                            return ExceptionBack();
+                        }
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        var result = await NomalBack(context);
+                        return result;
+                    }
+                    catch (Exception ex)
+                    {
+                        loger.Error(ex);
+                        if (ExceptionBack == null) ExceptionBack = () => default(T);
+                        return ExceptionBack();
+                    }
+                }
+
+            }
+        }
+
+
+
+
 
         public abstract bool AddService(string nameOrConnectionString);
 
@@ -47,74 +97,56 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
         #region ServerDefine
 
 
-        public async Task<bool> ClearServer(string serverName)
+        public Task<bool> ClearServer(string serverName)
         {
-            using (var context = GetContext())
+            return TryTransaction<bool>(async (context) =>
             {
-                using (var transaction = await context.Database.BeginTransactionAsync())
+                var server = context.Servers.SingleOrDefault(s => s.Name == serverName);
+                if (server == null)
                 {
-                    try
+                    await context.Servers.AddAsync(new Entities.Server
                     {
-                        var server = context.Servers.SingleOrDefault(s => s.Name == serverName);
-                        if (server == null) {
-                            await context.Servers.AddAsync(new Entities.Server {
-                                Name = serverName,
-                                CreatedAt = DateTime.Now,
-                                Description = "未初始化配置的任务服务器",
-                                PlugPath = "",
-                            });
-                        }
-
-                        var plugs = context.ServerPlugs.Where(s => s.ServerName == serverName);
-                        context.ServerPlugs.RemoveRange(plugs);
-
-                        var queues = context.ServerQueues.Where(s => s.ServerName == serverName);
-                        context.ServerPlugs.RemoveRange(plugs);
-
-                        var result = await context.SaveChangesAsync();
-                        transaction.Commit();
-                        return result > 0;
-                    }
-                    catch (Exception)
-                    {
-                        return false;
-                    }
+                        Name = serverName,
+                        CreatedAt = DateTime.Now,
+                        Description = "未初始化配置的任务服务器",
+                        PlugPath = "",
+                    });
                 }
-            }
+
+                var plugs = context.ServerPlugs.Where(s => s.ServerName == serverName);
+                context.ServerPlugs.RemoveRange(plugs);
+
+                var queues = context.ServerQueues.Where(s => s.ServerName == serverName);
+                context.ServerPlugs.RemoveRange(plugs);
+
+                var result = await context.SaveChangesAsync();
+                return result > 0;
+
+            }, () => false);
         }
 
 
-        public async Task<bool> AddOrUpdateServerAsync(ServerDefine model, List<string> pluginNames)
+        public Task<bool> AddOrUpdateServerAsync(ServerDefine model, List<string> pluginNames)
         {
-            using (var context = GetContext())
+            return TryTransaction<bool>(async (context) =>
             {
-                using (var transaction = await context.Database.BeginTransactionAsync())
-                {
-                    try
-                    {
-                        var server = context.Servers.SingleOrDefault(s => s.Name == model.Name);
-                        if (server != null) context.Servers.Remove(server);
+                var server = context.Servers.SingleOrDefault(s => s.Name == model.Name);
+                if (server != null) context.Servers.Remove(server);
 
-                        var plugs = context.ServerPlugs.Where(s => s.ServerName == model.Name);
-                        context.ServerPlugs.RemoveRange(plugs);
+                var plugs = context.ServerPlugs.Where(s => s.ServerName == model.Name);
+                context.ServerPlugs.RemoveRange(plugs);
 
-                        var queues = context.ServerQueues.Where(s => s.ServerName == model.Name);
-                        context.ServerPlugs.RemoveRange(plugs);
+                var queues = context.ServerQueues.Where(s => s.ServerName == model.Name);
+                context.ServerPlugs.RemoveRange(plugs);
 
-                        await context.Servers.AddAsync(model.Convert());
-                        var plugins = pluginNames.Select(s => new ServerPlugin(model.Name, s));
-                        await context.ServerPlugs.AddRangeAsync(plugins);
+                await context.Servers.AddAsync(model.Convert());
+                var plugins = pluginNames.Select(s => new ServerPlugin(model.Name, s));
+                await context.ServerPlugs.AddRangeAsync(plugins);
 
-                        var result = await context.SaveChangesAsync();
-                        transaction.Commit();
-                        return result > 0;
-                    }
-                    catch (Exception)
-                    {
-                        return false;
-                    }
-                }
-            }
+                var result = await context.SaveChangesAsync();
+                return result > 0;
+
+            }, () => false);
         }
 
 
@@ -180,57 +212,46 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         #region DomainDefine
 
-        public async Task<bool> AddDomainAsync(DomainDefine define)
+        public Task<bool> AddDomainAsync(DomainDefine define)
         {
-            using (var context = GetContext())
+            return TryTransaction<bool>(async (context) =>
             {
-                using (var transaction = await context.Database.BeginTransactionAsync())
+                var domain = define.GetDomain();
+                ClearDomain(context, domain.Title);
+                var domainResult = await context.Domains.AddAsync(domain);
+                await context.SaveChangesAsync();
+
+                var assemblies = define.InnerJobSets;
+                if (assemblies != null)
                 {
-                    try
+                    foreach (var assembly in assemblies)
                     {
-                        var domain = define.GetDomain();
-                        ClearDomain(context, domain.Title);
-                        var domainResult = await context.Domains.AddAsync(domain);
+                        var assemblyOne = assembly.GetAssembly(domainResult.Entity.ID);
+                        var assemblyResult = await context.Assemblies.AddAsync(assemblyOne);
                         await context.SaveChangesAsync();
 
-                        var assemblies = define.InnerJobSets;
-                        if (assemblies != null)
+                        var jobs = assembly.InnerJobs;
+                        if (jobs == null) continue;
+                        foreach (var job in jobs)
                         {
-                            foreach (var assembly in assemblies)
+                            var jobOne = job.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
+                            var jobResult = await context.Jobs.AddAsync(jobOne);
+                            await context.SaveChangesAsync();
+
+                            var constructors = job.InnerConstructors;
+                            if (constructors == null) continue;
+                            foreach (var constructor in constructors)
                             {
-                                var assemblyOne = assembly.GetAssembly(domainResult.Entity.ID);
-                                var assemblyResult = await context.Assemblies.AddAsync(assemblyOne);
-                                await context.SaveChangesAsync();
-
-                                var jobs = assembly.InnerJobs;
-                                if (jobs == null) continue;
-                                foreach (var job in jobs)
-                                {
-                                    var jobOne = job.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
-                                    var jobResult = await context.Jobs.AddAsync(jobOne);
-                                    await context.SaveChangesAsync();
-
-                                    var constructors = job.InnerConstructors;
-                                    if (constructors == null) continue;
-                                    foreach (var constructor in constructors)
-                                    {
-                                        var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
-                                        await context.JobConstructorParameters.AddRangeAsync(paramers);
-                                    }
-                                }
+                                var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
+                                await context.JobConstructorParameters.AddRangeAsync(paramers);
                             }
                         }
-
-                        var result =await context.SaveChangesAsync();
-                        transaction.Commit();
-                        return true;
-                    }
-                    catch (Exception)
-                    {
-                        return false;
                     }
                 }
-            }
+
+                var result = await context.SaveChangesAsync();
+                return true;
+            }, () => false);
         }
 
         void ClearDomain(EFCoreDBContext context, string domainName)

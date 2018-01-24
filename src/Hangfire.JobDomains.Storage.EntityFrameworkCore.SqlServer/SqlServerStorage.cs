@@ -12,6 +12,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer
 
     public class SqlServerStorage : EFCoreStorage
     {
+        public override bool TransactionEnable => true;
 
         public override EFCoreDBContext GetContext()=> new SqlServerDBContext();
 

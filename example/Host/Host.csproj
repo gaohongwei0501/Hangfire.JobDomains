@@ -191,6 +191,10 @@
       <Project>{A9A2FE55-76E9-4BE5-9B5E-65467A8BFDB9}</Project>
       <Name>Hangfire.JobDomains.Storage.Location</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory.csproj">
+      <Project>{db8dba62-3792-4448-b799-c6bf0347cb83}</Project>
+      <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite\Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite.csproj">
       <Project>{582e67be-0e5c-463c-a77c-dba858e9e3f1}</Project>
       <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite</Name>

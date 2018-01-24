@@ -49,20 +49,20 @@ namespace Hangfire.JobDomains
         /// <summary>
         /// 任务域服务（单机模式）
         /// </summary>
-        public static void UseDomains<T>(this IAppBuilder app, string path = "", string controllerName = "/HangfireDomain", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
+        public static async Task UseDomains<T>(this IAppBuilder app, string path = "", string controllerName = "/HangfireDomain", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
             GlobalMode = HangfireDomainMode.All;
-            app.InitDomainsAtServer<T>(path, connectString, workerCount);
+            await app.InitDomainsAtServer<T>(path, connectString, workerCount);
             app.InitDomainsAtClient<T>(controllerName, connectString);
         }
 
         /// <summary>
         /// 任务域服务(服务器模式）
         /// </summary>
-        public static void UseDomainsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
+        public static async Task UseDomainsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
             GlobalMode = HangfireDomainMode.Server;
-            app.InitDomainsAtServer<T>(path, connectString, workerCount);
+            await app.InitDomainsAtServer<T>(path, connectString, workerCount);
         }
 
         /// <summary>
@@ -76,14 +76,12 @@ namespace Hangfire.JobDomains
         }
 
 
-        static void InitDomainsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
+        static async Task InitDomainsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-            var fetchOptions = JobDomainManager.InitServer(path, workerCount);
-            Task.WaitAny(fetchOptions);
-            if (fetchOptions.IsFaulted) throw (fetchOptions.Exception);
-            app.UseHangfireServer(fetchOptions.Result);
+            var Options= await JobDomainManager.InitServer(path, workerCount);
+            app.UseHangfireServer(Options);
         }
 
         static void InitDomainsAtClient<T>(this IAppBuilder app, string controllerName= "/HangfireDomain", string connectString = "") where T : IDomainStorage, new()
