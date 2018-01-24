@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities
 {
-    public class Domain : SQLiteEntityBase
+    public class Plugin : SQLiteEntityBase
     {
         public string PathName { get; set; }
 

@@ -13,7 +13,7 @@ namespace Hangfire.JobDomains.Models
 {
    
 
-    public class DomainDefine
+    public class PluginDefine
     {
 
         public string PathName { get; private set; }
@@ -24,13 +24,13 @@ namespace Hangfire.JobDomains.Models
 
         List<AssemblyDefine> _jobSets = null;
 
-        public DomainDefine(string path)
+        public PluginDefine(string path)
         {
             PathName = path;
             Title = path;
         }
 
-        public DomainDefine(string path, string name , string description)
+        public PluginDefine(string path, string name , string description)
         {
             PathName = path;
             Title = string.IsNullOrEmpty(name) ? path : name;

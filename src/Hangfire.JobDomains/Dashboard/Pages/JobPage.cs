@@ -16,7 +16,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
         public const string Title = "任务详情";
 
-        public DomainDefine TheDomain { get; set; }
+        public PluginDefine TheDomain { get; set; }
 
         public AssemblyDefine TheAssembly { get; set; }
 
@@ -28,7 +28,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             FetchHeader = () =>$"任务：{(TheJob == null ? name : TheJob.Title)}";
             Sidebar = () => SidebarMenus.JobsMenu(domain, assembly, name);
 
-            var set = StorageService.Provider.GetDomainDefines();
+            var set = StorageService.Provider.GetPluginDefines();
             TheDomain = set.SingleOrDefault(s => s.Title == domain);
             TheAssembly = TheDomain?.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
             TheJob = TheAssembly?.GetJobs().SingleOrDefault(s => s.Name == name);
@@ -68,7 +68,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             var structures = TheJob.GetConstructors();
 
             var customAttr=$@" data-domain=""{ TheDomain.Title }""  data-assembly=""{ TheAssembly.ShortName }"" data-job=""{ TheJob.Name }""  data-url=""{Url.To(UrlHelperExtension.JobCommandRoute)}"" ";
-            var queues = StorageService.Provider.GetQueuesByDomain(this.Storage, TheDomain.PathName);
+            var queues = StorageService.Provider.GetQueuesByPlugin(this.Storage, TheDomain.PathName);
 
             foreach (var structure in structures)
             {

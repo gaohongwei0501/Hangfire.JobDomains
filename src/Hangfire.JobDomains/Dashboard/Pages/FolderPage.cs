@@ -11,20 +11,20 @@ using System.Threading.Tasks;
 namespace Hangfire.JobDomains.Dashboard.Pages
 {
 
-    internal class DomainPage : HtmlPage
+    internal class FolderPage : HtmlPage
     {
 
         public const string Title = "程序集详情";
 
-        public DomainDefine TheDomain { get; set; }
+        public PluginDefine TheDomain { get; set; }
 
-        public DomainPage(string name) 
+        public FolderPage(string name) 
         {
             FetchTitle = () => Title;
             FetchHeader = () => $"插件：{(TheDomain == null ? name : TheDomain.Title)}";
 
-            Sidebar = ()=>SidebarMenus.DomainsMenu(name);
-            var set = StorageService.Provider.GetDomainDefines();
+            Sidebar = ()=>SidebarMenus.PluginsMenu(name);
+            var set = StorageService.Provider.GetPluginDefines();
             TheDomain = set.SingleOrDefault(s => s.Title == name);
         }
 
@@ -34,7 +34,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
             WriteBar();
 
-            var servers = StorageService.Provider.GetServersByDomain(TheDomain.Title);
+            var servers = StorageService.Provider.GetServersByPlugin(TheDomain.Title);
             var serverList = PageContent.Tag.ListLink(servers, Url.CreateServerRoute);
             var panel = PageContent.Tag.Panel("支持该服务的服务器", string.Empty, serverList);
             WriteLiteral(panel);

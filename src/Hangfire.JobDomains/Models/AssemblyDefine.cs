@@ -16,7 +16,7 @@ namespace Hangfire.JobDomains.Models
     /// </summary>
     public class AssemblyDefine
     {
-        public DomainDefine Parent { get; private set; }
+        public PluginDefine Parent { get; private set; }
 
         /// <summary>
         /// 全名
@@ -51,7 +51,7 @@ namespace Hangfire.JobDomains.Models
         /// <summary>
         /// 构造函数
         /// </summary>
-        public AssemblyDefine(DomainDefine parent, string file, string fullname, string shortname, string title, string description)
+        public AssemblyDefine(PluginDefine parent, string file, string fullname, string shortname, string title, string description)
         {
             Parent = parent;
             FileName = file;

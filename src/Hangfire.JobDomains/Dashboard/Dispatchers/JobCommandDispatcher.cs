@@ -23,7 +23,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             return Task.FromResult(new JsonData(ex, null));
         }
 
-        public DomainDefine TheDomain { get; set; }
+        public PluginDefine TheDomain { get; set; }
 
         public AssemblyDefine TheAssembly { get; set; }
 
@@ -49,7 +49,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             JobData = await GetDictionaryValue("data");
             var paramers = JobData?.Select(s => s.Value).ToArray();
 
-            var set = StorageService.Provider.GetDomainDefines();
+            var set = StorageService.Provider.GetPluginDefines();
             TheDomain = set.SingleOrDefault(s => s.Title == domain);
             TheAssembly = TheDomain?.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
             TheJob = TheAssembly?.GetJobs().SingleOrDefault(s => s.Name == job);

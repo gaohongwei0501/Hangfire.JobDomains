@@ -14,7 +14,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
     internal class AssemblyPage : HtmlPage
     {
       
-        public DomainDefine TheDomain { get; set; }
+        public PluginDefine TheDomain { get; set; }
 
         public AssemblyDefine TheAssembly { get; set; }
 
@@ -23,8 +23,8 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             FetchTitle = () => $"{ (TheAssembly == null ? string.Empty : TheAssembly.ShortName) } 程序集任务定义详情";
             FetchHeader = () => $"任务集：{(TheAssembly == null ? string.Empty : TheAssembly.Title)}" ;
 
-            Sidebar = ()=>SidebarMenus.DomainsMenu(domain);
-            var set = StorageService.Provider.GetDomainDefines();
+            Sidebar = ()=>SidebarMenus.PluginsMenu(domain);
+            var set = StorageService.Provider.GetPluginDefines();
             TheDomain = set.SingleOrDefault(s => s.Title == domain);
             TheAssembly = TheDomain?.GetJobSets().SingleOrDefault(s => s.ShortName == name);
         }

@@ -19,12 +19,15 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer
             modelBuilder.ApplyConfiguration<Entities.ServerPlugin>(new ServerPluginMapper());
             modelBuilder.ApplyConfiguration<Entities.ServerQueue>(new ServerQueueMapper());
             modelBuilder.ApplyConfiguration<Entities.Queue>(new QueueMapper());
-            modelBuilder.ApplyConfiguration<Entities.Domain>(new DomainMapper());
+            modelBuilder.ApplyConfiguration<Entities.Plugin>(new PluginMapper());
             modelBuilder.ApplyConfiguration<Entities.Assembly>(new AssemblyTypeMapper());
             modelBuilder.ApplyConfiguration<Entities.Job>(new JobMapper());
             modelBuilder.ApplyConfiguration<Entities.JobConstructorParameter>(new JobConstructorParameterMapper());
         }
 
+        /// <summary>
+        /// Add-Migration init
+        /// </summary>
         public static string ConnectionString { get; set; } = "DevConnectionString";
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionbuilder)

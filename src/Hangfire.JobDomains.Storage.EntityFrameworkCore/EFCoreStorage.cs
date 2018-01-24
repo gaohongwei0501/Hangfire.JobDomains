@@ -168,7 +168,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
             }
         }
 
-        public List<string> GetServersByDomain(string domain)
+        public List<string> GetServersByPlugin(string domain)
         {
             using (var context = GetContext())
             {
@@ -212,7 +212,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         #region DomainDefine
 
-        public Task<bool> AddDomainAsync(DomainDefine define)
+        public Task<bool> AddPluginAsync(PluginDefine define)
         {
             return TryTransaction<bool>(async (context) =>
             {
@@ -268,16 +268,16 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
             context.Domains.Remove(domain);
         }
 
-        public List<DomainDefine> GetAllDomains()
+        public List<PluginDefine> GetAllPlugins()
         {
             using (var context = GetContext())
             {
                 var domains = context.Domains.ToList();
-                return domains.Select(s => new DomainDefine(s.PathName,s.Title, s.Description)).ToList();
+                return domains.Select(s => new PluginDefine(s.PathName,s.Title, s.Description)).ToList();
             }
         }
 
-        public List<AssemblyDefine> GetAssemblies(DomainDefine domainDefine)
+        public List<AssemblyDefine> GetAssemblies(PluginDefine domainDefine)
         {
             using (var context = GetContext())
             {

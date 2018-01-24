@@ -53,28 +53,6 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                     b.ToTable("JobDomains.Assembly","Hangfire");
                 });
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Domain", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreatedAt");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(200);
-
-                    b.Property<string>("PathName");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.HasKey("ID");
-
-                    b.ToTable("JobDomains.Domain","Hangfire");
-                });
-
             modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Job", b =>
                 {
                     b.Property<int>("ID")
@@ -135,6 +113,28 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("JobDomains.JobConstructorParameter","Hangfire");
+                });
+
+            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Plugin", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200);
+
+                    b.Property<string>("PathName");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.HasKey("ID");
+
+                    b.ToTable("JobDomains.Plugin","Hangfire");
                 });
 
             modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Queue", b =>

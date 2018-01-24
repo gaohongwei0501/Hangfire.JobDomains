@@ -33,23 +33,6 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "JobDomains.Domain",
-                schema: "Hangfire",
-                columns: table => new
-                {
-                    ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CreatedAt = table.Column<DateTime>(nullable: false),
-                    Description = table.Column<string>(maxLength: 200, nullable: true),
-                    PathName = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_JobDomains.Domain", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "JobDomains.Job",
                 schema: "Hangfire",
                 columns: table => new
@@ -87,6 +70,23 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JobDomains.JobConstructorParameter", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JobDomains.Plugin",
+                schema: "Hangfire",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Description = table.Column<string>(maxLength: 200, nullable: true),
+                    PathName = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobDomains.Plugin", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -160,15 +160,15 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.Migrations
                 schema: "Hangfire");
 
             migrationBuilder.DropTable(
-                name: "JobDomains.Domain",
-                schema: "Hangfire");
-
-            migrationBuilder.DropTable(
                 name: "JobDomains.Job",
                 schema: "Hangfire");
 
             migrationBuilder.DropTable(
                 name: "JobDomains.JobConstructorParameter",
+                schema: "Hangfire");
+
+            migrationBuilder.DropTable(
+                name: "JobDomains.Plugin",
                 schema: "Hangfire");
 
             migrationBuilder.DropTable(

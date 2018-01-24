@@ -90,7 +90,7 @@
     <Compile Include="Dashboard\PageResult\CommandResult.cs" />
     <Compile Include="Dashboard\PageResult\ContentResult.cs" />
     <Compile Include="Dashboard\Pages\BatchSchedulePage.cs" />
-    <Compile Include="Dashboard\Pages\DomainPage.cs" />
+    <Compile Include="Dashboard\Pages\FolderPage.cs" />
     <Compile Include="Dashboard\HtmlPage.cs" />
     <Compile Include="Dashboard\Pages\AssemblyPage.cs" />
     <Compile Include="Dashboard\Pages\JobPage.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="Server\JobDomainManager.cs" />
     <Compile Include="Server\JobInvoke.cs" />
     <Compile Include="Models\AssemblyDefine.cs" />
-    <Compile Include="Models\DomainDefine.cs" />
+    <Compile Include="Models\PluginDefine.cs" />
     <Compile Include="Dashboard\Dispatchers\EmbeddedResourceDispatcher.cs" />
     <Compile Include="Dashboard\TagHelper.cs" />
     <Compile Include="Models\JobDefine.cs" />

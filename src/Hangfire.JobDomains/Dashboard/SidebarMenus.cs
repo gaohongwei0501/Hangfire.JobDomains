@@ -85,7 +85,7 @@ namespace Hangfire.JobDomains.Dashboard
             return menus;
         };
 
-        public static Func<string, List<Func<RazorPage, MenuItem>>> DomainsMenu = (current) =>
+        public static Func<string, List<Func<RazorPage, MenuItem>>> PluginsMenu = (current) =>
         {
 
             var menus = new List<Func<RazorPage, MenuItem>>
@@ -93,7 +93,7 @@ namespace Hangfire.JobDomains.Dashboard
                 page => new MenuItem("任务包列表", "#")
             };
 
-            var domains = StorageService.Provider.GetDomainDefines().OrderBy(s => s.Title);
+            var domains = StorageService.Provider.GetPluginDefines().OrderBy(s => s.Title);
 
             foreach (var one in domains)
             {
@@ -115,7 +115,7 @@ namespace Hangfire.JobDomains.Dashboard
 
             var menus = new List<Func<RazorPage, MenuItem>>();
 
-            var set = StorageService.Provider.GetDomainDefines();
+            var set = StorageService.Provider.GetPluginDefines();
             var theDomain = set.SingleOrDefault(s => s.Title == d);
             if (theDomain == null) return menus;
             var theSet = theDomain.GetJobSets().SingleOrDefault(s => s.ShortName == a);

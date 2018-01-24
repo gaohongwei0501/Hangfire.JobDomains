@@ -13,6 +13,8 @@ namespace Hangfire.JobDomains.Dashboard
     internal static class UrlHelperExtension
     {
 
+        public static string baseRoute = "packets";
+
         static string EscapeRoute(this string input)
         {
             return input.Replace(".", "~");
@@ -30,7 +32,7 @@ namespace Hangfire.JobDomains.Dashboard
 
         #region MainPage
 
-        public const string MainPageRoute = "/domains";
+        public static string MainPageRoute => $"/{baseRoute}";
 
         /// <summary>
         /// MainPage CreateRoute
@@ -47,7 +49,7 @@ namespace Hangfire.JobDomains.Dashboard
 
         #region SystemPage
 
-        public const string SystemPageRoute = "/domains/set";
+        public static string SystemPageRoute => $"/{baseRoute}/set";
 
         /// <summary>
         /// MainPage CreateRoute
@@ -63,7 +65,7 @@ namespace Hangfire.JobDomains.Dashboard
 
         #region BatchSchedulePage
 
-        public const string BatchSchedulePageRoute = "/domains/batch";
+        public static string BatchSchedulePageRoute = $"/{baseRoute}/batch";
 
         /// <summary>
         /// BatchSchedulePage CreateRoute
@@ -79,10 +81,10 @@ namespace Hangfire.JobDomains.Dashboard
 
         #region ServerListPage
 
-        public const string ServerListPageRoute = "/domains/servers";
+        public static string ServerListPageRoute => $"/{baseRoute}/servers";
 
         /// <summary>
-        /// DomainPage CreateRoute
+        /// ServerListPage CreateRoute
         /// </summary>
         public static (string Name, string Link) CreateServerListRoute(this UrlHelper Url)
         {
@@ -95,10 +97,10 @@ namespace Hangfire.JobDomains.Dashboard
 
         #region ServerPage
 
-        public const string ServerPageRoute = "/domains/server-(?<name>.+)";
+        public static string ServerPageRoute = $"/{baseRoute}/server-(?<name>.+)";
 
         /// <summary>
-        /// DomainPage CreateRoute
+        /// ServerPage CreateRoute
         /// </summary>
         public static (string Name, string Link) CreateServerRoute(this UrlHelper Url, ServerDefine server)
         {
@@ -124,10 +126,10 @@ namespace Hangfire.JobDomains.Dashboard
 
         #region QueueListPage
 
-        public const string QueueListPageRoute = "/domains/queues";
+        public static string QueueListPageRoute = $"/{baseRoute}/queues";
 
         /// <summary>
-        /// DomainPage CreateRoute
+        /// QueueListPage CreateRoute
         /// </summary>
         public static (string Name, string Link) CreateQueueListRoute(this UrlHelper Url)
         {
@@ -140,10 +142,10 @@ namespace Hangfire.JobDomains.Dashboard
 
         #region QueuePage
 
-        public const string QueuePageRoute = "/domains/queue-(?<name>.+)";
+        public static string QueuePageRoute = $"/{baseRoute}/queue-(?<name>.+)";
 
         /// <summary>
-        /// DomainPage CreateRoute
+        /// QueuePage CreateRoute
         /// </summary>
         public static (string Name, string Link) CreateQueueRoute(this UrlHelper Url, QueueDefine queue)
         {
@@ -167,89 +169,82 @@ namespace Hangfire.JobDomains.Dashboard
 
         #endregion
 
+        #region FolderPage
 
-        #region DomainPage
-
-        public const string DomainPageRoute = "/domains/domain-(?<name>.+)";
+        public static string FolderPageRoute = $"/{baseRoute}/folder-(?<name>.+)";
 
         /// <summary>
-        /// DomainPage CreateRoute
+        /// FolderPage CreateRoute
         /// </summary>
-        public static (string Name, string Link) CreateRoute(this UrlHelper Url , DomainDefine domain)
+        public static (string Name, string Link) CreateRoute(this UrlHelper Url , PluginDefine plugin)
         {
-            var name = domain.Title;
-            var link = DomainPageRoute.Replace("(?<name>.+)", domain.PathName).EscapeRoute();
+            var name = plugin.Title;
+            var link = FolderPageRoute.Replace("(?<name>.+)", plugin.PathName).EscapeRoute();
             return (name, Url.To(link));
         }
 
-        public static DomainPage CreateDomainPage(Match match)
+        public static FolderPage CreateFolderPage(Match match)
         {
             var name = match.Groups["name"];
-            return new DomainPage(name.EscapeNomal());
+            return new FolderPage(name.EscapeNomal());
         }
 
         #endregion
 
         #region AssemblyPage
 
-        public const string AssemblyPageRoute = "/domains/assembly-(?<name>.+)-domain-(?<domain>.+)";
+        public static string AssemblyPageRoute = $"/{baseRoute}/assembly-(?<name>.+)-folder-(?<plugin>.+)";
 
         /// <summary>
         /// AssemblyPage  CreateRoute
         /// </summary>
-        public static (string Name, string Link) CreateRoute(this UrlHelper Url, DomainDefine domain, AssemblyDefine assembly)
+        public static (string Name, string Link) CreateRoute(this UrlHelper Url, PluginDefine plugin, AssemblyDefine assembly)
         {
             var name = assembly.Title;
-            var link = AssemblyPageRoute.Replace("(?<domain>.+)", domain.PathName).Replace("(?<name>.+)", assembly.ShortName).EscapeRoute();
+            var link = AssemblyPageRoute.Replace("(?<plugin>.+)", plugin.PathName).Replace("(?<name>.+)", assembly.ShortName).EscapeRoute();
             return (name, Url.To(link));
         }
 
         public static AssemblyPage CreateAssemblyPage(Match match)
         {
-            var domain = match.Groups["domain"];
+            var plugin = match.Groups["plugin"];
             var name = match.Groups["name"];
-            return new AssemblyPage(domain.EscapeNomal(), name.EscapeNomal());
+            return new AssemblyPage(plugin.EscapeNomal(), name.EscapeNomal());
         }
 
         #endregion
 
         #region JobPage
 
-        public const string JobPageRoute = "/domains/job-(?<name>.+)-assembly-(?<assembly>.+)-domain-(?<domain>.+)";
-
+        public static string JobPageRoute = $"/{baseRoute}/job-(?<name>.+)-assembly-(?<assembly>.+)-folder-(?<plugin>.+)";
 
         /// <summary>
         /// JobPage  CreateRoute
         /// </summary>
-        public static (string Name, string Link) CreateRoute(this UrlHelper Url, DomainDefine domain, AssemblyDefine assembly, JobDefine job)
+        public static (string Name, string Link) CreateRoute(this UrlHelper Url, PluginDefine plugin, AssemblyDefine assembly, JobDefine job)
         {
             var name = job.Title;
-            var link = JobPageRoute.Replace("(?<domain>.+)", domain.PathName).Replace("(?<assembly>.+)", assembly.ShortName).Replace("(?<name>.+)", job.Name).EscapeRoute();
+            var link = JobPageRoute.Replace("(?<plugin>.+)", plugin.PathName).Replace("(?<assembly>.+)", assembly.ShortName).Replace("(?<name>.+)", job.Name).EscapeRoute();
             return (name, Url.To(link));
         }
 
         public static JobPage CreateJobPage(Match match)
         {
-            var domain = match.Groups["domain"];
+            var plugin = match.Groups["plugin"];
             var assembly = match.Groups["assembly"];
             var name = match.Groups["name"];
-            return new JobPage(domain.EscapeNomal(), assembly.EscapeNomal(), name.EscapeNomal());
+            return new JobPage(plugin.EscapeNomal(), assembly.EscapeNomal(), name.EscapeNomal());
         }
-
-        #endregion
-
-        #region DomainCommandPage
-
-     //   public const string DomainCommandRoute = "/domains/command-domain-(?<cmd>.+)-domain-(?<name>.+)";
-        public const string DomainCommandRoute = "/domains/command-domain";
 
         #endregion
 
         #region CommandPage
 
-        public const string JobCommandRoute = "/domains/command-job";
+        public static string PluginCommandRoute = $"/{baseRoute}/command-plugin";
 
-        public const string ServerCommandRoute = "/domains/command-server";
+        public static string JobCommandRoute = $"/{baseRoute}/command-job";
+
+        public static string ServerCommandRoute = $"/{baseRoute}/command-server";
 
         #endregion
 

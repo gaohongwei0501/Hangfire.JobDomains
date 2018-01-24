@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
 {
-    internal class DomainMapper : IEntityTypeConfiguration<EntityFrameworkCore.Entities.Domain>
+    internal class PluginMapper : IEntityTypeConfiguration<EntityFrameworkCore.Entities.Plugin>
     {
-        public void Configure(EntityTypeBuilder<EntityFrameworkCore.Entities.Domain> builder)
+        public void Configure(EntityTypeBuilder<EntityFrameworkCore.Entities.Plugin> builder)
         {
             // Primary Key
             builder.HasKey(t => t.ID);
@@ -21,7 +21,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
             builder.Property(t => t.Title).IsRequired().HasMaxLength(50);
             builder.Property(t => t.Description).HasMaxLength(200);
 
-            builder.ToTable("JobDomains.Domain", "Hangfire");
+            builder.ToTable("JobDomains.Plugin", "Hangfire");
         }
     }
 }

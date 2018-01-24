@@ -122,16 +122,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoMigration.cs" />
-    <Compile Include="Migrations\20180122101230_init.cs" />
-    <Compile Include="Migrations\20180122101230_init.designer.cs">
-      <DependentUpon>20180122101230_init.cs</DependentUpon>
+    <Compile Include="Migrations\20180124101030_init.cs" />
+    <Compile Include="Migrations\20180124101030_init.designer.cs">
+      <DependentUpon>20180124101030_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\SqlServerDBContextModelSnapshot.cs" />
     <Compile Include="TypeMapper\AssemblyTypeMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlServerDBContext.cs" />
     <Compile Include="SqlServerStorage.cs" />
-    <Compile Include="TypeMapper\DomainMapper.cs" />
+    <Compile Include="TypeMapper\PluginMapper.cs" />
     <Compile Include="TypeMapper\JobConstructorParameter.cs" />
     <Compile Include="TypeMapper\JobMapper.cs" />
     <Compile Include="TypeMapper\QueueMapper.cs" />

@@ -22,9 +22,9 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
             };
         }
 
-        public static Domain GetDomain(this DomainDefine model)
+        public static Plugin GetDomain(this PluginDefine model)
         {
-            return new Domain
+            return new Plugin
             {
                 PathName= model.PathName,
                 Title = model.Title,

@@ -31,7 +31,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite
             modelBuilder.Entity<Entities.ServerPlugin>().ToTable("JobDomains.ServerPlugin", "Hangfire");
             modelBuilder.Entity<Entities.ServerQueue>().ToTable("JobDomains.ServerQueue", "Hangfire");
             modelBuilder.Entity<Entities.Queue>().ToTable("JobDomains.Queue", "Hangfire");
-            modelBuilder.Entity<Entities.Domain>().ToTable("JobDomains.Domain", "Hangfire");
+            modelBuilder.Entity<Entities.Plugin>().ToTable("JobDomains.Domain", "Hangfire");
             modelBuilder.Entity<Entities.Assembly>().ToTable("JobDomains.Assembly", "Hangfire");
             modelBuilder.Entity<Entities.Job>().ToTable("JobDomains.Job", "Hangfire");
             modelBuilder.Entity<Entities.JobConstructorParameter>().ToTable("JobDomains.JobConstructor", "Hangfire");

@@ -116,7 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Assembly.cs" />
-    <Compile Include="Entities\Domain.cs" />
+    <Compile Include="Entities\Plugin.cs" />
     <Compile Include="Entities\Job.cs" />
     <Compile Include="Entities\JobConstructorParameter.cs" />
     <Compile Include="Entities\Queue.cs" />

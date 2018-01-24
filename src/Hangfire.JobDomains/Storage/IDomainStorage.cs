@@ -20,7 +20,7 @@ namespace Hangfire.JobDomains.Storage
 
         ServerDefine GetServer(string server);
 
-        List<string> GetServersByDomain(string domain);
+        List<string> GetServersByPlugin(string domain);
 
         List<string> GetServersByQueue(string queue);
 
@@ -28,15 +28,15 @@ namespace Hangfire.JobDomains.Storage
 
         List<QueueDefine> GetCustomerQueues(string server);
 
-        List<DomainDefine> GetAllDomains();
+        List<PluginDefine> GetAllPlugins();
 
-        List<AssemblyDefine> GetAssemblies(DomainDefine domain);
+        List<AssemblyDefine> GetAssemblies(PluginDefine domain);
 
         List<JobDefine> GetJobs(AssemblyDefine assembly);
 
         List<ConstructorDefine> GetConstructors(JobDefine job);
 
-        Task<bool> AddDomainAsync(DomainDefine define);
+        Task<bool> AddPluginAsync(PluginDefine define);
 
     }
 

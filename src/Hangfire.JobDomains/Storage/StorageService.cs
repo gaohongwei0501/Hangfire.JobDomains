@@ -63,7 +63,7 @@ namespace Hangfire.JobDomains.Storage
             return Storage.GetServer(serverName);
         }
 
-        public List<string> GetServersByDomain(string domain) => Storage.GetServersByDomain(domain);
+        public List<string> GetServersByPlugin(string plugin) => Storage.GetServersByPlugin(plugin);
 
         public List<QueueDefine> GetQueues(Hangfire.JobStorage hangfireStorage)
         {
@@ -113,31 +113,31 @@ namespace Hangfire.JobDomains.Storage
             return list.Distinct().Where(s => s != "default").Select(s => new QueueDefine { Name = s, Description = "服务器队列" });
         }
 
-        public IEnumerable<string> GetQueuesByDomain(Hangfire.JobStorage hangfireStorage, string domainName)
+        public IEnumerable<string> GetQueuesByPlugin(Hangfire.JobStorage hangfireStorage, string pluginName)
         {
-            var domainServers = GetServersByDomain(domainName);
+            var pluginServers = GetServersByPlugin(pluginName);
             var monitor = hangfireStorage.GetMonitoringApi();
             var activeServers = monitor.Servers();
 
             #region 激活的【任务服务器】（可以执行指定插件的任务服务器）的队列集
 
-            var activeDomainServers = activeServers.Where(s => domainServers.Contains(SubServerName(s.Name))).ToList();
-            var domainQueues = new List<string>();
-            activeDomainServers.ForEach(s => domainQueues.AddRange(s.Queues));
-            var domainDistincts = domainQueues.Distinct().Where(s => s != "default");
+            var activePluginServers = activeServers.Where(s => pluginServers.Contains(SubServerName(s.Name))).ToList();
+            var pluginQueues = new List<string>();
+            activePluginServers.ForEach(s => pluginQueues.AddRange(s.Queues));
+            var pluginDistincts = pluginQueues.Distinct().Where(s => s != "default");
 
             #endregion
 
             #region 激活的非【任务服务器】的队列集
 
-            var otherActiveDomainServers = activeServers.Where(s => domainServers.Contains(SubServerName(s.Name)) == false).ToList();
+            var otherActivePluginServers = activeServers.Where(s => pluginServers.Contains(SubServerName(s.Name)) == false).ToList();
             var otherQueues = new List<string>();
-            otherActiveDomainServers.ForEach(s => otherQueues.AddRange(s.Queues));
+            otherActivePluginServers.ForEach(s => otherQueues.AddRange(s.Queues));
             var otherDistincts = otherQueues.Distinct();
 
             #endregion
 
-            return domainDistincts.Where(s => otherDistincts.Contains(s) == false);
+            return pluginDistincts.Where(s => otherDistincts.Contains(s) == false);
         }
 
         public QueueDefine GetQueue(Hangfire.JobStorage hangfireStorage, string queueName)
@@ -149,15 +149,15 @@ namespace Hangfire.JobDomains.Storage
             return queue;
         }
 
-        public List<DomainDefine> GetDomainDefines() => Storage.GetAllDomains();
+        public List<PluginDefine> GetPluginDefines() => Storage.GetAllPlugins();
 
-        public List<AssemblyDefine> GetAssemblies(DomainDefine domain) => Storage.GetAssemblies(domain);
+        public List<AssemblyDefine> GetAssemblies(PluginDefine plugin) => Storage.GetAssemblies(plugin);
 
         public List<JobDefine> GetJobs(AssemblyDefine assembly) => Storage.GetJobs(assembly);
 
         public List<ConstructorDefine> GetConstructors(JobDefine job) => Storage.GetConstructors(job);
 
-        public Task<bool> AddDomainAsync(DomainDefine define) => Storage.AddDomainAsync(define);
+        public Task<bool> AddPluginAsync(PluginDefine define) => Storage.AddPluginAsync(define);
 
        
 

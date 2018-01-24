@@ -64,21 +64,25 @@ namespace Hangfire.JobDomains.Server
         static async Task<List<string>> ScanServer(string basePath)
         {
             if (Directory.Exists(basePath) == false) Directory.CreateDirectory(basePath);
-            var queues = new List<string>();
+            var plugins = new List<string>();
             var paths = Directory.GetDirectories(basePath);
             foreach (var path in paths)
             {
                 var index = path.LastIndexOf("\\");
                 var dir = path.Substring(index + 1);
-                var define = new DomainDefine(dir);
+                var define = new PluginDefine(dir);
                 LoadDomain(basePath, define);
-                await StorageService.Provider.AddDomainAsync(define);
-                queues.Add(define.Title);
+
+                var sets = define.GetJobSets();
+                if (sets == null || sets.Count == 0) continue;
+
+                await StorageService.Provider.AddPluginAsync(define);
+                plugins.Add(define.Title);
             }
-            return queues;
+            return plugins;
         }
 
-        static void LoadDomain(string basePath, DomainDefine define)
+        static void LoadDomain(string basePath, PluginDefine define)
         {
             var files = Directory.GetFiles($"{basePath}\\{define.PathName}", "*.dll");
             var assemblies = new List<AssemblyDefine>();
@@ -102,7 +106,7 @@ namespace Hangfire.JobDomains.Server
             define.SetJobSets(assemblies);
         }
 
-        static AssemblyDefine CreateAssemblyDefine(DomainDefine domainDefine, Assembly define)
+        static AssemblyDefine CreateAssemblyDefine(PluginDefine domainDefine, Assembly define)
         {
             var file = define.Location;
             var fullName = define.FullName;
