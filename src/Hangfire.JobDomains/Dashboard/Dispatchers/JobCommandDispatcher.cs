@@ -59,10 +59,10 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
 
             switch (jobCmd)
             {
-                case JobPageCommand.Schedule: Schedule(queue, start, period, jobSign, paramers); break;
+                case JobPageCommand.Schedule: Schedule(queue,  period, jobSign, paramers); break;
                 case JobPageCommand.Delay: Delay(queue, start, paramers); break;
-                case JobPageCommand.Immediately: JobTest(queue, paramers); break;
-                case JobPageCommand.Test: JobTest(queue, paramers); break;
+                case JobPageCommand.Immediately: DynamicDispatch.TestInvoke(TheDomain.PathName, TheJob.Title, TheAssembly.FullName, TheJob.FullName, paramers, queue); break;
+                case JobPageCommand.Test: DynamicDispatch.TestInvoke(TheDomain.PathName, TheJob.Title, TheAssembly.FullName, TheJob.FullName, paramers, queue); break;
             }
 
             return new JsonData
@@ -72,11 +72,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
                 Url = "",
             };
         }
-
-        void JobTest(string queue, object[] paramers)
-        {
-            JobInvoke.Test(queue, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
-        }
+     
 
         bool IsPeriod(string period) {
             try
@@ -89,13 +85,10 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             }
         }
 
-
-        void Schedule(string queue, DateTime start, string period, string jobSign, object[] paramers)
+        void Schedule(string queue, string period, string jobSign, object[] paramers)
         {
             if(IsPeriod(period)==false) throw (new Exception("任务周期不能被识别"));
-            if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
-            var delay = start - DateTime.Now;
-            JobInvoke.ScheduleEnqueued(delay, period, queue, jobSign, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
+            JobInvoke.RecurringInvoke( period, queue, jobSign, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
         void Delay(string queue, DateTime start, object[] paramers)
@@ -103,7 +96,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
             var delay = start - DateTime.Now;
             //  BackgroundJob.Schedule(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), delay);
-            JobInvoke.DelayEnqueued(delay, queue, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
+            JobInvoke.ScheduleInvoke(delay, queue, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
    

@@ -11,49 +11,50 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Server
 {
+  
     internal class JobInvoke
     {
-        public static void ScheduleEnqueued(TimeSpan delay, string period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
-        {
-            BackgroundJob.Schedule(() => RecurringInvoke(period, queue, jobSign, pluginName, assembly, job, paramers), delay);
-        }
 
-        public static void DelayEnqueued(TimeSpan delay, string queue, string pluginName, string assembly, string job, object[] paramers)
+        public static void ScheduleInvoke(TimeSpan delay, string queue, string pluginName, string assembly, string job, object[] paramers)
         {
             BackgroundJob.Schedule(() => ImmediatelyEnqueued(queue, pluginName, assembly, job, paramers), delay);
         }
 
-        public static void ImmediatelyEnqueued(string queue, string pluginName, string assembly, string job, object[] paramers)
+        static void ImmediatelyEnqueued(string queue, string pluginName, string assembly, string job, object[] paramers)
         {
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
-            hangFireClient.Create(() => Invoke(pluginName, assembly, job, paramers), state);
+            hangFireClient.Create(() => _JobInvoke.Invoke(pluginName, assembly, job, paramers), state);
         }
 
         public static void RecurringInvoke(string period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
         {
-            RecurringJob.AddOrUpdate(jobSign, () => Invoke(pluginName, assembly, job, paramers), period, queue: queue);
-        }
-
-        public static void Invoke(string pluginName, string assembly, string job, object[] paramers)
-        {
-            DomainInvoke<bool>(pluginName, assembly, job, paramers, PrefabricationActivator.Dispatch, domain => true);
+            RecurringJob.AddOrUpdate(jobSign, () => _JobInvoke.Invoke(pluginName, assembly, job, paramers), period, queue: queue);
         }
 
         public static void Test(string queue, string pluginName, string assembly, string job, object[] paramers)
         {
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
-            hangFireClient.Create(() => TestInvoke(pluginName, assembly, job, paramers), state);
+            hangFireClient.Create(() => _JobInvoke.TestInvoke(pluginName, assembly, job, paramers), state);
         }
+
+    }
+
+    internal class _JobInvoke
+    {
 
         public static bool TestInvoke(string pluginName, string assembly, string job, object[] paramers)
         {
-            return DomainInvoke<bool>(pluginName, assembly, job, paramers, PrefabricationActivator.Test, domain => (bool)domain.GetData("result"));
+            return Invoke<bool>(pluginName, assembly, job, paramers, PrefabricationActivator.Test, domain => (bool)domain.GetData("result"));
         }
 
+        public static void Invoke(string pluginName, string assembly, string job, object[] paramers)
+        {
+            Invoke<bool>(pluginName, assembly, job, paramers, PrefabricationActivator.Dispatch, domain => true);
+        }
 
-        static T DomainInvoke<T>(string pluginName, string assembly, string job, object[] paramers, Action act, Func<AppDomain, T> GetResult)
+        static T Invoke<T>(string pluginName, string assembly, string job, object[] paramers, Action act, Func<AppDomain, T> GetResult)
         {
             AppDomain Domain = null;
             try
