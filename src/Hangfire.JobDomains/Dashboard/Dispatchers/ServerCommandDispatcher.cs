@@ -77,7 +77,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             var queue = StorageService.Provider.GetSelfQueue(TheServer.Name);
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             EnqueuedState state = new Hangfire.States.EnqueuedState(queue.Name);
-            hangFireClient.Create(()=> JobDomainManager.Restart(path), state);
+            hangFireClient.Create(()=> PluginServiceManager.Restart(path), state);
 
             return new JsonData
             {

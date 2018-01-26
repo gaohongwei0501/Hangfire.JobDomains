@@ -96,7 +96,6 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         #region ServerDefine
 
-
         public Task<bool> ClearServer(string serverName)
         {
             return TryTransaction<bool>(async (context) =>
@@ -210,15 +209,29 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         #endregion
 
-        #region DomainDefine
+        #region  PluginDefine
+
+        void ClearPlugin(EFCoreDBContext context, string domainName)
+        {
+            var domain = context.Plugins.SingleOrDefault(s => s.Title == domainName);
+            if (domain == null) return;
+            var assemblies = context.Assemblies.Where(s => s.PluginID == domain.ID);
+            var jobs = context.Jobs.Where(s => s.DomainID == domain.ID);
+            var constructorParameters = context.JobConstructorParameters.Where(s => s.DomainID == domain.ID);
+
+            context.JobConstructorParameters.RemoveRange(constructorParameters);
+            context.Jobs.RemoveRange(jobs);
+            context.Assemblies.RemoveRange(assemblies);
+            context.Plugins.Remove(domain);
+        }
 
         public Task<bool> AddPluginAsync(PluginDefine define)
         {
             return TryTransaction<bool>(async (context) =>
             {
                 var domain = define.GetDomain();
-                ClearDomain(context, domain.Title);
-                var domainResult = await context.Domains.AddAsync(domain);
+                ClearPlugin(context, domain.Title);
+                var domainResult = await context.Plugins.AddAsync(domain);
                 await context.SaveChangesAsync();
 
                 var assemblies = define.InnerJobSets;
@@ -253,38 +266,38 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
                 return true;
             }, () => false);
         }
-
-        void ClearDomain(EFCoreDBContext context, string domainName)
-        {
-            var domain = context.Domains.SingleOrDefault(s => s.Title == domainName);
-            if (domain == null) return;
-            var assemblies = context.Assemblies.Where(s => s.DomainID == domain.ID);
-            var jobs = context.Jobs.Where(s => s.DomainID == domain.ID);
-            var constructorParameters = context.JobConstructorParameters.Where(s => s.DomainID == domain.ID);
-
-            context.JobConstructorParameters.RemoveRange(constructorParameters);
-            context.Jobs.RemoveRange(jobs);
-            context.Assemblies.RemoveRange(assemblies);
-            context.Domains.Remove(domain);
-        }
-
+ 
         public List<PluginDefine> GetAllPlugins()
         {
             using (var context = GetContext())
             {
-                var domains = context.Domains.ToList();
-                return domains.Select(s => new PluginDefine(s.PathName,s.Title, s.Description)).ToList();
+                var Plugins = context.Plugins.ToList();
+                return Plugins.Select(s => new PluginDefine(s.PathName,s.Title, s.Description)).ToList();
             }
         }
 
-        public List<AssemblyDefine> GetAssemblies(PluginDefine domainDefine)
+        public List<PluginDefine> GetPlugins(string server)
         {
             using (var context = GetContext())
             {
-                var domain = context.Domains.FirstOrDefault(s => s.Title == domainDefine.Title);
-                if (domain == null) return new List<AssemblyDefine>();
-                var assemblies = context.Assemblies.Where(s => s.DomainID == domain.ID);
-                return assemblies.Select(s => new AssemblyDefine(domainDefine, s.FileName, s.FullName, s.ShortName, s.Title, s.Description)).ToList();
+                var result = from o in context.Plugins
+                             join m in context.ServerPlugs
+                             on o.PathName equals m.PlugName
+                             where m.ServerName == server
+                             select o;
+        
+                return result.Select(s => new PluginDefine(s.PathName, s.Title, s.Description)).ToList();
+            }
+        }
+
+        public List<AssemblyDefine> GetAssemblies(PluginDefine pluginDefine)
+        {
+            using (var context = GetContext())
+            {
+                var plugin = context.Plugins.FirstOrDefault(s => s.Title == pluginDefine.Title);
+                if (plugin == null) return new List<AssemblyDefine>();
+                var assemblies = context.Assemblies.Where(s => s.PluginID == plugin.ID);
+                return assemblies.Select(s => new AssemblyDefine(pluginDefine, s.FileName, s.FullName, s.ShortName, s.Title, s.Description)).ToList();
             }
         }
 
@@ -295,9 +308,9 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
                 var domainDefine = assemblyDefine.Parent;
                 if (domainDefine == null) return new List<JobDefine>();
 
-                var domain = context.Domains.FirstOrDefault(s => s.Title == domainDefine.Title);
+                var domain = context.Plugins.FirstOrDefault(s => s.Title == domainDefine.Title);
                 if (domain == null) return new List<JobDefine>();
-                var assembly = context.Assemblies.Where(s => s.DomainID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
+                var assembly = context.Assemblies.Where(s => s.PluginID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
                 if (assembly == null) return new List<JobDefine>();
                 var jobs = context.Jobs.Where(s => s.AssemblyID == assembly.ID);
                 return jobs.Select(s => new JobDefine(assemblyDefine, s.FullName, s.Name, s.Title, s.Description)).ToList();
@@ -313,9 +326,9 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
                 var domainDefine = assemblyDefine.Parent;
                 if (domainDefine == null) return new List<ConstructorDefine>();
 
-                var domain = context.Domains.FirstOrDefault(s => s.Title == assemblyDefine.Parent.Title);
+                var domain = context.Plugins.FirstOrDefault(s => s.Title == assemblyDefine.Parent.Title);
                 if (domain == null) return new List<ConstructorDefine>();
-                var assembly = context.Assemblies.Where(s => s.DomainID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
+                var assembly = context.Assemblies.Where(s => s.PluginID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
                 if (assembly == null) return new List<ConstructorDefine>();
                 var job = context.Jobs.Where(s => s.AssemblyID == assembly.ID).FirstOrDefault(s => s.Name == jobDefine.Name);
                 if (job == null) return new List<ConstructorDefine>();
@@ -341,57 +354,6 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
         #endregion
 
-        #region SysSetting
-
-        public Dictionary<SysSettingKey, string> GetSysSetting()
-        {
-            using (var context = GetContext())
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public bool SetSysSetting(SysSettingKey key, string value)
-        {
-            using (var context = GetContext())
-            {
-                throw new NotImplementedException();
-
-            }
-        }
-
-        public Dictionary<int, string> GetJobCornSetting()
-        {
-            var dic = new Dictionary<int, string>();
-            dic.Add(1, "一分钟");
-            dic.Add(5, "五分钟");
-            dic.Add(10, "十分钟");
-            return dic;
-            //using (var context = GetContext())
-            //{
-            //    throw new NotImplementedException();
-            //}
-        }
-
-        public bool AddJobCornSetting(int key, string value)
-        {
-            using (var context = GetContext())
-            {
-                throw new NotImplementedException();
-
-            }
-        }
-
-        public bool DeleteJobCornSetting(int key)
-        {
-            using (var context = GetContext())
-            {
-                throw new NotImplementedException();
-
-            }
-        }
-
-        #endregion
 
     }
 }

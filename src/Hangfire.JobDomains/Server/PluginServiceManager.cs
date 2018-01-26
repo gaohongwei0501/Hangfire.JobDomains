@@ -11,12 +11,12 @@ using Common.Logging;
 
 namespace Hangfire.JobDomains.Server
 {
-    internal class JobDomainManager
+    internal class PluginServiceManager
     {
 
         public static string ServerName => Environment.MachineName.ToLower();
 
-        static ILog loger = LogManager.GetLogger<JobDomainManager>();
+        static ILog loger = LogManager.GetLogger<PluginServiceManager>();
 
         public static async Task<BackgroundJobServerOptions> InitServer(string path, int workerCount)
         {
@@ -24,10 +24,8 @@ namespace Hangfire.JobDomains.Server
                 var server=  StorageService.Provider.GetServer(ServerName);
                 if (server != null) path = server.PlugPath;
             }
-            else
-            {
-                await UpdateServer(path);
-            }
+          
+            await UpdateServer(path);
 
             var queues = StorageService.Provider.GetQueues(null, ServerName);
             var options = new BackgroundJobServerOptions
@@ -63,8 +61,9 @@ namespace Hangfire.JobDomains.Server
 
         static async Task<List<string>> ScanServer(string basePath)
         {
-            if (Directory.Exists(basePath) == false) Directory.CreateDirectory(basePath);
             var plugins = new List<string>();
+            if (string.IsNullOrEmpty(basePath)) return plugins;
+            if (Directory.Exists(basePath) == false) Directory.CreateDirectory(basePath);
             var paths = Directory.GetDirectories(basePath);
             foreach (var path in paths)
             {

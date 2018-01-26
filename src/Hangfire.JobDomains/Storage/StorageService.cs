@@ -55,6 +55,7 @@ namespace Hangfire.JobDomains.Storage
         {
             var Server = Storage.GetServer(serverName);
             Server.Queues = GetQueues(hangfireStorage, serverName);
+            Server.Plugins = Storage.GetPlugins(serverName);
             return Server;
         }
 

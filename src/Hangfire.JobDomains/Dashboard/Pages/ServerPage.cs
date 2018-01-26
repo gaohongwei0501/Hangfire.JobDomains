@@ -39,10 +39,10 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             var queuesPanel = PageContent.Tag.Panel("所属队列", string.Empty, queuesContent);
             WriteLiteral(queuesPanel);
 
-            var domains = server.Domains;
+            var domains = server.Plugins;
             var domainsContent = PageContent.Tag.ListLink(domains, Url.CreateRoute);
-            var domainsPanel = PageContent.Tag.Panel("支持插件", string.Empty, domainsContent);
-            WriteLiteral(domainsPanel);
+            var pluginsPanel = PageContent.Tag.Panel("支持插件", string.Empty, domainsContent);
+            WriteLiteral(pluginsPanel);
 
             WriteLiteral(PageContent.Tag.CreateCommandComfirmBox());
             PageContent.WriteScriptFile(Url.To("/jsex/domainScript"));

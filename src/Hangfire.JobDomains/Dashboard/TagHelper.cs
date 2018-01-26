@@ -353,23 +353,6 @@ namespace Hangfire.JobDomains.Dashboard
         }
 
 
-        static Dictionary<SysSettingKey, string> SysSettingDescriptions = new Dictionary<SysSettingKey, string>();
-
-      
-        static void ReadDescriptions()
-        {
-            Type SysSettingType = typeof(SysSettingKey);
-            Array arrays = Enum.GetValues(SysSettingType);
-            for (int i = 0; i < arrays.LongLength; i++)
-            {
-                var value = (SysSettingKey)arrays.GetValue(i);
-                FieldInfo fieldInfo = SysSettingType.GetField(value.ToString());
-                var attr= fieldInfo.GetCustomAttribute<DescriptionAttribute>(false);
-                SysSettingDescriptions.Add(value, attr.Description);
-            }
-        }
-
-
         public static string CreateCronDeleteButtons(this TagHelper Tag, int value)
         {
             return $@"<a href=""javascript:void(0);"" class=""Cron-Delete"" data-value=""{value}"">删除</a>";

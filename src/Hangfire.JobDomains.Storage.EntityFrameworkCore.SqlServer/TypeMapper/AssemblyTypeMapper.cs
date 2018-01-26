@@ -19,7 +19,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
             // Properties
             builder.Property(t => t.ID).UseSqlServerIdentityColumn();
 
-            builder.Property(t => t.DomainID).IsRequired();
+            builder.Property(t => t.PluginID).IsRequired();
 
             builder.Property(t => t.FileName).IsRequired().HasMaxLength(200);
             builder.Property(t => t.FullName).IsRequired().HasMaxLength(200);

@@ -10,7 +10,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities
     public class Assembly : SQLiteEntityBase
     {
 
-        public int DomainID { get; set; }
+        public int PluginID { get; set; }
 
         /// <summary>
         /// 全名

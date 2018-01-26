@@ -26,7 +26,7 @@ namespace Hangfire.JobDomains.Models
 
         public string PlugPath { get; set; }
 
-        public List<PluginDefine> Domains { get; set; }
+        public List<PluginDefine> Plugins { get; set; }
 
         public List<QueueDefine> Queues { get; set; }
 

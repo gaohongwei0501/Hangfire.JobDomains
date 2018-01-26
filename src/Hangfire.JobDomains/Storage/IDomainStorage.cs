@@ -30,6 +30,8 @@ namespace Hangfire.JobDomains.Storage
 
         List<PluginDefine> GetAllPlugins();
 
+        List<PluginDefine> GetPlugins(string server);
+
         List<AssemblyDefine> GetAssemblies(PluginDefine domain);
 
         List<JobDefine> GetJobs(AssemblyDefine assembly);

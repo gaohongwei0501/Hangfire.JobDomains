@@ -49,42 +49,42 @@ namespace Hangfire.JobDomains
         /// <summary>
         /// 任务域服务（单机模式）
         /// </summary>
-        public static async Task UseDomains<T>(this IAppBuilder app, string path = "", string controllerName = "/HangfireDomain", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
+        public static async Task UseHangfirePlugins<T>(this IAppBuilder app, string path = "", string controllerName = "/HangfireDomain", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
             GlobalMode = HangfireDomainMode.All;
-            await app.InitDomainsAtServer<T>(path, connectString, workerCount);
-            app.InitDomainsAtClient<T>(controllerName, connectString);
+            await app.InitPluginsAtServer<T>(path, connectString, workerCount);
+            app.InitPluginsAtClient<T>(controllerName, connectString);
         }
 
         /// <summary>
         /// 任务域服务(服务器模式）
         /// </summary>
-        public static async Task UseDomainsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
+        public static async Task UseHangfirePluginsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
             GlobalMode = HangfireDomainMode.Server;
-            await app.InitDomainsAtServer<T>(path, connectString, workerCount);
+            await app.InitPluginsAtServer<T>(path, connectString, workerCount);
         }
 
         /// <summary>
         /// 任务域服务（客户端模式）
         /// </summary>
-        public static void UseDomainsAtClient<T>(this IAppBuilder app, string controllerName = "/HangfireDomain", string connectString = "") where T : IDomainStorage, new()
+        public static void UseHangfirePluginsAtClient<T>(this IAppBuilder app, string controllerName = "/HangfireDomain", string connectString = "") where T : IDomainStorage, new()
         {
             GlobalMode = HangfireDomainMode.Client;
-            app.InitDomainsAtClient<T>(controllerName, connectString);
+            app.InitPluginsAtClient<T>(controllerName, connectString);
             InitLocalRoute();
         }
 
 
-        static async Task InitDomainsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
+        static async Task InitPluginsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IDomainStorage, new()
         {
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-            var Options= await JobDomainManager.InitServer(path, workerCount);
+            var Options= await PluginServiceManager.InitServer(path, workerCount);
             app.UseHangfireServer(Options);
         }
 
-        static void InitDomainsAtClient<T>(this IAppBuilder app, string controllerName= "/HangfireDomain", string connectString = "") where T : IDomainStorage, new()
+        static void InitPluginsAtClient<T>(this IAppBuilder app, string controllerName= "/HangfireDomain", string connectString = "") where T : IDomainStorage, new()
         {
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
@@ -128,7 +128,7 @@ namespace Hangfire.JobDomains
         {
             if (GlobalMode == HangfireDomainMode.Client) return;
 
-            var link = UrlHelperExtension.ServerPageRoute.Replace("(?<name>.+)", JobDomainManager.ServerName);
+            var link = UrlHelperExtension.ServerPageRoute.Replace("(?<name>.+)", PluginServiceManager.ServerName);
 
             NavigationMenu.Items.Add(page => new MenuItem("本机服务", page.Url.To(link))
             {

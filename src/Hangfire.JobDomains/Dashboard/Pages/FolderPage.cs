@@ -16,32 +16,32 @@ namespace Hangfire.JobDomains.Dashboard.Pages
 
         public const string Title = "程序集详情";
 
-        public PluginDefine TheDomain { get; set; }
+        public PluginDefine ThePlugin { get; set; }
 
         public FolderPage(string name) 
         {
             FetchTitle = () => Title;
-            FetchHeader = () => $"插件：{(TheDomain == null ? name : TheDomain.Title)}";
+            FetchHeader = () => $"插件：{(ThePlugin == null ? name : ThePlugin.Title)}";
 
             Sidebar = ()=>SidebarMenus.PluginsMenu(name);
             var set = StorageService.Provider.GetPluginDefines();
-            TheDomain = set.SingleOrDefault(s => s.Title == name);
+            ThePlugin = set.SingleOrDefault(s => s.Title == name);
         }
 
         protected override bool Content()
         {
-            if (TheDomain == null) return NoFound();
+            if (ThePlugin == null) return NoFound();
 
             WriteBar();
 
-            var servers = StorageService.Provider.GetServersByPlugin(TheDomain.Title);
+            var servers = StorageService.Provider.GetServersByPlugin(ThePlugin.Title);
             var serverList = PageContent.Tag.ListLink(servers, Url.CreateServerRoute);
             var panel = PageContent.Tag.Panel("支持该服务的服务器", string.Empty, serverList);
             WriteLiteral(panel);
 
-            var list = TheDomain.GetJobSets();
+            var list = ThePlugin.GetJobSets();
             if (list.Count == 0) return None();
-            PageContent.WritePagerPanel($@"任务程序集", list, PageIndex, PageSize, d => Url.CreateRoute(TheDomain, d));
+            PageContent.WritePagerPanel($@"任务程序集", list, PageIndex, PageSize, d => Url.CreateRoute(ThePlugin, d));
             return true;
         }
 
@@ -63,7 +63,7 @@ namespace Hangfire.JobDomains.Dashboard.Pages
             var mainRoute = Url.CreateRoute();
             var bar = $@"<ol class='breadcrumb'>
                           <li><a href='{ mainRoute.Link }'>{ mainRoute.Name }</a></li>
-                          <li class='active'><a href='#'>{ Url.CreateRoute(TheDomain).Name }</a></li>
+                          <li class='active'><a href='#'>{ Url.CreateRoute(ThePlugin).Name }</a></li>
                         </ol>";
             WriteLiteral(bar);
         }

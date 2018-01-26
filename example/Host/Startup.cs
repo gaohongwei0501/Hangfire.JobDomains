@@ -21,21 +21,16 @@ namespace Host
     {
         public void Configuration(IAppBuilder app)
         {
-            // 有关如何配置应用程序的详细信息，请访问 http://go.microsoft.com/fwlink/?LinkID=316888
-            var filePath = @"E:\Hangfile.Sparepart.Lib";
-            var dataPath = @"Data Source=E:\Hangfile.Sparepart.Lib\Data\Store.dat;";//Version=3;
 
+            var filePath = @"E:\Hangfile.Sparepart.Lib"; 
             GlobalConfiguration.Configuration.UseMemoryStorage();
-            var LoadAsyc = app.UseDomains<Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory.MemoryStorage>(filePath);
-
-            //  GlobalConfiguration.Configuration.UseSQLiteStorage(dataPath);
-            //  app.UseDomains<Hangfire.JobDomains.Storage.Sqlite.SQLiteStorage>(filePath, dataPath);
+            var LoadAsyc = app.UseHangfirePlugins<Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory.MemoryStorage>(filePath);
 
             //var dataConnectString = "ConnectionString";
             //GlobalConfiguration.Configuration.UseSqlServerStorage(dataConnectString);
 
             ////app.UseDomains<LocationStorage>(filePath, connectString);
-            //var LoadAsyc = app.UseDomains<SqlServerStorage>(connectString: dataConnectString);
+            //var LoadAsyc = app.UseHangfirePlugins<SqlServerStorage>(connectString: dataConnectString);
 
             Task.WaitAll(LoadAsyc);
             app.Run(context =>

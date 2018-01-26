@@ -37,7 +37,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
         {
             return new Assembly
             {
-                DomainID = DomainID,
+                PluginID = DomainID,
                 FullName = model.FullName,
                 FileName = model.FileName,
                 ShortName = model.ShortName,
