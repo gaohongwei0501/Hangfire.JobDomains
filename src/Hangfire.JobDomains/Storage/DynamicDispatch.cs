@@ -1,4 +1,5 @@
-﻿using Hangfire.Common;
+﻿using Common.Logging;
+using Hangfire.JobDomains.Models;
 using Hangfire.JobDomains.Server;
 using Hangfire.States;
 using System;
@@ -12,208 +13,118 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Storage
 {
+
     public class DynamicDispatch
     {
 
-        public static void TestInvoke(string pluginName, string jobDesc, string assembly, string job, object[] paramers, string queue)
+        static ILog loger = LogManager.GetLogger<DynamicDispatch>();
+
+        static ConcurrentDictionary<string, Action<JobParamer>> DynamicInvokes = new ConcurrentDictionary<string, Action<JobParamer>>();
+
+        Type InvokeType { get; set; }
+
+        JobParamer Paramer { get; set; }
+
+        public DynamicDispatch(JobParamer paramer)
         {
-            var invoke = DynamicInvokeBuilder.TestInvoke<DynamicDispatch>(pluginName, job);
-            invoke(queue, pluginName, assembly, job, paramers);
+            InvokeType = DynamicFactory.GetType<DynamicBaseService>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
+            Paramer = paramer;
         }
 
-        public static void ImmediatelyInvoke(string queue, string pluginName, string assembly, string job, object[] paramers)
+        public void TestInvoke()
         {
-            var invoke = DynamicInvokeBuilder.ImmediatelyInvoke<DynamicDispatch>(pluginName, job);
-            invoke(queue, pluginName, assembly, job, paramers);
+            var key = $"{Paramer.PluginName}_{Paramer.JobName}_Test";
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetTestInvoke"));
+            invoke(Paramer);
         }
 
-
-        public static void ScheduleInvoke(TimeSpan delay, string queue, string pluginName, string assembly, string job, object[] paramers)
+        public void ImmediatelyInvoke()
         {
-            var invoke = DynamicInvokeBuilder.ScheduleInvoke<DynamicDispatch>(pluginName, job);
-            invoke(queue, pluginName, assembly, job, paramers);
-        }
-      
-
-        public static void PeriodInvoke(string period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
-        {
-            var invoke = DynamicInvokeBuilder.PeriodInvoke<DynamicDispatch>(pluginName, job);
-            invoke(queue, pluginName, assembly, job, paramers);
-        }
-    
-    }
-
-    /// <summary>
-    /// 动态填写实体类的值
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class DynamicInvokeBuilder
-    {
-
-        private static ConcurrentDictionary<string, Action<string, string, string, string, object[]>> DynamicImmediatelyInvokes = new ConcurrentDictionary<string, Action<string, string, string, string, object[]>>();
-        private static ConcurrentDictionary<string, Action> DynamicScheduleInvokes = new ConcurrentDictionary<string, Action>();
-        private static ConcurrentDictionary<string, Action> DynamicPeriodInvokes = new ConcurrentDictionary<string, Action>();
-
-        private static readonly MethodInfo CreateMethod = typeof(IBackgroundJobClient).GetMethod("Create", new Type[] { typeof(Job),typeof(IState) });
-
-        #region TestInvoke
-
-        public static Action<string, string, string, string, object[]> TestInvoke<T>(string pluginName, string jobName)
-        {
-            return DynamicImmediatelyInvokes.GetOrAdd($"{pluginName}_{jobName}_Test", key => CreateBuilderTestInvoke<T>(key));
+            var key = $"{Paramer.PluginName}_{Paramer.JobName}_Immediately";
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetEnqueuedInvoke"));
+            invoke(Paramer);
         }
 
-        static Action<string, string, string, string, object[]> CreateBuilderTestInvoke<T>(string name)
+        public void ScheduleInvoke()
         {
-            DynamicMethod method = new DynamicMethod(name, typeof(T), new Type[] {   }, typeof(T), true);
-            ILGenerator IL = method.GetILGenerator();
+            if (Paramer.JobDelay.Minutes < 0) throw (new Exception("任务启动时间设置失败"));
+            var key = $"{Paramer.PluginName}_{Paramer.JobName}_Schedule";
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetScheduleInvoke"));
+            invoke(Paramer);
+        }
 
-            var invoke = IL.DeclareLocal(typeof(Hangfire.JobDomains.Server.JobInvoke));
-            var state = IL.DeclareLocal(typeof(Hangfire.States.EnqueuedState));
+        public void PeriodInvoke()
+        {
+            if (Paramer.IsPeriod == false) throw (new Exception("任务周期不能被识别"));
+            var key = $"{Paramer.PluginName}_{Paramer.JobName}_Period";
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetPeriodInvoke"));
+            invoke(Paramer);
+        }
 
-            //IL.Emit(OpCodes.Ldarg_0);
-            //IL.Emit(OpCodes.Callvirt, NewRow);
-            //IL.Emit(OpCodes.Stloc_0);
+        static Action<JobParamer> CreateBuilderInvoke(Type type, string invokeName)
+        {
+            DynamicMethod dynamicMethod = new DynamicMethod(string.Empty, typeof(Action<JobParamer>), new Type[] { }, true);
+            ILGenerator IL = dynamicMethod.GetILGenerator();
 
+            var genericTypeOfCts = typeof(DynamicBaseClass<>).MakeGenericType(type);
+            var con = genericTypeOfCts.GetConstructor(new Type[] { });
+            var method = genericTypeOfCts.GetMethod(invokeName);
 
-
-
-
+            IL.Emit(OpCodes.Newobj, con);
+            IL.Emit(OpCodes.Callvirt, method);
             IL.Emit(OpCodes.Ret);
 
-            return (Action<string, string, string, string, object[]>)method.CreateDelegate(typeof(Action<string, string, string, string, object[]>));
+            var fetch = (Func<Action<JobParamer>>)dynamicMethod.CreateDelegate(typeof(Func<Action<JobParamer>>));
+            return fetch();
         }
-
-        #endregion
-
-        #region ImmediatelyInvoke
-
-        public static Action<string, string, string, string, object[]> ImmediatelyInvoke<T>(string pluginName, string jobName)
-        {
-            return DynamicImmediatelyInvokes.GetOrAdd($"{pluginName}_{jobName}_Immediately", key => CreateBuilderImmediatelyInvoke<T>());
-        }
-
-        static Action<string, string, string, string, object[]> CreateBuilderImmediatelyInvoke<T>()
-        {
-
-            DynamicMethod method = new DynamicMethod("DynamicCreate", typeof(T), new Type[] { }, typeof(T), true);
-            ILGenerator generator = method.GetILGenerator();
-
-            LocalBuilder result = generator.DeclareLocal(typeof(T));
-            generator.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
-            generator.Emit(OpCodes.Stloc, result);
-
-
-
-            generator.Emit(OpCodes.Ldloc, result);
-            generator.Emit(OpCodes.Ret);
-
-            return (Action<string, string, string, string, object[]>)method.CreateDelegate(typeof(Action<string, string, string, string, object[]>));
-        }
-
-        #endregion
-
-        #region ScheduleInvoke
-
-        public static Action<string, string, string, string, object[]> ScheduleInvoke<T>(string pluginName, string jobName)
-        {
-            return DynamicImmediatelyInvokes.GetOrAdd($"{pluginName}_{jobName}_Test", key => CreateBuilderScheduleInvoke<T>());
-        }
-
-        static Action<string, string, string, string, object[]> CreateBuilderScheduleInvoke<T>()
-        {
-
-            DynamicMethod method = new DynamicMethod("DynamicCreate", typeof(T), new Type[] { }, typeof(T), true);
-            ILGenerator generator = method.GetILGenerator();
-
-            LocalBuilder result = generator.DeclareLocal(typeof(T));
-            generator.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
-            generator.Emit(OpCodes.Stloc, result);
-
-
-
-            generator.Emit(OpCodes.Ldloc, result);
-            generator.Emit(OpCodes.Ret);
-
-            return (Action<string, string, string, string, object[]>)method.CreateDelegate(typeof(Action<string, string, string, string, object[]>));
-        }
-
-        #endregion
-
-        #region PeriodInvoke
-
-        public static Action<string, string, string, string, object[]> PeriodInvoke<T>(string pluginName, string jobName)
-        {
-            return DynamicImmediatelyInvokes.GetOrAdd($"{pluginName}_{jobName}_Test", key => CreateBuilderPeriodInvoke<T>());
-        }
-
-        static Action<string, string, string, string, object[]> CreateBuilderPeriodInvoke<T>()
-        {
-
-            DynamicMethod method = new DynamicMethod("DynamicCreate", typeof(T), new Type[] { }, typeof(T), true);
-            ILGenerator generator = method.GetILGenerator();
-
-            LocalBuilder result = generator.DeclareLocal(typeof(T));
-            generator.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
-            generator.Emit(OpCodes.Stloc, result);
-
-
-
-            generator.Emit(OpCodes.Ldloc, result);
-            generator.Emit(OpCodes.Ret);
-
-            return (Action<string, string, string, string, object[]>)method.CreateDelegate(typeof(Action<string, string, string, string, object[]>));
-        }
-
-        #endregion
-
-
-        static Action CreateBuilder<T>()
-        {
-
-            DynamicMethod method = new DynamicMethod("DynamicCreate", typeof(T), new Type[] { }, typeof(T), true);
-            ILGenerator generator = method.GetILGenerator();
-
-            LocalBuilder result = generator.DeclareLocal(typeof(T));
-            generator.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
-            generator.Emit(OpCodes.Stloc, result);
-
-            generator.Emit(OpCodes.Ldloc, result);
-            generator.Emit(OpCodes.Ret);
-
-            return (Action)method.CreateDelegate(typeof(Action));
-        }
+       
     }
 
-   
 
-    internal class TestJobInvoke
+    public class DynamicBaseClass<T> where T : DynamicBaseService
     {
 
-        public void ScheduleInvoke(TimeSpan delay, string queue, string pluginName, string assembly, string job, object[] paramers)
+        public Action<JobParamer> GetTestInvoke()
         {
-            BackgroundJob.Schedule(() => ImmediatelyEnqueued(queue, pluginName, assembly, job, paramers), delay);
+            return paramer =>
+            {
+                IBackgroundJobClient hangFireClient = new BackgroundJobClient();
+                EnqueuedState state = new Hangfire.States.EnqueuedState(paramer.QueueName);
+                hangFireClient.Create<T>(service => service.TestInvoke(paramer), state);
+            };
         }
 
-        void ImmediatelyEnqueued(string queue, string pluginName, string assembly, string job, object[] paramers)
+        public Action<JobParamer> GetScheduleInvoke()
         {
-            IBackgroundJobClient hangFireClient = new BackgroundJobClient();
-            EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
-            hangFireClient.Create(() => _JobInvoke.Invoke(pluginName, assembly, job, paramers), state);
+            return paramer =>
+            {
+                BackgroundJob.Schedule<T>(service => service.Enqueued(paramer), paramer.JobDelay);
+            };
         }
 
-        public void RecurringInvoke(string period, string queue, string jobSign, string pluginName, string assembly, string job, object[] paramers)
+        public Action<JobParamer> GetEnqueuedInvoke()
         {
-            RecurringJob.AddOrUpdate(jobSign, () => _JobInvoke.Invoke(pluginName, assembly, job, paramers), period, queue: queue);
+            return paramer =>
+             {
+                 IBackgroundJobClient hangFireClient = new BackgroundJobClient();
+                 EnqueuedState state = new Hangfire.States.EnqueuedState(paramer.QueueName);
+                 hangFireClient.Create<T>(service => service.Invoke(paramer), state);
+             };
         }
 
-
-        public void Test(string queue, string pluginName, string assembly, string job, object[] paramers)
+        public Action<JobParamer> GetPeriodInvoke()
         {
-            IBackgroundJobClient hangFireClient = new BackgroundJobClient();
-            EnqueuedState state = new Hangfire.States.EnqueuedState(queue);
-            hangFireClient.Create(() => _JobInvoke.TestInvoke(pluginName, assembly, job, paramers), state);
+            return paramer =>
+            {
+                RecurringJob.AddOrUpdate<T>(paramer.JobTitle, service => service.Invoke(paramer), paramer.JobPeriod, queue: paramer.QueueName);
+            };
         }
 
     }
+
+
+
+
+
+
 }

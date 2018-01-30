@@ -61,10 +61,6 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
             }
         }
 
-
-
-
-
         public abstract bool AddService(string nameOrConnectionString);
 
         protected string GetConnectionString(string nameOrConnectionString)

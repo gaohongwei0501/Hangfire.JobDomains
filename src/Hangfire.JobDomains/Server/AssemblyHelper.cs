@@ -11,7 +11,7 @@ using System.Security.Permissions;
 
 namespace Hangfire.JobDomains.Server
 {
-    internal static class AssemblyHelper
+    internal static class _AssemblyHelper
     {
         public static IEnumerable<Type> GetInterfaceTypes<T>(this Assembly assembly)
         {

@@ -100,6 +100,8 @@ namespace Hangfire.JobDomains.Storage
         IEnumerable<QueueDefine> GetActiveServerQueues(Hangfire.JobStorage hangfireStorage, string serverName)
         {
             var monitor = hangfireStorage.GetMonitoringApi();
+            var severs = monitor.Servers();
+            if(severs==null|| severs.Count==0) return new List<QueueDefine>();
             var server = monitor.Servers().FirstOrDefault(s => SubServerName(s.Name) == serverName);
             if (server == null) return new List<QueueDefine>();
             return server.Queues.Where(s => s != "default").Select(s => new QueueDefine { Name = s, Description = "服务器队列", IsActive = true });

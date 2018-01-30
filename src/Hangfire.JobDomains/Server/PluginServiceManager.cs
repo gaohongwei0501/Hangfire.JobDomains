@@ -8,6 +8,7 @@ using Hangfire.JobDomains.Interface;
 using Hangfire.JobDomains.Storage;
 using System.Threading.Tasks;
 using Common.Logging;
+using System.Threading;
 
 namespace Hangfire.JobDomains.Server
 {
@@ -61,10 +62,16 @@ namespace Hangfire.JobDomains.Server
 
         static async Task<List<string>> ScanServer(string basePath)
         {
+            var Dynamic = $"{ AppDomain.CurrentDomain.BaseDirectory }Dynamic";
+            if (Directory.Exists(Dynamic)) Directory.Delete(Dynamic, true);
+            Thread.Sleep(1000);
+            Directory.CreateDirectory(Dynamic);
+
             var plugins = new List<string>();
             if (string.IsNullOrEmpty(basePath)) return plugins;
             if (Directory.Exists(basePath) == false) Directory.CreateDirectory(basePath);
             var paths = Directory.GetDirectories(basePath);
+
             foreach (var path in paths)
             {
                 var index = path.LastIndexOf("\\");
@@ -77,21 +84,37 @@ namespace Hangfire.JobDomains.Server
 
                 await StorageService.Provider.AddPluginAsync(define);
                 plugins.Add(define.Title);
+
+                LoadDynamic(define, Dynamic);
             }
+
             return plugins;
         }
 
-        static void LoadDomain(string basePath, PluginDefine define)
+        static void LoadDynamic(PluginDefine plugin,string path)
         {
-            var files = Directory.GetFiles($"{basePath}\\{define.PathName}", "*.dll");
+            foreach (var ass in plugin.InnerJobSets)
+            {
+                var jobs = ass.GetJobs();
+                foreach (var job in jobs)
+                {
+                    DynamicFactory.Create<DynamicBaseService>(plugin.PathName, ass.ShortName, job.Name, job.Title, path);
+                }
+            }
+        }
+
+
+        static void LoadDomain(string basePath, PluginDefine plugin)
+        {
+            var files = Directory.GetFiles($"{basePath}\\{plugin.PathName}", "*.dll");
             var assemblies = new List<AssemblyDefine>();
             foreach (var assemblyFile in files)
             {
                 try
                 {
                     var assemblyItem = Assembly.ReflectionOnlyLoadFrom(assemblyFile);
-                    var assemblyDefine = CreateAssemblyDefine(define, assemblyItem);
-                    var jobs = ReadPrefabricationAssembly(assemblyDefine, assemblyItem);
+                    var assemblyDefine = CreateAssemblyDefine(plugin, assemblyItem);
+                    var jobs = ReadPrefabricationAssembly(plugin, assemblyDefine, assemblyItem);
                     if (jobs.Count == 0) continue;
                     assemblyDefine.SetJobs(jobs);
                     assemblies.Add(assemblyDefine);
@@ -102,7 +125,7 @@ namespace Hangfire.JobDomains.Server
                 }
             }
             if (assemblies.Count == 0) return;
-            define.SetJobSets(assemblies);
+            plugin.SetJobSets(assemblies);
         }
 
         static AssemblyDefine CreateAssemblyDefine(PluginDefine domainDefine, Assembly define)
@@ -115,7 +138,7 @@ namespace Hangfire.JobDomains.Server
             return new AssemblyDefine(domainDefine, file, fullName, shortName, title, description);
         }
 
-        static List<JobDefine> ReadPrefabricationAssembly(AssemblyDefine assemblyDefine, Assembly assembly)
+        static List<JobDefine> ReadPrefabricationAssembly(PluginDefine plugin, AssemblyDefine assemblyDefine, Assembly assembly)
         {
             var list = new List<JobDefine>();
             var types = assembly.GetInterfaceTypes<IPrefabrication>();
@@ -145,6 +168,9 @@ namespace Hangfire.JobDomains.Server
             }
             return constructors;
         }
+
+       
+
 
     }
 

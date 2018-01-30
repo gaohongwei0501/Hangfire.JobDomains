@@ -13,8 +13,6 @@ using  CronExpressionDescriptor;
 namespace Hangfire.JobDomains.Dashboard.Dispatchers
 {
 
-
-
     internal class JobCommandDispatcher : CommandDispatcher<JsonData>
     {
 
@@ -35,34 +33,46 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
         {
             var cmd = await GetFromValue("cmd");
             var jobCmd = JobPageCommand.None;
-            Enum.TryParse<JobPageCommand>(cmd, out jobCmd);
+            Enum.TryParse(cmd, out jobCmd);
 
             var domain = await GetFromValue("domain");
             var assembly = await GetFromValue("assembly");
             var job = await GetFromValue("job");
-
-            var start = await GetFromValue<DateTime>("start", DateTime.MinValue);
-            var period = await GetFromValue("period");
-            var queue = (await GetFromValue("queue")).ToLower();
-            var jobSign = await GetFromValue("sign");
-
-            JobData = await GetDictionaryValue("data");
-            var paramers = JobData?.Select(s => s.Value).ToArray();
 
             var set = StorageService.Provider.GetPluginDefines();
             TheDomain = set.SingleOrDefault(s => s.Title == domain);
             TheAssembly = TheDomain?.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
             TheJob = TheAssembly?.GetJobs().SingleOrDefault(s => s.Name == job);
 
+            var start = await GetFromValue<DateTime>("start", DateTime.MinValue);
+            JobData = await GetDictionaryValue("data");
+            var sign = await GetFromValue("sign");
+
+            var paramer = new JobParamer
+            {
+                QueueName = (await GetFromValue("queue")).ToLower(),
+                PluginName = TheDomain.PathName,
+                AssemblyFullName = TheAssembly.FullName,
+                AssemblyName = TheAssembly.ShortName,
+                JobName = TheJob.FullName,
+                JobParamers = JobData?.Select(s => s.Value).ToArray(),
+                JobDelay = start - DateTime.Now,
+                JobPeriod = await GetFromValue("period"),
+                JobTitle = string.IsNullOrEmpty(sign) ? TheJob.Title : sign
+            };
+
+
             if (TheJob == null) throw (new Exception("未正确定位到工作任务."));
             if (jobCmd == JobPageCommand.None) throw (new Exception("未正确定位到任务指令."));
 
+            var service = new DynamicDispatch(paramer);
+
             switch (jobCmd)
             {
-                case JobPageCommand.Schedule: Schedule(queue,  period, jobSign, paramers); break;
-                case JobPageCommand.Delay: Delay(queue, start, paramers); break;
-                case JobPageCommand.Immediately: DynamicDispatch.TestInvoke(TheDomain.PathName, TheJob.Title, TheAssembly.FullName, TheJob.FullName, paramers, queue); break;
-                case JobPageCommand.Test: DynamicDispatch.TestInvoke(TheDomain.PathName, TheJob.Title, TheAssembly.FullName, TheJob.FullName, paramers, queue); break;
+                case JobPageCommand.Schedule: service.PeriodInvoke(); break;
+                case JobPageCommand.Delay: service.ScheduleInvoke(); break;
+                case JobPageCommand.Immediately: service.TestInvoke(); break;
+                case JobPageCommand.Test: service.TestInvoke(); break;
             }
 
             return new JsonData
@@ -71,32 +81,7 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
                 Message = "提交成功.",
                 Url = "",
             };
-        }
-     
 
-        bool IsPeriod(string period) {
-            try
-            {
-                ExpressionDescriptor.GetDescription(period);
-                return true;
-            }
-            catch {
-                return false;
-            }
-        }
-
-        void Schedule(string queue, string period, string jobSign, object[] paramers)
-        {
-            if(IsPeriod(period)==false) throw (new Exception("任务周期不能被识别"));
-            JobInvoke.RecurringInvoke( period, queue, jobSign, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
-        }
-
-        void Delay(string queue, DateTime start, object[] paramers)
-        {
-            if (start < DateTime.Now) throw (new Exception("任务启动时间设置失败"));
-            var delay = start - DateTime.Now;
-            //  BackgroundJob.Schedule(() => JobInvoke.Invoke(TheDomain.BasePath, TheAssembly.FullName, TheJob.FullName, paramers), delay);
-            JobInvoke.ScheduleInvoke(delay, queue, TheDomain.PathName, TheAssembly.FullName, TheJob.FullName, paramers);
         }
 
    
