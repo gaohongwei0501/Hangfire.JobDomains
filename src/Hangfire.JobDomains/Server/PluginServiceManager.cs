@@ -62,11 +62,6 @@ namespace Hangfire.JobDomains.Server
 
         static async Task<List<string>> ScanServer(string basePath)
         {
-            var Dynamic = $"{ AppDomain.CurrentDomain.BaseDirectory }Dynamic";
-            if (Directory.Exists(Dynamic)) Directory.Delete(Dynamic, true);
-            Thread.Sleep(1000);
-            Directory.CreateDirectory(Dynamic);
-
             var plugins = new List<string>();
             if (string.IsNullOrEmpty(basePath)) return plugins;
             if (Directory.Exists(basePath) == false) Directory.CreateDirectory(basePath);
@@ -84,25 +79,12 @@ namespace Hangfire.JobDomains.Server
 
                 await StorageService.Provider.AddPluginAsync(define);
                 plugins.Add(define.Title);
-
-                LoadDynamic(define, Dynamic);
             }
 
             return plugins;
         }
 
-        static void LoadDynamic(PluginDefine plugin,string path)
-        {
-            foreach (var ass in plugin.InnerJobSets)
-            {
-                var jobs = ass.GetJobs();
-                foreach (var job in jobs)
-                {
-                    DynamicFactory.Create<DynamicBaseService>(plugin.PathName, ass.ShortName, job.Name, job.Title, path);
-                }
-            }
-        }
-
+      
 
         static void LoadDomain(string basePath, PluginDefine plugin)
         {
@@ -169,12 +151,29 @@ namespace Hangfire.JobDomains.Server
             return constructors;
         }
 
-       
+        public static void LoadDynamic()
+        {
+            var plugins = StorageService.Provider.GetPluginDefines();
+            foreach (var plugin in plugins) {
+                var sets = plugin.GetJobSets();
+                foreach (var ass in sets)
+                {
+                    var jobs = ass.GetJobs();
+                    foreach (var job in jobs)
+                    {
+                        DynamicFactory.Create<DynamicBaseService>(plugin.PathName, ass.ShortName, job.Name, job.Title);
+                    }
+                }
+            }
+
+            AppDomain.CurrentDomain.AppendPrivatePath(DynamicFactory.DynamicPath);
+
+        }
 
 
     }
 
-     
-  
+
+
 
 }

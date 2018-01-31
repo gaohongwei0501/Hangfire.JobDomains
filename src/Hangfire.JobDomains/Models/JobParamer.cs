@@ -43,6 +43,11 @@ namespace Hangfire.JobDomains.Models
         public string JobTitle { get; set; }
 
         /// <summary>
+        /// 任务全称
+        /// </summary>
+        public string JobFullName { get; set; }
+
+        /// <summary>
         /// 任务名称
         /// </summary>
         public string JobName { get; set; }

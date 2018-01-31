@@ -81,6 +81,8 @@ namespace Hangfire.JobDomains
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
             var Options= await PluginServiceManager.InitServer(path, workerCount);
+
+            PluginServiceManager.LoadDynamic();
             app.UseHangfireServer(Options);
         }
 

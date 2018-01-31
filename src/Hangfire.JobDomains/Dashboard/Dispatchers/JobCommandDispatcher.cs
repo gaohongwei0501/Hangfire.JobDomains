@@ -54,13 +54,13 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
                 PluginName = TheDomain.PathName,
                 AssemblyFullName = TheAssembly.FullName,
                 AssemblyName = TheAssembly.ShortName,
-                JobName = TheJob.FullName,
+                JobFullName = TheJob.FullName,
+                JobName = TheJob.Name,
                 JobParamers = JobData?.Select(s => s.Value).ToArray(),
                 JobDelay = start - DateTime.Now,
                 JobPeriod = await GetFromValue("period"),
                 JobTitle = string.IsNullOrEmpty(sign) ? TheJob.Title : sign
             };
-
 
             if (TheJob == null) throw (new Exception("未正确定位到工作任务."));
             if (jobCmd == JobPageCommand.None) throw (new Exception("未正确定位到任务指令."));

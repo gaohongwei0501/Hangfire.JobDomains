@@ -45,7 +45,7 @@ namespace Hangfire.JobDomains.Storage
                 };
                 Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
                 if (Directory.Exists(path) == false) throw (new Exception("此服务器不支持该插件"));
-                var args = new CrossDomainData { PluginDir = path, assemblyName = paramer.AssemblyFullName, typeName = paramer.JobName, paramers = paramer.JobParamers };
+                var args = new CrossDomainData { PluginDir = path, assemblyName = paramer.AssemblyFullName, typeName = paramer.JobFullName, paramers = paramer.JobParamers };
                 Domain.SetData("args", args);
                 Domain.DoCallBack(new CrossAppDomainDelegate(act));
                 return GetResult(Domain);

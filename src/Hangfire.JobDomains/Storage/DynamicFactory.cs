@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Hangfire.JobDomains.Storage
 {
@@ -15,78 +16,58 @@ namespace Hangfire.JobDomains.Storage
 
         private static ConcurrentDictionary<string, Type> DynamicTypes = new ConcurrentDictionary<string, Type>();
 
+        public static string DynamicPath { get; }= $"{ AppDomain.CurrentDomain.BaseDirectory }Dynamic";
+
+        static DynamicFactory()
+        {
+            if (string.IsNullOrEmpty(DynamicPath)) return;
+            if (Directory.Exists(DynamicPath)) Directory.Delete(DynamicPath, true);
+            Thread.Sleep(1000);
+            Directory.CreateDirectory(DynamicPath);
+        }
+
         public static Type GetType<T>(string plugName, string assemblyName, string jobName, string jobTitle) where T : class
         {
-            assemblyName = $"{ plugName }.{ assemblyName }.{ jobName }";
+            var  assembly = $"{ plugName }.{ assemblyName }.{ jobName }";
             var className = jobTitle.Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");
-            var key = $"{ plugName }.{ assemblyName }.{ className }";
-
-            var dynamicType = DynamicTypes.GetOrAdd(key, k =>
-            {
-                var assembly = new AssemblyName(assemblyName);
-                var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assembly, AssemblyBuilderAccess.Run);
-                var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName, $"{assemblyName}.dll");
-                //定义公开,继承Object,无接口的类
-                var typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.Public | TypeAttributes.Serializable, typeof(T), new Type[0]);
-
-                var _type = typeBuilder.CreateType();
-               // assemblyBuilder.Save($"Dynamic.{plugName}.{assembly}.dll");
-                return _type;
-            });
+            var key = $"{ plugName }.{ assembly }.{ className }";
+            var file = $"{DynamicPath}\\{assembly}.dll";
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var dynamicAssembly = assemblies.FirstOrDefault(s => s.FullName.Contains(assembly));
+            if (dynamicAssembly == null && File.Exists(file) == false) dynamicAssembly = Create<T>(plugName, assemblyName, jobName, jobTitle);
+            var dynamicType = dynamicAssembly.GetType(className);
             return dynamicType;
         }
 
-        public static void Create<T>(string plugName, string assemblyName, string jobName, string jobTitle,string path) where T : class
+        public static Assembly Create<T>(string plugName, string assemblyName, string jobName, string jobTitle) where T : class
         {
             assemblyName = $"{ plugName }.{ assemblyName }.{ jobName }";
             var className = jobTitle.Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");
-            //var key = $"{ plugName }.{ assemblyName }.{ className }";
-
-            //var dynamicType = DynamicTypes.GetOrAdd(key, k =>
-            //{
-            //    var assembly = new AssemblyName(assemblyName);
-            //    var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assembly, AssemblyBuilderAccess.RunAndSave, path);
-            //    var moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule", $"{assemblyName}.dll");
-            //    //定义公开,继承Object,无接口的类
-            //    var typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.Public | TypeAttributes.Serializable, typeof(T), new Type[0]);
-
-            //    var _type = typeBuilder.CreateType();
-            //    assemblyBuilder.Save($"{plugName}.{assembly}.dll");
-            //    return _type;
-            //});
 
             var assembly = new AssemblyName(assemblyName);
-            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assembly, AssemblyBuilderAccess.Save, path);
+            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assembly, AssemblyBuilderAccess.Save, DynamicPath);
             var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName, $"{assemblyName}.dll");
             //定义公开,继承Object,无接口的类
             var typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.Public | TypeAttributes.Serializable, typeof(T), new Type[0]);
 
             var _type = typeBuilder.CreateType();
             assemblyBuilder.Save($"{assembly}.dll");
+
+            var file = $"{DynamicPath}\\{assemblyName}.dll";
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var dynamicAssembly = assemblies.SingleOrDefault(s => s.FullName.Contains(assemblyName));
+            return dynamicAssembly;
         }
 
 
-
-        public static T CreateInstance<T>(string plugName, string assemblyName, string jobName, string jobTitle) where T:class
+        static byte[] loadFile(string filename)
         {
-            assemblyName = $"{ plugName }.{ assemblyName }.{ jobName }";
-            var className = jobTitle.Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");
-            var key = $"{ plugName }.{ assemblyName }.{ className }";
+            FileStream fs = new FileStream(filename, FileMode.Open);
+            byte[] buffer = new byte[(int)fs.Length];
+            fs.Read(buffer, 0, buffer.Length);
+            fs.Close();
 
-            var dynamicType = DynamicTypes.GetOrAdd(key, k =>
-            {
-                var assembly = new AssemblyName(assemblyName);
-                var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assembly, AssemblyBuilderAccess.Run);
-                var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName, $"{assemblyName}.dll");
-                //定义公开,继承Object,无接口的类
-                var typeBuilder = moduleBuilder.DefineType(className, TypeAttributes.Public | TypeAttributes.Serializable, typeof(T), new Type[0]);
-
-                var _type = typeBuilder.CreateType();
-               // assemblyBuilder.Save($"Dynamic\\{plugName}\\{assembly}.dll");
-                return _type;
-            });
-
-            return Activator.CreateInstance(dynamicType) as T;
+            return buffer;
         }
     }
 
