@@ -8,27 +8,27 @@ using System.IO;
 namespace Hangfire.JobDomains.Storage
 {
 
-    public class DynamicBaseService
+    public class DynamicBaseClass
     {
 
         public void Enqueued(JobParamer paramer)
         {
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             EnqueuedState state = new Hangfire.States.EnqueuedState(paramer.QueueName);
-            hangFireClient.Create(() => Invoke(paramer), state);
+            hangFireClient.Create(() => Execute(paramer), state);
         }
 
-        public bool TestInvoke(JobParamer paramer)
+        public bool Test(JobParamer paramer)
         {
-            return Invoke<bool>(paramer, PrefabricationActivator.Test, domain => (bool)domain.GetData("result"));
+            return Execute<bool>(paramer, PrefabricationActivator.Test, domain => (bool)domain.GetData("result"));
         }
 
-        public void Invoke(JobParamer paramer)
+        public void Execute(JobParamer paramer)
         {
-            Invoke<bool>(paramer, PrefabricationActivator.Dispatch, domain => true);
+            Execute<bool>(paramer, PrefabricationActivator.Dispatch, domain => true);
         }
 
-        static T Invoke<T>(JobParamer paramer, Action act, Func<AppDomain, T> GetResult)
+        static T Execute<T>(JobParamer paramer, Action act, Func<AppDomain, T> GetResult)
         {
             AppDomain Domain = null;
             try

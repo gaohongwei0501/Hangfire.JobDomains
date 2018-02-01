@@ -104,15 +104,15 @@ namespace Hangfire.JobDomains.Dashboard.Pages
                     }
                 }
 
-                inputs.Append(PageContent.Tag.CreateJobQueues(queues));
 
                 var heading = $"{TheJob.Name}({title.ToString().TrimEnd(',')})";
 
+                var queue = PageContent.Tag.CreateJobQueues(queues);
                 var test = PageContent.Tag.CreateJobTestButton();
                 var schedule = PageContent.Tag.CreateJobScheduleButton( );
                 var period = PageContent.Tag.CreateJobPeriodButton( TheJob.Title);
 
-                var panel = PageContent.Tag.Panel(heading, "", inputs.ToString(), new List<string> { test, schedule, period } , "js-domain-job", customAttr);
+                var panel = PageContent.Tag.Panel(heading, "", inputs.ToString(), new List<string> { queue, test, schedule, period } , "js-domain-job", customAttr);
                 WriteLiteral(panel);
             }
 

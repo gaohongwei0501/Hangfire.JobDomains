@@ -65,14 +65,14 @@ namespace Hangfire.JobDomains.Dashboard.Dispatchers
             if (TheJob == null) throw (new Exception("未正确定位到工作任务."));
             if (jobCmd == JobPageCommand.None) throw (new Exception("未正确定位到任务指令."));
 
-            var service = new DynamicDispatch(paramer);
+            var service = new DynamicService(paramer);
 
             switch (jobCmd)
             {
-                case JobPageCommand.Schedule: service.PeriodInvoke(); break;
-                case JobPageCommand.Delay: service.ScheduleInvoke(); break;
-                case JobPageCommand.Immediately: service.TestInvoke(); break;
-                case JobPageCommand.Test: service.TestInvoke(); break;
+                case JobPageCommand.Schedule: service.PeriodDispatch(); break;
+                case JobPageCommand.Delay: service.ScheduleDispatch(); break;
+                case JobPageCommand.Immediately: service.TestDispatch(); break;
+                case JobPageCommand.Test: service.TestDispatch(); break;
             }
 
             return new JsonData

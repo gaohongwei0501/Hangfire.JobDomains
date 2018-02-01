@@ -14,7 +14,6 @@ namespace Hangfire.JobDomains.Storage
     public class DynamicFactory
     {
 
-        private static ConcurrentDictionary<string, Type> DynamicTypes = new ConcurrentDictionary<string, Type>();
 
         public static string DynamicPath { get; }= $"{ AppDomain.CurrentDomain.BaseDirectory }Dynamic";
 

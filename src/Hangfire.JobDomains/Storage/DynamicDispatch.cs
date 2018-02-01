@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace Hangfire.JobDomains.Storage
 {
-
-    public class DynamicDispatch
+    
+    public class DynamicService
     {
 
-        static ILog loger = LogManager.GetLogger<DynamicDispatch>();
+        static ILog loger = LogManager.GetLogger<DynamicService>();
 
         static ConcurrentDictionary<string, Action<JobParamer>> DynamicInvokes = new ConcurrentDictionary<string, Action<JobParamer>>();
 
@@ -25,39 +25,39 @@ namespace Hangfire.JobDomains.Storage
 
         JobParamer Paramer { get; set; }
 
-        public DynamicDispatch(JobParamer paramer)
+        public DynamicService(JobParamer paramer)
         {
-            InvokeType = DynamicFactory.GetType<DynamicBaseService>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
+            InvokeType = DynamicFactory.GetType<DynamicBaseClass>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
             Paramer = paramer;
         }
 
-        public void TestInvoke()
+        public void TestDispatch()
         {
             var key = $"{Paramer.PluginName}_{Paramer.JobName}_Test";
-            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetTestInvoke"));
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetTestService"));
             invoke(Paramer);
         }
 
-        public void ImmediatelyInvoke()
+        public void ImmediatelyDispatch()
         {
             var key = $"{Paramer.PluginName}_{Paramer.JobName}_Immediately";
-            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetEnqueuedInvoke"));
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetEnqueuedService"));
             invoke(Paramer);
         }
 
-        public void ScheduleInvoke()
+        public void ScheduleDispatch()
         {
             if (Paramer.JobDelay.Minutes < 0) throw (new Exception("任务启动时间设置失败"));
             var key = $"{Paramer.PluginName}_{Paramer.JobName}_Schedule";
-            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetScheduleInvoke"));
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetScheduleService"));
             invoke(Paramer);
         }
 
-        public void PeriodInvoke()
+        public void PeriodDispatch()
         {
             if (Paramer.IsPeriod == false) throw (new Exception("任务周期不能被识别"));
             var key = $"{Paramer.PluginName}_{Paramer.JobName}_Period";
-            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetPeriodInvoke"));
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetPeriodService"));
             invoke(Paramer);
         }
 
@@ -66,7 +66,7 @@ namespace Hangfire.JobDomains.Storage
             DynamicMethod dynamicMethod = new DynamicMethod(string.Empty, typeof(Action<JobParamer>), new Type[] { }, true);
             ILGenerator IL = dynamicMethod.GetILGenerator();
 
-            var genericTypeOfCts = typeof(DynamicBaseClass<>).MakeGenericType(type);
+            var genericTypeOfCts = typeof(DynamicClassExtension<>).MakeGenericType(type);
             var con = genericTypeOfCts.GetConstructor(new Type[] { });
             var method = genericTypeOfCts.GetMethod(invokeName);
 
@@ -79,52 +79,6 @@ namespace Hangfire.JobDomains.Storage
         }
        
     }
-
-
-    public class DynamicBaseClass<T> where T : DynamicBaseService
-    {
-
-        public Action<JobParamer> GetTestInvoke()
-        {
-            return paramer =>
-            {
-                IBackgroundJobClient hangFireClient = new BackgroundJobClient();
-                EnqueuedState state = new Hangfire.States.EnqueuedState(paramer.QueueName);
-                hangFireClient.Create<T>(service => service.TestInvoke(paramer), state);
-            };
-        }
-
-        public Action<JobParamer> GetScheduleInvoke()
-        {
-            return paramer =>
-            {
-                BackgroundJob.Schedule<T>(service => service.Enqueued(paramer), paramer.JobDelay);
-            };
-        }
-
-        public Action<JobParamer> GetEnqueuedInvoke()
-        {
-            return paramer =>
-             {
-                 IBackgroundJobClient hangFireClient = new BackgroundJobClient();
-                 EnqueuedState state = new Hangfire.States.EnqueuedState(paramer.QueueName);
-                 hangFireClient.Create<T>(service => service.Invoke(paramer), state);
-             };
-        }
-
-        public Action<JobParamer> GetPeriodInvoke()
-        {
-            return paramer =>
-            {
-                RecurringJob.AddOrUpdate<T>(paramer.JobTitle, service => service.Invoke(paramer), paramer.JobPeriod, queue: paramer.QueueName);
-            };
-        }
-
-    }
-
-
-
-
 
 
 }

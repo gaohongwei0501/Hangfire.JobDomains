@@ -27,14 +27,14 @@ namespace Hangfire.JobDomains.Tests
             });
         }
 
-        public class DynamicTestClass : DynamicBaseService { }
+        public class DynamicTestClass : DynamicBaseClass { }
 
         static void CreateDynamicTestClassTestMethod(TypeBuilder typeBuilder)
         {
             MethodBuilder theMethod = typeBuilder.DefineMethod("DynamicTestClassTest", MethodAttributes.Public,typeof(Action<JobParamer>), new Type[] { });
             ILGenerator IL = theMethod.GetILGenerator();
 
-            var genericTypeOfCts = typeof(DynamicBaseClass<>).MakeGenericType(typeof(DynamicTestClass));
+            var genericTypeOfCts = typeof(DynamicClassExtension<>).MakeGenericType(typeof(DynamicTestClass));
             var con = genericTypeOfCts.GetConstructor(new Type[] { });
             var method = genericTypeOfCts.GetMethod("GetTestInvoke");
 
@@ -57,7 +57,7 @@ namespace Hangfire.JobDomains.Tests
             var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName, assemblyFileName);
             var typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Class | TypeAttributes.Public);
 
-            var typeOfCts = typeof(DynamicBaseClass<>);
+            var typeOfCts = typeof(DynamicClassExtension<>);
             var genericTypeOfCts = typeOfCts.MakeGenericType(typeBuilder);
 
             var fieldBuilder = typeBuilder.DefineField(fieldName, genericTypeOfCts, FieldAttributes.Public);

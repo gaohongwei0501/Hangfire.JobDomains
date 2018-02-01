@@ -161,7 +161,7 @@ namespace Hangfire.JobDomains.Server
                     var jobs = ass.GetJobs();
                     foreach (var job in jobs)
                     {
-                        DynamicFactory.Create<DynamicBaseService>(plugin.PathName, ass.ShortName, job.Name, job.Title);
+                        DynamicFactory.Create<DynamicBaseClass>(plugin.PathName, ass.ShortName, job.Name, job.Title);
                     }
                 }
             }
