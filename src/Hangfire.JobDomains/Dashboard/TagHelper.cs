@@ -213,7 +213,7 @@ namespace Hangfire.JobDomains.Dashboard
     internal static class TagExtension
     {
 
-        public static string CreateLoadingWall(this TagHelper Tag,string message)
+        public static string CreateLoadingWall(this TagHelper Tag, string message)
         {
             return $@"<div id=""LoadingWall"" class=""modal fade"" data-keyboard=""false"" data-backdrop = ""static"" data-role = ""dialog""
                          aria-labelledby = ""myModalLabel"" aria-hidden = ""true"" >
@@ -243,34 +243,16 @@ namespace Hangfire.JobDomains.Dashboard
                     </div>";
         }
 
-        public static string CreateJobScheduleParamers(this TagHelper Tag, IEnumerable<string> queues, string id, string sign)
+
+        public static string CreateJobQueues(this TagHelper Tag, IEnumerable<string> queues)
         {
             var bulider = new StringBuilder();
 
-            bulider.Append($@" <div class=""form-group"">
-                            <label  class=""control-label"">周期任务标识</label>
-                            <input type='text' class=""form-control  schedule_sign "" placeholder=""周期任务标识 ""  value=""{ sign }"" />
-                    </div>");
-
-            bulider.Append($@" <div class=""form-group"">
-                            <label  class=""control-label"">周期任务周期（5段 Cron 值）<a href ='http://cron.qqe2.com/' target=""_blank"" >参考</a></label>
-                            <input type='text' class=""form-control  schedule_period"" placeholder=""任务周期 ""  value="""" />
-                    </div>");
-
-            bulider.Append($@"  <div class=""form-group"">
-                        <div class='input-group date' id=""{ id }_schedule_date_datetimepicker"" >
-                            <input type='text' class=""form-control  schedule_date "" placeholder=""首次执行时间 "" id=""{ id }_schedule_date"" />
-                            <span class=""input-group-addon"">
-                                <span class=""glyphicon glyphicon-calendar""></span>
-                            </span>
-                        </div>
-                    </div>");
-
-            bulider.Append($@"
-                               <div class=""input-group  input-group-sm"" >
+            bulider.Append($@"<div class=""form-group"">
+                               <div class=""input-group  "" >
                                 <input type=""text"" class=""form-control schedule_queue""  placeholder=""任务工作执行队列"">
                                 <span class=""input-group-btn"">
-                                    <button type=""button"" class=""btn btn-info btn-sm dropdown-toggle"" data-toggle=""dropdown"" aria-haspopup=""true"" aria-expanded=""false"">
+                                    <button type=""button"" class=""btn btn-info dropdown-toggle"" data-toggle=""dropdown"" aria-haspopup=""true"" aria-expanded=""false"">
                                          推荐队列 &nbsp; <span class=""caret""></span>
                                     </button>
                                     <ul class=""dropdown-menu"">");
@@ -278,66 +260,88 @@ namespace Hangfire.JobDomains.Dashboard
 
             foreach (var item in queues)
             {
-                bulider.Append($@"<li><a href=""#""   class=""js-job-queue"" input-id=""{ id }"" data-name=""{ item }""  >{ item }</a></li>");
+                bulider.Append($@"<li><a href=""#""  class=""js-job-queue""  data-name=""{ item }""  >{ item }</a></li>");
             }
 
-            bulider.Append(@" </ul></span></div>");
+            bulider.Append(@" </ul></span></div></div>");
 
             return bulider.ToString();
         }
 
-        public static string CreateJobScheduleButtons(this TagHelper Tag , string id)
+
+        public static string CreateJobTestButton(this TagHelper Tag, string loading = "Loading...")
         {
             var bulider = new StringBuilder();
-            var loadingText = "Loading...";
 
-            bulider.Append($@"<div class=""btn-group pull-right"" role=""group"" aria-label=""..."">
-                                   <button class=""js-domain-job-commands-create  btn btn-default btn-sm btn-warning"" type=""button"" input-id=""{ id }"" 
-                                        data-cmd=""{ JobPageCommand.Delay }"" data-loading-text=""{ loadingText }"">
-                                        <span class=""glyphicon  glyphicon-play-circle ""></span> &nbsp; 排期执行
-                                    </button>
-
-                                    <button class=""js-domain-job-commands-create  btn btn-default btn-sm btn-success"" type=""button"" input-id=""{ id }"" 
-                                        data-cmd=""{ JobPageCommand.Schedule }"" data-loading-text=""{ loadingText }"">
-                                        <span class=""glyphicon  glyphicon-repeat ""></span> &nbsp; 周期执行
-                                    </button>
-                              
+            bulider.Append($@"<div class=""form-group"">
+                                <div class=""btn-group "" role=""group"" aria-label=""..."">
+                                  
                                       <button class=""js-domain-job-commands-create btn btn-default btn-sm btn-danger"" 
-                                         data-cmd=""{ JobPageCommand.Test }"" data-loading-text=""{ loadingText }"" input-id=""{ id }""> 
+                                         data-cmd=""{ JobPageCommand.Test }"" data-loading-text=""{ loading }"" > 
                                         <span class=""glyphicon glyphicon-info-sign""></span> &nbsp;测试
                                     </button>
-                                    </div>");
+                                    </div>
+                                </div>
+                          ");
+
+            return bulider.ToString();
+        }
+
+        public static string CreateJobScheduleButton(this TagHelper Tag, string loading = "Loading...")
+        {
+            var id= Guid.NewGuid().ToString();
+            var bulider = new StringBuilder();
+            bulider.Append($@"  <div class=""form-group"">
+                            <label  class=""control-label"">排期执行时间</label>
+                        <div class='input-group date' id=""{ id }_schedule_date_datetimepicker"" >
+                            <input type='text' class=""form-control  schedule_date "" placeholder=""执行时间 "" id=""{ id }_schedule_date"" />
+                            <span class=""input-group-addon"">
+                                <span class=""glyphicon glyphicon-calendar""></span>
+                            </span>
+                        </div>
+                    </div>");
 
 
-            //bulider.Append($@"<div class=""btn-group pull-right"" role=""group"" aria-label=""..."">
-            //                       <button class=""js-domain-job-commands-delay  btn btn-default btn-sm btn-warning"" type=""button"" input-id=""{ id }"" 
-            //                            data-cmd=""{ JobPageCommand.Delay }"" data-loading-text=""{ loadingText }"">
-            //                            <span class=""glyphicon  glyphicon-play-circle ""></span> &nbsp; 排期执行
-            //                        </button>
+            bulider.Append($@"<div class=""form-group"">
+                            <div class=""btn-group "" role=""group"" aria-label=""..."">
+                                   <button class=""js-domain-job-commands-create  btn btn-default btn-sm btn-warning"" type=""button"" input-id=""{ id }"" 
+                                        data-cmd=""{ JobPageCommand.Delay }"" data-loading-text=""{ loading }"">
+                                        <span class=""glyphicon  glyphicon-play-circle ""></span> &nbsp; 排期执行
+                                    </button>
+                                  </div>
+                            </div>");
+            return bulider.ToString();
+        }
 
-            //                    <div class=""btn-group"" role=""group"">
 
-            //                        <button type=""button"" class=""btn btn-success btn-sm dropdown-toggle"" data-toggle=""dropdown"" aria-haspopup=""true"" aria-expanded=""false"">
-            //                           <span class=""glyphicon glyphicon-repeat""></span>  周期执行 &nbsp; <span class=""caret""></span>
-            //                        </button>
-            //                        <ul class=""dropdown-menu"">");
+        public static string CreateJobPeriodButton(this TagHelper Tag,  string sign, string loading = "Loading...")
+        {
+            var bulider = new StringBuilder();
 
-            //foreach (var item in jobCorns)
-            //{
-            //    bulider.Append($@"<li><a href=""#"" class=""js-domain-job-commands-schedule"" input-id=""{ id }"" data-schedule=""{ item.Key }""         
-            //                            data-cmd=""{ JobPageCommand.Schedule }"" data-loading-text=""{ loadingText }"">{ item.Value }</a></li>");
-            //}
+            bulider.Append($@" <div class=""form-group"">
+                            <label  class=""control-label"">周期任务标识</label>
+                            <input type='text' class=""form-control  schedule_sign disabled"" disabled=""disabled"" placeholder=""任务标识 ""   value=""{ sign }"" />
+                    </div>");
 
-            //bulider.Append($@" </ul></div>
-            //                  <button class=""js-domain-job-commands-test btn btn-sm btn-danger"" 
-            //                     data-cmd=""{ JobPageCommand.Test }"" data-loading-text=""{ loadingText }"" input-id=""{ id }""> 
-            //                    <span class=""glyphicon glyphicon-info-sign""></span> &nbsp;测试
-            //                </button>
-            //                </div>");
+            bulider.Append($@" <div class=""form-group"">
+                            <label  class=""control-label"">周期任务周期（5段 Cron 值）<a href ='http://cron.qqe2.com/' target=""_blank"" >参考</a></label>
+                            <input type='text' class=""form-control  schedule_period"" placeholder=""任务周期 ""  value="""" />
+                    </div>");
+
+
+            bulider.Append($@"<div class=""form-group"">
+                            <div class=""btn-group "" role=""group"" aria-label=""..."">
+                                    <button class=""js-domain-job-commands-create  btn btn-default btn-sm btn-success"" type=""button""
+                                        data-cmd=""{ JobPageCommand.Schedule }"" data-loading-text=""{ loading }"">
+                                        <span class=""glyphicon  glyphicon-repeat ""></span> &nbsp; 周期执行
+                                    </button>
+                                  </div>
+                           </div>");
 
 
             return bulider.ToString();
         }
+
 
         public static string CreateDescription(this TagHelper Tag, string description) {
 
