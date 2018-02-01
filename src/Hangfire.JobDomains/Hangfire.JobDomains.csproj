@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\JobSection.cs" />
+    <Compile Include="CustomAuthorizeFilter.cs" />
     <Compile Include="Dashboard\Dispatchers\ServerCommandDispatcher.cs" />
     <Compile Include="Dashboard\Pages\QueueListPage.cs" />
     <Compile Include="Dashboard\Pages\QueuePage.cs" />
