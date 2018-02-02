@@ -1,6 +1,6 @@
 ﻿using Common.Logging;
-using Hangfire.JobDomains.Models;
-using Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities;
+using Hangfire.PluginPackets.Models;
+using Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
 {
 
     public abstract class EFCoreStorage : IDomainStorage
@@ -211,9 +211,9 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
         {
             var domain = context.Plugins.SingleOrDefault(s => s.Title == domainName);
             if (domain == null) return;
-            var assemblies = context.Assemblies.Where(s => s.PluginID == domain.ID);
-            var jobs = context.Jobs.Where(s => s.DomainID == domain.ID);
-            var constructorParameters = context.JobConstructorParameters.Where(s => s.DomainID == domain.ID);
+            var assemblies = context.Assemblies.Where(s => s.PluginId == domain.Id);
+            var jobs = context.Jobs.Where(s => s.PluginId == domain.Id);
+            var constructorParameters = context.JobConstructorParameters.Where(s => s.PluginId  == domain.Id);
 
             context.JobConstructorParameters.RemoveRange(constructorParameters);
             context.Jobs.RemoveRange(jobs);
@@ -235,7 +235,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
                 {
                     foreach (var assembly in assemblies)
                     {
-                        var assemblyOne = assembly.GetAssembly(domainResult.Entity.ID);
+                        var assemblyOne = assembly.GetAssembly(domainResult.Entity.Id);
                         var assemblyResult = await context.Assemblies.AddAsync(assemblyOne);
                         await context.SaveChangesAsync();
 
@@ -243,7 +243,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
                         if (jobs == null) continue;
                         foreach (var job in jobs)
                         {
-                            var jobOne = job.GetJob(domainResult.Entity.ID, assemblyResult.Entity.ID);
+                            var jobOne = job.GetJob(domainResult.Entity.Id, assemblyResult.Entity.Id);
                             var jobResult = await context.Jobs.AddAsync(jobOne);
                             await context.SaveChangesAsync();
 
@@ -251,7 +251,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
                             if (constructors == null) continue;
                             foreach (var constructor in constructors)
                             {
-                                var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.ID, assemblyResult.Entity.ID, jobResult.Entity.ID);
+                                var paramers = constructor.GetJobConstructorParameters(domainResult.Entity.Id, assemblyResult.Entity.Id, jobResult.Entity.Id);
                                 await context.JobConstructorParameters.AddRangeAsync(paramers);
                             }
                         }
@@ -292,7 +292,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
             {
                 var plugin = context.Plugins.FirstOrDefault(s => s.Title == pluginDefine.Title);
                 if (plugin == null) return new List<AssemblyDefine>();
-                var assemblies = context.Assemblies.Where(s => s.PluginID == plugin.ID);
+                var assemblies = context.Assemblies.Where(s => s.PluginId == plugin.Id);
                 return assemblies.Select(s => new AssemblyDefine(pluginDefine, s.FileName, s.FullName, s.ShortName, s.Title, s.Description)).ToList();
             }
         }
@@ -306,9 +306,9 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
                 var domain = context.Plugins.FirstOrDefault(s => s.Title == domainDefine.Title);
                 if (domain == null) return new List<JobDefine>();
-                var assembly = context.Assemblies.Where(s => s.PluginID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
+                var assembly = context.Assemblies.Where(s => s.PluginId == domain.Id).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
                 if (assembly == null) return new List<JobDefine>();
-                var jobs = context.Jobs.Where(s => s.AssemblyID == assembly.ID);
+                var jobs = context.Jobs.Where(s => s.AssemblyId == assembly.Id);
                 return jobs.Select(s => new JobDefine(assemblyDefine, s.FullName, s.Name, s.Title, s.Description)).ToList();
             }
         }
@@ -324,11 +324,11 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
 
                 var domain = context.Plugins.FirstOrDefault(s => s.Title == assemblyDefine.Parent.Title);
                 if (domain == null) return new List<ConstructorDefine>();
-                var assembly = context.Assemblies.Where(s => s.PluginID == domain.ID).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
+                var assembly = context.Assemblies.Where(s => s.PluginId == domain.Id).FirstOrDefault(s => s.ShortName == assemblyDefine.ShortName);
                 if (assembly == null) return new List<ConstructorDefine>();
-                var job = context.Jobs.Where(s => s.AssemblyID == assembly.ID).FirstOrDefault(s => s.Name == jobDefine.Name);
+                var job = context.Jobs.Where(s => s.AssemblyId == assembly.Id).FirstOrDefault(s => s.Name == jobDefine.Name);
                 if (job == null) return new List<ConstructorDefine>();
-                var paramerGroups = context.JobConstructorParameters.Where(s => s.JobID == job.ID).GroupBy(s => s.ConstructorGuid);
+                var paramerGroups = context.JobConstructorParameters.Where(s => s.JobId == job.Id).GroupBy(s => s.ConstructorGuid);
                 var constructors = new List<ConstructorDefine>();
                 foreach (var group in paramerGroups)
                 {

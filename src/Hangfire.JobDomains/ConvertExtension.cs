@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains
+namespace Hangfire.PluginPackets
 {
     internal static  class ConvertExtension
     {

@@ -1,6 +1,6 @@
 ﻿using Hangfire.Dashboard;
-using Hangfire.JobDomains.Dashboard.Pages;
-using Hangfire.JobDomains.Models;
+using Hangfire.PluginPackets.Dashboard.Pages;
+using Hangfire.PluginPackets.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Dashboard
+namespace Hangfire.PluginPackets.Dashboard
 {
     internal static class UrlHelperExtension
     {

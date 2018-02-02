@@ -1,4 +1,4 @@
-﻿using Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities;
+﻿using Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
@@ -7,7 +7,7 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
 {
     public abstract class EFCoreDBContext : DbContext
     {

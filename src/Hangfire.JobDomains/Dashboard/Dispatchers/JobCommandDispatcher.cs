@@ -1,6 +1,6 @@
-﻿using Hangfire.JobDomains.Models;
-using Hangfire.JobDomains.Server;
-using Hangfire.JobDomains.Storage;
+﻿using Hangfire.PluginPackets.Models;
+using Hangfire.PluginPackets.Server;
+using Hangfire.PluginPackets.Storage;
 using Hangfire.States;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using  CronExpressionDescriptor;
 
-namespace Hangfire.JobDomains.Dashboard.Dispatchers
+namespace Hangfire.PluginPackets.Dashboard.Dispatchers
 {
 
     internal class JobCommandDispatcher : CommandDispatcher<JsonData>

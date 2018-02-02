@@ -1,11 +1,11 @@
-﻿using Hangfire.JobDomains.Models;
+﻿using Hangfire.PluginPackets.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage
+namespace Hangfire.PluginPackets.Storage
 {
     internal class StorageService
     {

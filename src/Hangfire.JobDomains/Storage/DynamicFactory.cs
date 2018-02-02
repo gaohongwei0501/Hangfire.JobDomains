@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace Hangfire.JobDomains.Storage
+namespace Hangfire.PluginPackets.Storage
 {
     public class DynamicFactory
     {

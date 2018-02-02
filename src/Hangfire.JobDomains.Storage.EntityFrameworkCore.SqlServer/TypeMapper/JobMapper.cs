@@ -6,20 +6,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.TypeMapper
 {
     internal class JobMapper : IEntityTypeConfiguration<EntityFrameworkCore.Entities.Job>
     {
         public void Configure(EntityTypeBuilder<EntityFrameworkCore.Entities.Job> builder)
         {
             // Primary Key
-            builder.HasKey(t => t.ID);
+            builder.HasKey(t => t.Id);
 
             // Properties
-            builder.Property(t => t.ID).UseSqlServerIdentityColumn();
+            builder.Property(t => t.Id).UseSqlServerIdentityColumn();
 
-            builder.Property(t => t.DomainID).IsRequired();
-            builder.Property(t => t.AssemblyID).IsRequired();
+            builder.Property(t => t.PluginId).IsRequired();
+            builder.Property(t => t.AssemblyId).IsRequired();
 
             builder.Property(t => t.FullName).IsRequired().HasMaxLength(200);
             builder.Property(t => t.Name).IsRequired().HasMaxLength(50);
@@ -27,7 +27,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
             builder.Property(t => t.Title).HasMaxLength(50);
             builder.Property(t => t.Description).HasMaxLength(200);
 
-            builder.ToTable("JobDomains.Job", "Hangfire");
+            builder.ToTable("Extension_Job", "Hangfire");
         }
     }
 }

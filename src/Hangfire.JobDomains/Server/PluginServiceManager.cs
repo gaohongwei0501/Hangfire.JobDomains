@@ -1,16 +1,16 @@
-﻿using Hangfire.JobDomains.Models;
+﻿using Hangfire.PluginPackets.Models;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using Hangfire.JobDomains.Interface;
-using Hangfire.JobDomains.Storage;
+using Hangfire.PluginPackets.Interface;
+using Hangfire.PluginPackets.Storage;
 using System.Threading.Tasks;
 using Common.Logging;
 using System.Threading;
 
-namespace Hangfire.JobDomains.Server
+namespace Hangfire.PluginPackets.Server
 {
     internal class PluginServiceManager
     {

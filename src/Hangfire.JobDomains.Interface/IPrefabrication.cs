@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Interface
+namespace Hangfire.PluginPackets.Interface
 {
 
     /// <summary>

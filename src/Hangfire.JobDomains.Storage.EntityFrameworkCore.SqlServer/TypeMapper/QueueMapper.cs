@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.TypeMapper
 {
     public class QueueMapper : IEntityTypeConfiguration<EntityFrameworkCore.Entities.Queue>
     {
@@ -19,7 +19,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
             builder.Property(t => t.Description).IsRequired().HasMaxLength(50);
             builder.Property(t => t.CreatedAt).IsRequired();
 
-            builder.ToTable("JobDomains.Queue", "Hangfire");
+            builder.ToTable("Extension_Queue", "Hangfire");
         }
     }
 }

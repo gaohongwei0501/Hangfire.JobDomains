@@ -1,11 +1,11 @@
-﻿using Hangfire.JobDomains.Storage;
+﻿using Hangfire.PluginPackets.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Dashboard.Pages
+namespace Hangfire.PluginPackets.Dashboard.Pages
 {
     internal class SystemPage : HtmlPage
     {

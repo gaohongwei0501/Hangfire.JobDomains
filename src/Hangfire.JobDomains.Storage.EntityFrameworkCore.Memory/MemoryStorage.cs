@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Hangfire.JobDomains.Models;
+using Hangfire.PluginPackets.Models;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.Memory
 {
     public class MemoryStorage : EFCoreStorage
     {

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Dashboard
+namespace Hangfire.PluginPackets.Dashboard
 {
 
     internal abstract class HtmlPage : RazorPage

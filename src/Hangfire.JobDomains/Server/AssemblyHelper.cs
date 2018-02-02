@@ -1,4 +1,4 @@
-﻿using Hangfire.JobDomains.Interface;
+﻿using Hangfire.PluginPackets.Interface;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
 
-namespace Hangfire.JobDomains.Server
+namespace Hangfire.PluginPackets.Server
 {
     internal static class _AssemblyHelper
     {

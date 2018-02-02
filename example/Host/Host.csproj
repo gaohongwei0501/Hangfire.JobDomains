@@ -188,25 +188,25 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory.csproj">
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory\Hangfire.PluginPackets.Storage.EntityFrameworkCore.Memory.csproj">
       <Project>{db8dba62-3792-4448-b799-c6bf0347cb83}</Project>
-      <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory</Name>
+      <Name>Hangfire.PluginPackets.Storage.EntityFrameworkCore.Memory</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite\Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite.csproj">
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite\Hangfire.PluginPackets.Storage.EntityFrameworkCore.Sqlite.csproj">
       <Project>{582e67be-0e5c-463c-a77c-dba858e9e3f1}</Project>
-      <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite</Name>
+      <Name>Hangfire.PluginPackets.Storage.EntityFrameworkCore.Sqlite</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer\Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.csproj">
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer\Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.csproj">
       <Project>{1b78ec58-7d47-49e0-8bed-b178585a05ac}</Project>
-      <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer</Name>
+      <Name>Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore\Hangfire.JobDomains.Storage.EntityFrameworkCore.csproj">
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Storage.EntityFrameworkCore\Hangfire.PluginPackets.Storage.EntityFrameworkCore.csproj">
       <Project>{fde585ef-195f-4512-b84f-b2e7b3d2f6be}</Project>
-      <Name>Hangfire.JobDomains.Storage.EntityFrameworkCore</Name>
+      <Name>Hangfire.PluginPackets.Storage.EntityFrameworkCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.JobDomains.csproj">
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.PluginPackets.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>
-      <Name>Hangfire.JobDomains</Name>
+      <Name>Hangfire.PluginPackets</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

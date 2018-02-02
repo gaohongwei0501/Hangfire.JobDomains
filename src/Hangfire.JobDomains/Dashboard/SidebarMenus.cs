@@ -1,14 +1,14 @@
 ﻿using Hangfire.Annotations;
 using Hangfire.Dashboard;
-using Hangfire.JobDomains.Models;
-using Hangfire.JobDomains.Storage;
+using Hangfire.PluginPackets.Models;
+using Hangfire.PluginPackets.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Dashboard
+namespace Hangfire.PluginPackets.Dashboard
 {
 
     internal class SidebarMenus

@@ -1,12 +1,12 @@
-﻿using Hangfire.JobDomains.Models;
-using Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities;
+﻿using Hangfire.PluginPackets.Models;
+using Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
 {
     internal static class ModelMapper
     {
@@ -37,7 +37,7 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
         {
             return new Assembly
             {
-                PluginID = DomainID,
+                PluginId = DomainID,
                 FullName = model.FullName,
                 FileName = model.FileName,
                 ShortName = model.ShortName,
@@ -51,8 +51,8 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
         {
             return new Job
             {
-                DomainID = DomainID,
-                AssemblyID = AssemblyID,
+                PluginId = DomainID,
+                AssemblyId = AssemblyID,
                 Name = model.Name,
                 FullName = model.FullName,
                 Title = model.Title,
@@ -68,9 +68,9 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
             {
                 var item = new JobConstructorParameter
                 {
-                    DomainID = DomainID,
-                    AssemblyID = AssemblyID,
-                    JobID = JobID,
+                    PluginId  = DomainID,
+                    AssemblyId = AssemblyID,
+                    JobId = JobID,
                     ConstructorGuid = Guid.NewGuid().ToString(),
                     Name = string.Empty,
                     Type = string.Empty,
@@ -84,9 +84,9 @@ namespace Hangfire.JobDomains.Storage.EntityFrameworkCore
             {
                 var item = new JobConstructorParameter
                 {
-                    DomainID = DomainID,
-                    AssemblyID = AssemblyID,
-                    JobID = JobID,
+                    PluginId  = DomainID,
+                    AssemblyId = AssemblyID,
+                    JobId = JobID,
                     ConstructorGuid = Guid.NewGuid().ToString(),
                     Name = par.Name,
                     Type = par.Type,

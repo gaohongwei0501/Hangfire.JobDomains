@@ -1,11 +1,11 @@
-﻿using Hangfire.JobDomains.Interface;
-using Hangfire.JobDomains.Models;
-using Hangfire.JobDomains.Server;
+﻿using Hangfire.PluginPackets.Interface;
+using Hangfire.PluginPackets.Models;
+using Hangfire.PluginPackets.Server;
 using Hangfire.States;
 using System;
 using System.IO;
 
-namespace Hangfire.JobDomains.Storage
+namespace Hangfire.PluginPackets.Storage
 {
 
     public class DynamicBaseClass

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Models
+namespace Hangfire.PluginPackets.Models
 {
     public class QueueDefine
     {

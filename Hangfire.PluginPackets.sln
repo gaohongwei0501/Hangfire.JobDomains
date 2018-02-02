@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{913D80B9-4D5F-46A2-967B-76D7174B55A9}"
 EndProject
@@ -9,19 +9,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{44CA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDLL", "example\TestDLL\TestDLL.csproj", "{27F50555-8E93-4EFB-A97E-1D6D16531A57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains", "src\Hangfire.JobDomains\Hangfire.JobDomains.csproj", "{D0A78F95-F4F6-4A90-800C-AAB3920BD830}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.PluginPackets", "src\Hangfire.JobDomains\Hangfire.PluginPackets.csproj", "{D0A78F95-F4F6-4A90-800C-AAB3920BD830}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Interface", "src\Hangfire.JobDomains.Interface\Hangfire.JobDomains.Interface.csproj", "{F0FC1AA5-7E4F-4C49-8412-4697B0F017EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.PluginPackets.Interface", "src\Hangfire.JobDomains.Interface\Hangfire.PluginPackets.Interface.csproj", "{F0FC1AA5-7E4F-4C49-8412-4697B0F017EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host", "example\Host\Host.csproj", "{A6A13437-F3BE-4997-A2B0-D6FFF03BD623}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.EntityFrameworkCore", "src\Hangfire.JobDomains.Storage.EntityFrameworkCore\Hangfire.JobDomains.Storage.EntityFrameworkCore.csproj", "{FDE585EF-195F-4512-B84F-B2E7B3D2F6BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.PluginPackets.Storage.EntityFrameworkCore", "src\Hangfire.JobDomains.Storage.EntityFrameworkCore\Hangfire.PluginPackets.Storage.EntityFrameworkCore.csproj", "{FDE585EF-195F-4512-B84F-B2E7B3D2F6BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite", "src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite\Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite.csproj", "{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.PluginPackets.Storage.EntityFrameworkCore.Sqlite", "src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite\Hangfire.PluginPackets.Storage.EntityFrameworkCore.Sqlite.csproj", "{582E67BE-0E5C-463C-A77C-DBA858E9E3F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer", "src\Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer\Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.csproj", "{1B78EC58-7D47-49E0-8BED-B178585A05AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer", "src\Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer\Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.csproj", "{1B78EC58-7D47-49E0-8BED-B178585A05AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory", "src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory.csproj", "{DB8DBA62-3792-4448-B799-C6BF0347CB83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.PluginPackets.Storage.EntityFrameworkCore.Memory", "src\Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory\Hangfire.PluginPackets.Storage.EntityFrameworkCore.Memory.csproj", "{DB8DBA62-3792-4448-B799-C6BF0347CB83}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{38F968CA-0CC3-4CEA-832C-FFAC069096E7}"
 EndProject

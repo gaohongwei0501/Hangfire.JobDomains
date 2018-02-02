@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Dashboard.Dispatchers
+namespace Hangfire.PluginPackets.Dashboard.Dispatchers
 {
     internal class EmbeddedResourceDispatcher : IDashboardDispatcher
     {

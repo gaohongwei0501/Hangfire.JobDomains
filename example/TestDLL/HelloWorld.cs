@@ -1,5 +1,5 @@
 ﻿using Common.Logging;
-using Hangfire.JobDomains.Interface;
+using Hangfire.PluginPackets.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;

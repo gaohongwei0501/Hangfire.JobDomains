@@ -1,11 +1,11 @@
-﻿using Hangfire.JobDomains.Server;
+﻿using Hangfire.PluginPackets.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Models
+namespace Hangfire.PluginPackets.Models
 {
 
     public class ServerDefine

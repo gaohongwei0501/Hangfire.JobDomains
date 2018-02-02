@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Dashboard.PageResult
+namespace Hangfire.PluginPackets.Dashboard.PageResult
 {
 
     internal class CommandResult: ContentResult

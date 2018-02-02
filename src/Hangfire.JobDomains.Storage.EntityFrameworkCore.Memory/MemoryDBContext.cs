@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Memory
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.Memory
 {
     public class MemoryDBContext : EFCoreDBContext
     {

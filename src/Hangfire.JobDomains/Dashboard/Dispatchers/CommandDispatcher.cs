@@ -10,7 +10,7 @@ using Newtonsoft.Json.Serialization;
 using Microsoft.Owin;
 using System.Text.RegularExpressions;
 
-namespace Hangfire.JobDomains.Dashboard.Dispatchers
+namespace Hangfire.PluginPackets.Dashboard.Dispatchers
 {
     internal abstract class CommandDispatcher<T> : IDashboardDispatcher
     {

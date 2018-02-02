@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities
 {
     public class ServerQueue : SQLiteEntityBase
     {

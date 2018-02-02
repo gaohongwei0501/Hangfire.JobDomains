@@ -6,22 +6,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.TypeMapper
 {
     internal class PluginMapper : IEntityTypeConfiguration<EntityFrameworkCore.Entities.Plugin>
     {
         public void Configure(EntityTypeBuilder<EntityFrameworkCore.Entities.Plugin> builder)
         {
             // Primary Key
-            builder.HasKey(t => t.ID);
+            builder.HasKey(t => t.Id);
 
             // Properties
-            builder.Property(t => t.ID).UseSqlServerIdentityColumn();
+            builder.Property(t => t.Id).UseSqlServerIdentityColumn();
 
             builder.Property(t => t.Title).IsRequired().HasMaxLength(50);
             builder.Property(t => t.Description).HasMaxLength(200);
 
-            builder.ToTable("JobDomains.Plugin", "Hangfire");
+            builder.ToTable("Extension_Plugin", "Hangfire");
         }
     }
 }

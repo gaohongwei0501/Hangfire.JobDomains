@@ -7,8 +7,8 @@
     <ProjectGuid>{D0A78F95-F4F6-4A90-800C-AAB3920BD830}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hangfire.JobDomains</RootNamespace>
-    <AssemblyName>Hangfire.JobDomains</AssemblyName>
+    <RootNamespace>Hangfire.PluginPackets</RootNamespace>
+    <AssemblyName>Hangfire.PluginPackets</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -123,9 +123,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Hangfire.JobDomains.Interface\Hangfire.JobDomains.Interface.csproj">
+    <ProjectReference Include="..\Hangfire.JobDomains.Interface\Hangfire.PluginPackets.Interface.csproj">
       <Project>{f0fc1aa5-7e4f-4c49-8412-4697b0f017ef}</Project>
-      <Name>Hangfire.JobDomains.Interface</Name>
+      <Name>Hangfire.PluginPackets.Interface</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

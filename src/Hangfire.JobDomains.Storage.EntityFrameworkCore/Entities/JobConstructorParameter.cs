@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities
 {
 
     public class JobConstructorParameter : SQLiteEntityBase
     {
 
-        public int DomainID { get; set; }
+        public int PluginId { get; set; }
 
-        public int AssemblyID { get; set; }
+        public int AssemblyId { get; set; }
 
-        public int JobID { get; set; }
+        public int JobId { get; set; }
 
         public string ConstructorGuid { get; set; }
 

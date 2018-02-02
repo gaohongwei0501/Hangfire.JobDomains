@@ -1,6 +1,6 @@
 ﻿using Common.Logging;
-using Hangfire.JobDomains.Models;
-using Hangfire.JobDomains.Server;
+using Hangfire.PluginPackets.Models;
+using Hangfire.PluginPackets.Server;
 using Hangfire.States;
 using System;
 using System.Collections.Concurrent;
@@ -11,7 +11,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage
+namespace Hangfire.PluginPackets.Storage
 {
     
     public class DynamicService

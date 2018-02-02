@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities
 {
     public class Assembly : SQLiteEntityBase
     {
 
-        public int PluginID { get; set; }
+        public int PluginId { get; set; }
 
         /// <summary>
         /// 全名

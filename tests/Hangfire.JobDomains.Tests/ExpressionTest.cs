@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Tests
+namespace Hangfire.PluginPackets.Tests
 {
     [TestClass]
     public class ExpressionTest

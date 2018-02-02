@@ -1,4 +1,4 @@
-﻿using Hangfire.JobDomains.Storage.EntityFrameworkCore;
+﻿using Hangfire.PluginPackets.Storage.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.Sqlite
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.Sqlite
 {
    
     internal class SQLiteDBContext : EFCoreDBContext

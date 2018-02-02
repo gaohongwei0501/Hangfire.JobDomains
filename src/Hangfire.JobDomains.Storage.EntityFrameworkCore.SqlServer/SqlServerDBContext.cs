@@ -1,4 +1,4 @@
-﻿using Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer.TypeMapper;
+﻿using Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.TypeMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
@@ -7,7 +7,7 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage.EntityFrameworkCore.SqlServer
+namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer
 {
     internal class SqlServerDBContext : EFCoreDBContext
     {

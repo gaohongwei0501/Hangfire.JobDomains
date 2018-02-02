@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains
+namespace Hangfire.PluginPackets
 {
     public class CustomAuthorizeFilter : IDashboardAuthorizationFilter
     {

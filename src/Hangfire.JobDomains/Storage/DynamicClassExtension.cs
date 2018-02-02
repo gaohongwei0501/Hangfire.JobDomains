@@ -1,4 +1,4 @@
-﻿using Hangfire.JobDomains.Models;
+﻿using Hangfire.PluginPackets.Models;
 using Hangfire.States;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Storage
+namespace Hangfire.PluginPackets.Storage
 {
     
     public class DynamicClassExtension<T> where T : DynamicBaseClass

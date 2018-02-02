@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Hangfire.JobDomains.Models;
-using Hangfire.JobDomains.Server;
-using Hangfire.JobDomains.Storage;
+using Hangfire.PluginPackets.Models;
+using Hangfire.PluginPackets.Server;
+using Hangfire.PluginPackets.Storage;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Hangfire.JobDomains.Tests
+namespace Hangfire.PluginPackets.Tests
 {
 
     [TestClass]

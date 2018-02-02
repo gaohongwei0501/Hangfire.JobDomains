@@ -8,7 +8,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Tests
+namespace Hangfire.PluginPackets.Tests
 {
     [TestClass]
     public class EmitTest

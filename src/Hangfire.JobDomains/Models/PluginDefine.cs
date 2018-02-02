@@ -1,4 +1,4 @@
-﻿using Hangfire.JobDomains.Interface;
+﻿using Hangfire.PluginPackets.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,9 +7,9 @@ using System.Reflection;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
-using Hangfire.JobDomains.Storage;
+using Hangfire.PluginPackets.Storage;
 
-namespace Hangfire.JobDomains.Models
+namespace Hangfire.PluginPackets.Models
 {
    
 

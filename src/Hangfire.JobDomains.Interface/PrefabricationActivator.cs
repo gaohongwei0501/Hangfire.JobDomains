@@ -7,7 +7,7 @@ using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.JobDomains.Interface
+namespace Hangfire.PluginPackets.Interface
 {
 
     public class PrefabricationActivator

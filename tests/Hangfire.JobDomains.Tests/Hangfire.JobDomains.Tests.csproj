@@ -7,8 +7,8 @@
     <ProjectGuid>{5C0843B1-B1A3-46B8-9E33-8B1E8778FEFE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Hangfire.JobDomains.Tests</RootNamespace>
-    <AssemblyName>Hangfire.JobDomains.Tests</AssemblyName>
+    <RootNamespace>Hangfire.PluginPackets.Tests</RootNamespace>
+    <AssemblyName>Hangfire.PluginPackets.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -58,9 +58,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.JobDomains.csproj">
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.PluginPackets.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>
-      <Name>Hangfire.JobDomains</Name>
+      <Name>Hangfire.PluginPackets</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

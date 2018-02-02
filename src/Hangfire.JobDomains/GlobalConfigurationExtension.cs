@@ -9,15 +9,15 @@ using Hangfire.Dashboard;
 using System.Collections.Concurrent;
 using Hangfire;
 using Microsoft.Owin;
-using Hangfire.JobDomains.Server;
-using Hangfire.JobDomains.Storage;
+using Hangfire.PluginPackets.Server;
+using Hangfire.PluginPackets.Storage;
 using Owin;
-using Hangfire.JobDomains.Dashboard.Dispatchers;
-using Hangfire.JobDomains.Dashboard;
-using Hangfire.JobDomains.Dashboard.Pages;
+using Hangfire.PluginPackets.Dashboard.Dispatchers;
+using Hangfire.PluginPackets.Dashboard;
+using Hangfire.PluginPackets.Dashboard.Pages;
 using System.Net;
 
-namespace Hangfire.JobDomains
+namespace Hangfire.PluginPackets
 {
     /// <summary>
     /// 运行模式
