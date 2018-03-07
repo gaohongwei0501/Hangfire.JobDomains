@@ -55,12 +55,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.PluginPackets.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>
       <Name>Hangfire.PluginPackets</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Hangfire.PluginPackets.Server\Hangfire.PluginPackets.Server.csproj">
+      <Project>{beef8adf-2fd2-4df3-bdca-23069b7e3907}</Project>
+      <Name>Hangfire.PluginPackets.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

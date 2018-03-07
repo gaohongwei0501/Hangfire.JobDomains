@@ -117,8 +117,8 @@
     <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Owin.Host.SystemWeb.3.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -207,6 +207,14 @@
     <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.PluginPackets.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>
       <Name>Hangfire.PluginPackets</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Hangfire.PluginPackets.Dashboard\Hangfire.PluginPackets.Dashboard.csproj">
+      <Project>{fb1bc260-9f0e-4e6d-bbe2-fc84190cbb44}</Project>
+      <Name>Hangfire.PluginPackets.Dashboard</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Hangfire.PluginPackets.Server\Hangfire.PluginPackets.Server.csproj">
+      <Project>{beef8adf-2fd2-4df3-bdca-23069b7e3907}</Project>
+      <Name>Hangfire.PluginPackets.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

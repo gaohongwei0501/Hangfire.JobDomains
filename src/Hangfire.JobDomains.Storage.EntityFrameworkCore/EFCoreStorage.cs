@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
 {
 
-    public abstract class EFCoreStorage : IDomainStorage
+    public abstract class EFCoreStorage : IStorage
     {
         static ILog loger = LogManager.GetLogger<EFCoreStorage>();
 

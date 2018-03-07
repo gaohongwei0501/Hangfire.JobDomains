@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hangfire.PluginPackets.Models
 {
-    internal class JsonData
+    public class JsonData
     {
         public JsonData() { }
 

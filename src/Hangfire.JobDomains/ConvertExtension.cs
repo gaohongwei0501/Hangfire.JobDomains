@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hangfire.PluginPackets
 {
-    internal static  class ConvertExtension
+    public static  class ConvertExtension
     {
         public static object ConvertTo(this object convertibleValue, object def)
         {

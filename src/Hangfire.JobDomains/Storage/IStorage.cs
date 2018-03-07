@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Hangfire.PluginPackets.Storage
 {
 
-    public interface IDomainStorage
+    public interface IStorage
     {
         bool AddService(string connectString);
 

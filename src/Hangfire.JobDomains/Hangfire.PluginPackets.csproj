@@ -51,8 +51,8 @@
     <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Owin.Host.SystemWeb.3.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.5.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -73,49 +73,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\JobSection.cs" />
     <Compile Include="CustomAuthorizeFilter.cs" />
-    <Compile Include="Dashboard\Dispatchers\ServerCommandDispatcher.cs" />
-    <Compile Include="Dashboard\Pages\QueueListPage.cs" />
-    <Compile Include="Dashboard\Pages\QueuePage.cs" />
-    <Compile Include="Dashboard\Pages\ServerPage.cs" />
-    <Compile Include="Dashboard\Pages\ServerListPage.cs" />
     <Compile Include="Models\JobParamer.cs" />
     <Compile Include="Models\QueueDefine.cs" />
     <Compile Include="Models\ServerDefine.cs" />
     <Compile Include="ConvertExtension.cs" />
-    <Compile Include="Dashboard\Dispatchers\CommandDispatcher.cs" />
-    <Compile Include="Dashboard\Dispatchers\JobCommandDispatcher.cs" />
-    <Compile Include="Dashboard\OwinExtensions.cs" />
-    <Compile Include="Dashboard\PageCommand.cs" />
-    <Compile Include="Dashboard\PageResult\CommandResult.cs" />
-    <Compile Include="Dashboard\PageResult\ContentResult.cs" />
-    <Compile Include="Dashboard\Pages\BatchSchedulePage.cs" />
-    <Compile Include="Dashboard\Pages\FolderPage.cs" />
-    <Compile Include="Dashboard\HtmlPage.cs" />
-    <Compile Include="Dashboard\Pages\AssemblyPage.cs" />
-    <Compile Include="Dashboard\Pages\JobPage.cs" />
-    <Compile Include="Dashboard\Pages\MainPage.cs" />
-    <Compile Include="Dashboard\SidebarMenus.cs" />
-    <Compile Include="Dashboard\Pages\SystemPage.cs" />
-    <Compile Include="Dashboard\SidebarPartial.cs" />
-    <Compile Include="Dashboard\UrlHelperExtension.cs" />
-    <Compile Include="GlobalConfigurationExtension.cs" />
     <Compile Include="Models\ConstructorDefine.cs" />
-    <Compile Include="Server\AssemblyHelper.cs" />
-    <Compile Include="Storage\DynamicClassExtension.cs" />
-    <Compile Include="Storage\DynamicBaseClass.cs" />
-    <Compile Include="Server\PluginServiceManager.cs" />
     <Compile Include="Models\AssemblyDefine.cs" />
     <Compile Include="Models\PluginDefine.cs" />
-    <Compile Include="Dashboard\Dispatchers\EmbeddedResourceDispatcher.cs" />
-    <Compile Include="Dashboard\TagHelper.cs" />
     <Compile Include="Models\JobDefine.cs" />
     <Compile Include="Models\JsonData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Storage\DynamicDispatch.cs" />
+    <Compile Include="Storage\DynamicBaseClass.cs" />
+    <Compile Include="Storage\DynamicClassExtension.cs" />
+    <Compile Include="Storage\DynamicService.cs" />
     <Compile Include="Storage\DynamicFactory.cs" />
-    <Compile Include="Storage\IDomainStorage.cs" />
+    <Compile Include="Storage\IStorage.cs" />
     <Compile Include="Storage\StorageService.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -129,14 +102,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Dashboard\Content\domainScript.js" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Dashboard\Content\image\loading.gif" />
-    <EmbeddedResource Include="Dashboard\Content\domainStyle.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Configuration\JobConfigTemplate.xml" />
+    <Folder Include="Server\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

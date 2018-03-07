@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace Hangfire.PluginPackets.Storage
 {
-    internal class StorageService
+    public class StorageService
     {
 
         public readonly static StorageService Provider = new StorageService();
 
-        static IDomainStorage Storage { get; set; }
+        static IStorage Storage { get; set; }
 
         public Task<bool> ClearServer(string serverName)=> Storage.ClearServer(serverName);
 
-        public bool SetStorage(IDomainStorage store, string connectString)
+        public bool SetStorage(IStorage store, string connectString)
         {
             if (Storage == null) Storage = store;
             return Storage.AddService(connectString);

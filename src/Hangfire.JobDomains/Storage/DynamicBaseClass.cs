@@ -1,6 +1,5 @@
 ﻿using Hangfire.PluginPackets.Interface;
 using Hangfire.PluginPackets.Models;
-using Hangfire.PluginPackets.Server;
 using Hangfire.States;
 using System;
 using System.IO;
@@ -33,7 +32,7 @@ namespace Hangfire.PluginPackets.Storage
             AppDomain Domain = null;
             try
             {
-                var server = StorageService.Provider.GetServer(null, PluginServiceManager.ServerName);
+                var server = StorageService.Provider.GetServer(null, Environment.MachineName.ToLower());
                 var path = $"{ server.PlugPath }//{ paramer.PluginName }";
                 AppDomainSetup setup = new AppDomainSetup
                 {

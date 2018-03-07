@@ -1,6 +1,5 @@
 ﻿using Common.Logging;
 using Hangfire.PluginPackets.Models;
-using Hangfire.PluginPackets.Server;
 using Hangfire.States;
 using System;
 using System.Collections.Concurrent;
