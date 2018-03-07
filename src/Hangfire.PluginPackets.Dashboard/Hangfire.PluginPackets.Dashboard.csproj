@@ -94,9 +94,9 @@
     <Compile Include="UrlHelperExtension.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\domainScript.js" />
-    <Content Include="Content\domainStyle.css" />
-    <Content Include="Content\image\loading.gif" />
+    <EmbeddedResource Include="Content\domainScript.js" />
+    <EmbeddedResource Include="Content\domainStyle.css" />
+    <EmbeddedResource Include="Content\image\loading.gif" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
