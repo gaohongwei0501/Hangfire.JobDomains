@@ -74,7 +74,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomAuthorizeFilter.cs" />
-    <Compile Include="Models\JobParamer.cs" />
     <Compile Include="Models\QueueDefine.cs" />
     <Compile Include="Models\ServerDefine.cs" />
     <Compile Include="ConvertExtension.cs" />

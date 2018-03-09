@@ -15,9 +15,9 @@ namespace Hangfire.PluginPackets.Interface
         public static void Test()
         {
             AppDomain domain = AppDomain.CurrentDomain;
-            CrossDomainData args = domain.GetData("args") as CrossDomainData;
+            AssemblyParamerArg args = domain.GetData("args") as AssemblyParamerArg;
             Init(domain, args.PluginDir);
-            var instance = domain.CreateInstance(args.assemblyName, args.typeName) as ObjectHandle;
+            var instance = domain.CreateInstance(args.AssemblyName, args.TypeName) as ObjectHandle;
             var job = instance.Unwrap() as IPrefabrication;
             domain.SetData("result", job.Test());
         }
@@ -25,9 +25,9 @@ namespace Hangfire.PluginPackets.Interface
         public static void Dispatch()
         {
             AppDomain domain = AppDomain.CurrentDomain;
-            CrossDomainData args = domain.GetData("args") as CrossDomainData;
+            AssemblyParamerArg args = domain.GetData("args") as AssemblyParamerArg;
             Init(domain, args.PluginDir);
-            var instance = domain.CreateInstance(args.assemblyName, args.typeName) as ObjectHandle;
+            var instance = domain.CreateInstance(args.AssemblyName, args.TypeName) as ObjectHandle;
             var job = instance.Unwrap() as IPrefabrication;
             job.Dispatch();
         }

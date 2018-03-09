@@ -47,10 +47,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CrossDomainData.cs" />
-    <Compile Include="IPrefabrication.cs" />
-    <Compile Include="NameplateAttribute.cs" />
-    <Compile Include="PrefabricationActivator.cs" />
+    <Compile Include="Batch\BatchImportService.cs" />
+    <Compile Include="Batch\IBatchImport.cs" />
+    <Compile Include="Batch\IJobBatch.cs" />
+    <Compile Include="Entities\AssemblyParamerArg.cs" />
+    <Compile Include="Job\IPrefabrication.cs" />
+    <Compile Include="Entities\PluginParamer.cs" />
+    <Compile Include="Job\NameplateAttribute.cs" />
+    <Compile Include="Batch\PeriodBatch.cs" />
+    <Compile Include="Job\PrefabricationActivator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

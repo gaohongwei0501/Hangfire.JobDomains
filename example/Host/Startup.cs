@@ -30,8 +30,9 @@ namespace Host
 
             var dataConnectString = "ConnectionString";
             GlobalConfiguration.Configuration.UseSqlServerStorage(dataConnectString);
-            //var LoadAsyc = app.UseHangfirePluginServer<SqlServerStorage>(connectString: dataConnectString);
-            //Task.WaitAll(LoadAsyc);
+            var LoadAsyc = app.UseHangfirePluginServer<SqlServerStorage>(connectString: dataConnectString);
+            Task.WaitAll(LoadAsyc);
+
             app.UseHangfirePluginDashboard<SqlServerStorage>(connectString: dataConnectString);
 
             app.Run(context =>

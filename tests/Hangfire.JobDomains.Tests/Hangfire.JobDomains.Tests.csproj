@@ -59,6 +59,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Hangfire.JobDomains.Interface\Hangfire.PluginPackets.Interface.csproj">
+      <Project>{F0FC1AA5-7E4F-4C49-8412-4697B0F017EF}</Project>
+      <Name>Hangfire.PluginPackets.Interface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Hangfire.JobDomains\Hangfire.PluginPackets.csproj">
       <Project>{d0a78f95-f4f6-4a90-800c-aab3920bd830}</Project>
       <Name>Hangfire.PluginPackets</Name>

@@ -1,16 +1,16 @@
-﻿using CronExpressionDescriptor;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.PluginPackets.Models
+namespace Hangfire.PluginPackets.Interface
 {
     /// <summary>
     /// 任务参数
     /// </summary>
-    public class JobParamer
+    [Serializable]
+    public class PluginParamer
     {
         /// <summary>
         /// 队列名称
@@ -67,25 +67,7 @@ namespace Hangfire.PluginPackets.Models
         /// </summary>
         public string JobPeriod { get; set; }
 
-        /// <summary>
-        /// 判断 JobPeriod 格式是否符合要求
-        /// </summary>
-        public bool IsPeriod
-        {
-            get
-            {
-                try
-                {
-                    ExpressionDescriptor.GetDescription(JobPeriod);
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
+   
 
     }
 }

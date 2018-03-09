@@ -1,4 +1,5 @@
-﻿using Hangfire.PluginPackets.Models;
+﻿using Hangfire.PluginPackets.Interface;
+using Hangfire.PluginPackets.Models;
 using Hangfire.States;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Hangfire.PluginPackets.Storage
     public class DynamicClassExtension<T> where T : DynamicBaseClass
     {
 
-        public Action<JobParamer> GetTestService()
+        public Action<PluginParamer> GetTestService()
         {
             return paramer =>
             {
@@ -22,7 +23,7 @@ namespace Hangfire.PluginPackets.Storage
             };
         }
 
-        public Action<JobParamer> GetScheduleService()
+        public Action<PluginParamer> GetScheduleService()
         {
             return paramer =>
             {
@@ -30,7 +31,7 @@ namespace Hangfire.PluginPackets.Storage
             };
         }
 
-        public Action<JobParamer> GetEnqueuedService()
+        public Action<PluginParamer> GetEnqueuedService()
         {
             return paramer =>
             {
@@ -40,7 +41,7 @@ namespace Hangfire.PluginPackets.Storage
             };
         }
 
-        public Action<JobParamer> GetPeriodService()
+        public Action<PluginParamer> GetPeriodService()
         {
             return paramer =>
             {

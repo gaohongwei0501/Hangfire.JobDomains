@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace Hangfire.PluginPackets.Interface
 {
-
-    public class CrossDomainData : MarshalByRefObject
+    [Serializable]
+    public class AssemblyParamerArg// : MarshalByRefObject
     {
-
+        
         public string PluginDir { get; set; }
 
-        public string assemblyName { get; set; }
+        public string AssemblyName { get; set; }
 
-        public string typeName { get; set; }
+        public string TypeName { get; set; }
 
-        public object[] paramers { get; set; }
+        public object[] Paramers { get; set; }
 
     }
 

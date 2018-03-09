@@ -65,6 +65,10 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
         {
             WriteBar();
 
+            var historyContent = PageContent.Tag.CreateJobHistoryList(TheDomain, TheAssembly, TheJob);
+            var historyPanel = PageContent.Tag.Panel("任务调取历史", string.Empty, historyContent, string.Empty);
+            WriteLiteral(historyPanel);
+
             var structures = TheJob.GetConstructors();
 
             var customAttr=$@" data-domain=""{ TheDomain.Title }""  data-assembly=""{ TheAssembly.ShortName }"" data-job=""{ TheJob.Name }""  data-url=""{Url.To(UrlHelperExtension.JobCommandRoute)}"" ";

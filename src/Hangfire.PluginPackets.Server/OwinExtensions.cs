@@ -16,7 +16,9 @@ namespace Hangfire.PluginPackets.Server
         public static async Task UseHangfirePluginServer<T>(this IAppBuilder app, string path = "",  string connectString = "", int workerCount = 5) where T : IStorage, new()
         {
             await app.InitPluginsAtServer<T>(path, connectString, workerCount);
+            PluginServiceManager.ImportPluginsBatch();
         }
+
 
         static async Task InitPluginsAtServer<T>(this IAppBuilder app, string path = "", string connectString = "", int workerCount = 5) where T : IStorage, new()
         {
@@ -27,6 +29,8 @@ namespace Hangfire.PluginPackets.Server
             PluginServiceManager.LoadDynamic();
             app.UseHangfireServer(Options);
         }
+
+      
 
     }
 }

@@ -4,6 +4,7 @@ using Hangfire.PluginPackets.Storage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -353,6 +354,30 @@ namespace Hangfire.PluginPackets.Dashboard
             var bulider = new StringBuilder();
             bulider.Append(Tag.ListItem($" 服务名器：{define.Name}"));
             bulider.Append(Tag.ListItem($" 插件位置：{define.PlugPath}",  $"<span class='js-server-path-set cmd-link' data-cmd='{ServerPageCommand.EditPath}' >编辑</span>"));
+            return Tag.List(bulider.ToString());
+        }
+
+        public static string CreateJobHistoryList(this TagHelper Tag, PluginDefine plugin, AssemblyDefine assembly, JobDefine job)
+        {
+            var bulider = new StringBuilder();
+
+            var path = DynamicFactory.DynamicPath;
+            var files = Directory.GetFiles(path);
+
+            var className = job.Title.Replace(" ", "_").Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");
+            var file_pro = $"{ plugin.PathName }.{ assembly.ShortName }.{ job.Name }";
+
+            foreach (var one in files)
+            {
+                var file = new FileInfo(one);
+                if (file.Name.StartsWith(file_pro) == false) continue;
+
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                var dynamicAssembly = assemblies.FirstOrDefault(s => s.FullName.Contains(file.Name.Replace(".dll","")));
+
+                bulider.Append(Tag.ListItem($" Assembly：{file.Name}"));
+            }
+
             return Tag.List(bulider.ToString());
         }
 

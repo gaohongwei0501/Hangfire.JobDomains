@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using  CronExpressionDescriptor;
+using Hangfire.PluginPackets.Interface;
 
 namespace Hangfire.PluginPackets.Dashboard.Dispatchers
 {
@@ -47,7 +48,7 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
             JobData = await GetDictionaryValue("data");
             var sign = await GetFromValue("sign");
 
-            var paramer = new JobParamer
+            var paramer = new PluginParamer
             {
                 QueueName = (await GetFromValue("queue")).ToLower(),
                 PluginName = TheDomain.PathName,

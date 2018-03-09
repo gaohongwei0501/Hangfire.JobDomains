@@ -20,19 +20,24 @@ namespace Hangfire.PluginPackets.Server
 
         private static readonly ConcurrentBag<BackgroundJobServer> Servers = new ConcurrentBag<BackgroundJobServer>();
 
-        public void Start<T>(string con, string path = "", int count = 5) where T : IStorage, new()
+        public async Task StartAsync<T>(string con, string path = "", int count = 5) where T : IStorage, new()
         {
             var connecting = StorageService.Provider.SetStorage(new T(), con);
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
-            var fetchOptions = PluginServiceManager.InitServer(path, count);
+            var Options = await PluginServiceManager.InitServer(path, count);
 
-            Task.WaitAll(fetchOptions);
-            var Options = fetchOptions.Result;
             PluginServiceManager.LoadDynamic();
 
             GlobalConfiguration.Configuration.UseSqlServerStorage(con);
             StartHangfireServer(JobStorage.Current, Options);
 
+            PluginServiceManager.ImportPluginsBatch();
+        }
+
+        public void Start<T>(string con, string path = "", int count = 5) where T : IStorage, new()
+        {
+            var start = StartAsync<T>(con, path, count);
+            Task.WaitAll(start);
         }
 
         public void Stop() {

@@ -76,7 +76,7 @@ namespace Hangfire.PluginPackets.Storage
 
         public QueueDefine GetSelfQueue(string serverName)
         {
-            QueueDefine loacl = new QueueDefine { Name = $"{serverName}_SelfQueue".ToLower(), Description = "服务器队列" };
+            QueueDefine loacl = new QueueDefine { Name = $"{serverName}_SelfQueue".ToLower(), Description = $"{serverName}服务器私有队列" };
             return loacl;
         }
 

@@ -27,8 +27,8 @@ namespace Hangfire.PluginPackets.Storage
 
         public static Type GetType<T>(string plugName, string assemblyName, string jobName, string jobTitle) where T : class
         {
-            var  assembly = $"{ plugName }.{ assemblyName }.{ jobName }";
-            var className = jobTitle.Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");
+            var className = jobTitle.Replace(" ", "_").Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");
+            var assembly = $"{ plugName }.{ assemblyName }.{ jobName }.{ className }";
             var key = $"{ plugName }.{ assembly }.{ className }";
             var file = $"{DynamicPath}\\{assembly}.dll";
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -40,8 +40,8 @@ namespace Hangfire.PluginPackets.Storage
 
         public static Assembly Create<T>(string plugName, string assemblyName, string jobName, string jobTitle) where T : class
         {
-            assemblyName = $"{ plugName }.{ assemblyName }.{ jobName }";
-            var className = jobTitle.Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");
+            var className = jobTitle.Replace(" ", "_").Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");
+            assemblyName = $"{ plugName }.{ assemblyName }.{ jobName }.{ className }";
 
             var assembly = new AssemblyName(assemblyName);
             var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assembly, AssemblyBuilderAccess.Save, DynamicPath);
@@ -55,9 +55,9 @@ namespace Hangfire.PluginPackets.Storage
             var file = $"{DynamicPath}\\{assemblyName}.dll";
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             var dynamicAssembly = assemblies.SingleOrDefault(s => s.FullName.Contains(assemblyName));
+
             return dynamicAssembly;
         }
-
 
         static byte[] loadFile(string filename)
         {

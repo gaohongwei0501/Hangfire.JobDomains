@@ -73,7 +73,7 @@ namespace Hangfire.PluginPackets.Server
                 var index = path.LastIndexOf("\\");
                 var dir = path.Substring(index + 1);
                 var define = new PluginDefine(dir);
-                LoadDomain(basePath, define);
+                LoadPlugin(basePath, define);
 
                 var sets = define.GetJobSets();
                 if (sets == null || sets.Count == 0) continue;
@@ -86,7 +86,7 @@ namespace Hangfire.PluginPackets.Server
         }
 
 
-        static void LoadDomain(string basePath, PluginDefine plugin)
+        static void LoadPlugin(string basePath, PluginDefine plugin)
         {
             var files = Directory.GetFiles($"{basePath}\\{plugin.PathName}", "*.dll");
             var assemblies = new List<AssemblyDefine>();
@@ -98,8 +98,11 @@ namespace Hangfire.PluginPackets.Server
                     var assemblyDefine = CreateAssemblyDefine(plugin, assemblyItem);
                     var jobs = ReadPrefabricationAssembly(plugin, assemblyDefine, assemblyItem);
                     if (jobs.Count == 0) continue;
+
                     assemblyDefine.SetJobs(jobs);
                     assemblies.Add(assemblyDefine);
+
+                    ReadBatchImportAssembly(plugin, assemblyDefine, assemblyItem);
                 }
                 catch (FileLoadException)
                 {
@@ -171,6 +174,78 @@ namespace Hangfire.PluginPackets.Server
 
         }
 
+        public static void ImportPluginsBatch()
+        {
+            var batchParamers =  GetPluginsBatches();
+            foreach (var paramer in batchParamers)
+            {
+                var service = new DynamicService(paramer);
+                service.PeriodDispatch();
+            }
+        }
+
+        static List<AssemblyParamerArg> BatchAssemblies { get; set; } = new List<AssemblyParamerArg>();
+
+        static void ReadBatchImportAssembly(PluginDefine plugin, AssemblyDefine assemblyDefine, Assembly assembly)
+        {
+            var types = assembly.GetInterfaceTypes<IBatchImport>();
+            foreach (var type in types)
+            {
+                var data = new AssemblyParamerArg
+                {
+                    PluginDir = plugin.PathName,
+                    AssemblyName = assemblyDefine.FullName,
+                    TypeName = type.FullName
+                };
+                BatchAssemblies.Add(data);
+            }
+        }
+
+        static List<PluginParamer> GetPluginsBatches()
+        {
+            var list = new List<PluginParamer>();
+            foreach (var batchArg in BatchAssemblies)
+            {
+                var subs = FetchBatches(batchArg, BatchImportService.FetchPeriodBatch);
+                foreach (var one in subs) {
+                    if (string.IsNullOrEmpty(one.QueueName)) {
+                        var queue= StorageService.Provider.GetSelfQueue(ServerName);
+                        one.QueueName = queue.Name;
+                    }
+                    one.PluginName = batchArg.PluginDir;
+                    list.Add(one);
+                }
+            }
+            return list;
+        }
+
+        static List<PluginParamer> FetchBatches(AssemblyParamerArg args,Action CrossAct)
+        {
+            AppDomain Domain = null;
+            try
+            {
+                var server = StorageService.Provider.GetServer(null, ServerName);
+                var path = $"{ server.PlugPath }//{ args.PluginDir }";
+                AppDomainSetup setup = new AppDomainSetup
+                {
+                    ApplicationBase = Path.GetDirectoryName(path),
+                    PrivateBinPath = path,
+                    DisallowApplicationBaseProbing = false,
+                    DisallowBindingRedirects = false
+                };
+                Domain = AppDomain.CreateDomain($"Plugin AppDomain { Guid.NewGuid() } ", null, setup);
+                if (Directory.Exists(path) == false) throw (new Exception("此服务器不支持该插件"));
+                Domain.SetData("args", args);
+                Domain.DoCallBack(new CrossAppDomainDelegate(CrossAct ));
+                var list = new List<PluginParamer>();
+                list.AddRange(Domain.GetData("paramers") as List<PluginParamer>);
+                return list;
+            }
+            finally
+            {
+                if (Domain != null) AppDomain.Unload(Domain);
+            }
+        }
 
     }
 

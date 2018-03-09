@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using Hangfire.PluginPackets.Interface;
 using Hangfire.PluginPackets.Models;
 using Hangfire.PluginPackets.Server;
 using Hangfire.PluginPackets.Storage;
@@ -31,7 +32,7 @@ namespace Hangfire.PluginPackets.Tests
 
         static void CreateDynamicTestClassTestMethod(TypeBuilder typeBuilder)
         {
-            MethodBuilder theMethod = typeBuilder.DefineMethod("DynamicTestClassTest", MethodAttributes.Public,typeof(Action<JobParamer>), new Type[] { });
+            MethodBuilder theMethod = typeBuilder.DefineMethod("DynamicTestClassTest", MethodAttributes.Public,typeof(Action<PluginParamer>), new Type[] { });
             ILGenerator IL = theMethod.GetILGenerator();
 
             var genericTypeOfCts = typeof(DynamicClassExtension<>).MakeGenericType(typeof(DynamicTestClass));
