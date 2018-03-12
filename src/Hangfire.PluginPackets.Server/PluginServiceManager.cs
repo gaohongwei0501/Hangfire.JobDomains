@@ -179,10 +179,14 @@ namespace Hangfire.PluginPackets.Server
             var batchParamers =  GetPluginsBatches();
             foreach (var paramer in batchParamers)
             {
-                var service = new DynamicService(paramer);
-                service.PeriodDispatch();
+                TryInvoke(() => {
+                    var service = new DynamicService(paramer);
+                    service.PeriodDispatch();
+                });
             }
         }
+
+     
 
         static List<AssemblyParamerArg> BatchAssemblies { get; set; } = new List<AssemblyParamerArg>();
 
@@ -206,15 +210,23 @@ namespace Hangfire.PluginPackets.Server
             var list = new List<PluginParamer>();
             foreach (var batchArg in BatchAssemblies)
             {
-                var subs = FetchBatches(batchArg, BatchImportService.FetchPeriodBatch);
-                foreach (var one in subs) {
-                    if (string.IsNullOrEmpty(one.QueueName)) {
-                        var queue= StorageService.Provider.GetSelfQueue(ServerName);
-                        one.QueueName = queue.Name;
+                TryInvoke(() =>
+                {
+                    var subs = FetchBatches(batchArg, BatchImportService.FetchPeriodBatch);
+                    foreach (var one in subs)
+                    {
+                        TryInvoke(() =>
+                        {
+                            if (string.IsNullOrEmpty(one.QueueName))
+                            {
+                                var queue = StorageService.Provider.GetSelfQueue(ServerName);
+                                one.QueueName = queue.Name;
+                            }
+                            one.PluginName = batchArg.PluginDir;
+                            list.Add(one);
+                        });
                     }
-                    one.PluginName = batchArg.PluginDir;
-                    list.Add(one);
-                }
+                });
             }
             return list;
         }
@@ -229,6 +241,7 @@ namespace Hangfire.PluginPackets.Server
                 AppDomainSetup setup = new AppDomainSetup
                 {
                     ApplicationBase = Path.GetDirectoryName(path),
+                    ConfigurationFile = $"{path}\\App.config",
                     PrivateBinPath = path,
                     DisallowApplicationBaseProbing = false,
                     DisallowBindingRedirects = false
@@ -247,6 +260,20 @@ namespace Hangfire.PluginPackets.Server
             }
         }
 
+        /// <summary>
+        /// 容错执行
+        /// </summary>
+        static void TryInvoke(Action invoke)
+        {
+            try
+            {
+                invoke();
+            }
+            catch (Exception ex)
+            {
+                loger.Error(ex);
+            }
+        }
     }
 
 }
