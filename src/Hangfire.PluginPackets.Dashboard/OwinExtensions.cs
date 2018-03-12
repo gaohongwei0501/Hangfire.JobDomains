@@ -26,15 +26,15 @@ namespace Hangfire.PluginPackets.Dashboard
         /// <summary>
         /// 任务域服务（客户端模式）
         /// </summary>
-        public static void UseHangfirePluginDashboard<T>(this IAppBuilder app, string controllerName = "/HangfireDomain", string connectString = "") where T : IStorage, new()
+        public static void UseHangfirePluginDashboard<T>(this IAppBuilder app, string controllerName = "/PluginPackets", string connectString = "") where T : IStorage, new()
         {
             app.InitPluginsAtClient<T>(controllerName, connectString);
         }
        
-        static void InitPluginsAtClient<T>(this IAppBuilder app, string controllerName= "/HangfireDomain", string connectString = "") where T : IStorage, new()
+        static void InitPluginsAtClient<T>(this IAppBuilder app, string controllerName= "/PluginPackets", string connectString = "") where T : IStorage, new()
         {
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
-            if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
+            if (connecting == false) throw (new Exception(" Hangfire.PluginPackets 数据服务连接失败"));
             app.UseHangfireDashboard(controllerName, new DashboardOptions()
             {
                 Authorization = new[] { new CustomAuthorizeFilter() }
@@ -45,9 +45,9 @@ namespace Hangfire.PluginPackets.Dashboard
         public static void InitRoute()
         {
 
-            DashboardRoutes.Routes.Add("/jsex/domainScript", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.JobDomains.Dashboard.Content.domainScript.js"));
-            DashboardRoutes.Routes.Add("/cssex/domainStyle", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.JobDomains.Dashboard.Content.domainStyle.css"));
-            DashboardRoutes.Routes.Add("/image/loading.gif", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.JobDomains.Dashboard.Content.image.loading.gif"));
+            DashboardRoutes.Routes.Add("/jsex/domainScript", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.PluginPackets.Dashboard.Content.domainScript.js"));
+            DashboardRoutes.Routes.Add("/cssex/domainStyle", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.PluginPackets.Dashboard.Content.domainStyle.css"));
+            DashboardRoutes.Routes.Add("/image/loading.gif", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.PluginPackets.Dashboard.Content.image.loading.gif"));
 
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.MainPageRoute, x => new MainPage());
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.SystemPageRoute, x => new SystemPage());

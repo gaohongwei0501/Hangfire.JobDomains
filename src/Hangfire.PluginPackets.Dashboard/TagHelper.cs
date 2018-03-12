@@ -321,7 +321,7 @@ namespace Hangfire.PluginPackets.Dashboard
 
             bulider.Append($@" <div class=""form-group"">
                             <label  class=""control-label"">周期任务标识</label>
-                            <input type='text' class=""form-control  schedule_sign disabled"" disabled=""disabled"" placeholder=""任务标识 ""   value=""{ sign }"" />
+                            <input type='text' class=""form-control  schedule_sign ""  placeholder=""任务标识 ""   value=""{ sign }"" />
                     </div>");
 
             bulider.Append($@" <div class=""form-group"">

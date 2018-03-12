@@ -37,7 +37,7 @@ namespace Host
 
             app.Run(context =>
             {
-                context.Response.Redirect("/HangfireDomain");
+                context.Response.Redirect("/PluginPackets");
                 return context.Response.WriteAsync("Hello, world.");
             });
 

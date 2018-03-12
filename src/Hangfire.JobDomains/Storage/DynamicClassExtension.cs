@@ -45,7 +45,7 @@ namespace Hangfire.PluginPackets.Storage
         {
             return paramer =>
             {
-                RecurringJob.AddOrUpdate<T>(paramer.JobTitle, service => service.Execute(paramer), paramer.JobPeriod, queue: paramer.QueueName);
+                RecurringJob.AddOrUpdate<T>(paramer.JobTitle, service => service.Execute(paramer), paramer.JobPeriod, TimeZoneInfo.Local, queue: paramer.QueueName);
             };
         }
 
