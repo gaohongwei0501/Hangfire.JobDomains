@@ -1,4 +1,5 @@
-﻿using Hangfire.PluginPackets.Models;
+﻿using Hangfire.PluginPackets.Command;
+using Hangfire.PluginPackets.Models;
 using Hangfire.PluginPackets.Storage;
 using Hangfire.States;
 using System;
@@ -18,7 +19,6 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
 
         public ServerDefine TheServer { get; private set; }
 
-
         public override async Task<JsonData> Invoke()
         {
             var cmd = await GetFromValue("cmd");
@@ -33,32 +33,7 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
             switch (serverCmd)
             {
                 case  ServerPageCommand.EditPath:return await EditPath(); 
-                
             }
-
-            //var start = await GetFromValue<DateTime>("start", DateTime.MinValue);
-            //var period = await GetFromValue<int>("period", 0);
-            //var queue = (await GetFromValue("queue")).ToLower();
-            //var jobSign = await GetFromValue("sign");
-
-            //JobData = await GetDictionaryValue("data");
-            //var paramers = JobData?.Select(s => s.Value).ToArray();
-
-            //var set = StorageService.Provider.GetDomainDefines();
-            //TheDomain = set.SingleOrDefault(s => s.Title == domain);
-            //TheAssembly = TheDomain?.GetJobSets().SingleOrDefault(s => s.ShortName == assembly);
-            //TheJob = TheAssembly?.GetJobs().SingleOrDefault(s => s.Name == job);
-
-            //if (TheJob == null) throw (new Exception("未正确定位到工作任务."));
-            //if (jobCmd == JobPageCommand.None) throw (new Exception("未正确定位到任务指令."));
-
-            //switch (jobCmd)
-            //{
-            //    case JobPageCommand.Schedule: Schedule(queue, start, period, jobSign, paramers); break;
-            //    case JobPageCommand.Delay: Delay(queue, start, paramers); break;
-            //    case JobPageCommand.Immediately: JobTest(queue, paramers); break;
-            //    case JobPageCommand.Test: JobTest(queue, paramers); break;
-            //}
 
             return new JsonData
             {
@@ -76,7 +51,7 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
             var queue = StorageService.Provider.GetSelfQueue(TheServer.Name);
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
             EnqueuedState state = new Hangfire.States.EnqueuedState(queue.Name);
-         //   hangFireClient.Create(()=> PluginServiceManager.Restart(path), state);
+            hangFireClient.Create(()=> ServerRefreshCommad.Invoke(path), state);
 
             return new JsonData
             {
@@ -85,8 +60,6 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
                 Url = "",
             };
         }
-
-
-
+       
     }
 }

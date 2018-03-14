@@ -63,6 +63,22 @@ namespace Hangfire.PluginPackets.Dashboard
 
         #endregion
 
+        #region ClientPage
+
+        public static string ClientPageRoute = $"/{baseRoute}/client";
+
+        /// <summary>
+        /// MainPage CreateRoute
+        /// </summary>
+        public static (string Name, string Link) CreateClientPage(this UrlHelper Url)
+        {
+            var name = ClientPage.Title;
+            var link = ClientPageRoute;
+            return (name, Url.To(link));
+        }
+
+        #endregion
+
         #region BatchSchedulePage
 
         public static string BatchSchedulePageRoute = $"/{baseRoute}/batch";
@@ -246,6 +262,8 @@ namespace Hangfire.PluginPackets.Dashboard
 
         public static string ServerCommandRoute = $"/{baseRoute}/command-server";
 
+        public static string ClientCommandRoute = $"/{baseRoute}/command-client";
+         
         #endregion
 
     }

@@ -104,6 +104,25 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                 });
 
             migrationBuilder.CreateTable(
+                name: "Extension_QueuePlan",
+                schema: "Hangfire",
+                columns: table => new
+                {
+                    PlanName = table.Column<string>(nullable: false),
+                    Args = table.Column<string>(maxLength: 500, nullable: false),
+                    AssemblyName = table.Column<string>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    Period = table.Column<string>(maxLength: 200, nullable: false),
+                    PlugName = table.Column<string>(maxLength: 200, nullable: false),
+                    QueueName = table.Column<string>(maxLength: 100, nullable: false),
+                    TypeName = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Extension_QueuePlan", x => x.PlanName);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Extension_Server",
                 schema: "Hangfire",
                 columns: table => new
@@ -173,6 +192,10 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
 
             migrationBuilder.DropTable(
                 name: "Extension_Queue",
+                schema: "Hangfire");
+
+            migrationBuilder.DropTable(
+                name: "Extension_QueuePlan",
                 schema: "Hangfire");
 
             migrationBuilder.DropTable(

@@ -28,6 +28,10 @@ namespace Hangfire.PluginPackets.Storage
 
         List<QueueDefine> GetCustomerQueues(string server);
 
+        Task<bool> AddQueuePlans(List<QueuePlanDefine> models);
+
+        List<QueuePlanDefine> GetQueuePlans(IEnumerable<string> queues)  ;
+
         List<PluginDefine> GetAllPlugins();
 
         List<PluginDefine> GetPlugins(string server);

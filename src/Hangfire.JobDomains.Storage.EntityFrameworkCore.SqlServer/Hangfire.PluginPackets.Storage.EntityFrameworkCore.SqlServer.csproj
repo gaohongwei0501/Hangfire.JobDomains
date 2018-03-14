@@ -123,9 +123,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoMigration.cs" />
-    <Compile Include="Migrations\20180202074210_init.cs" />
-    <Compile Include="Migrations\20180202074210_init.designer.cs">
-      <DependentUpon>20180202074210_init.cs</DependentUpon>
+    <Compile Include="Migrations\20180312094548_init.cs" />
+    <Compile Include="Migrations\20180312094548_init.designer.cs">
+      <DependentUpon>20180312094548_init.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\SqlServerDBContextModelSnapshot.cs" />
     <Compile Include="TypeMapper\AssemblyTypeMapper.cs" />
@@ -135,6 +135,7 @@
     <Compile Include="TypeMapper\PluginMapper.cs" />
     <Compile Include="TypeMapper\JobConstructorParameter.cs" />
     <Compile Include="TypeMapper\JobMapper.cs" />
+    <Compile Include="TypeMapper\QueuePlanMapper.cs" />
     <Compile Include="TypeMapper\QueueMapper.cs" />
     <Compile Include="TypeMapper\ServerPluginMapper.cs" />
     <Compile Include="TypeMapper\ServerQueueMapper.cs" />

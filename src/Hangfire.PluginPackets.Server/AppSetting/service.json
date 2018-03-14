@@ -1,5 +1,5 @@
 ﻿{
-  "ServiceName": "Hangfire.PluginPackets",
-  "ServiceDisplayName": "Hangfire.PluginPackets",
-  "ServiceDescription": "Hangfire.PluginPackets"
+  "ServiceName": "Hangfire.PluginPackets.Service",
+  "ServiceDisplayName": "Hangfire.PluginPackets.Service",
+  "ServiceDescription": "Hangfire.PluginPackets.Service"
 }

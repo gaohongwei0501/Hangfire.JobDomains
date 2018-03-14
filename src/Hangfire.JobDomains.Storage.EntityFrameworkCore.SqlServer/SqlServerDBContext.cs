@@ -19,6 +19,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer
             modelBuilder.ApplyConfiguration<Entities.ServerPlugin>(new ServerPluginMapper());
             modelBuilder.ApplyConfiguration<Entities.ServerQueue>(new ServerQueueMapper());
             modelBuilder.ApplyConfiguration<Entities.Queue>(new QueueMapper());
+            modelBuilder.ApplyConfiguration<Entities.QueuePlan>(new QueuePlanMapper());
             modelBuilder.ApplyConfiguration<Entities.Plugin>(new PluginMapper());
             modelBuilder.ApplyConfiguration<Entities.Assembly>(new AssemblyTypeMapper());
             modelBuilder.ApplyConfiguration<Entities.Job>(new JobMapper());

@@ -1,5 +1,4 @@
 ﻿using Hangfire.PluginPackets.Interface;
-using Hangfire.PluginPackets.Models;
 using Hangfire.States;
 using System;
 using System.Collections.Generic;
@@ -7,12 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hangfire.PluginPackets.Storage
+namespace Hangfire.PluginPackets.Dynamic
 {
-    
-    public class DynamicClassExtension<T> where T : DynamicBaseClass
+    public class JobCreate<T> where T : JobExecute
     {
-
         public Action<PluginParamer> GetTestService()
         {
             return paramer =>
@@ -48,6 +45,5 @@ namespace Hangfire.PluginPackets.Storage
                 RecurringJob.AddOrUpdate<T>(paramer.JobTitle, service => service.Execute(paramer), paramer.JobPeriod, TimeZoneInfo.Local, queue: paramer.QueueName);
             };
         }
-
     }
 }

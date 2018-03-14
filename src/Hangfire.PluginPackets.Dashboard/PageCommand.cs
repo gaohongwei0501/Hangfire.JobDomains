@@ -60,4 +60,14 @@ namespace Hangfire.PluginPackets.Dashboard
         Unload,
     }
 
+
+
+    internal enum ClientPageCommand
+    {
+        [DescriptionAttribute("未知预制指令")]
+        None,
+        [DescriptionAttribute("状态刷新")]
+        Refresh,
+    }
+
 }

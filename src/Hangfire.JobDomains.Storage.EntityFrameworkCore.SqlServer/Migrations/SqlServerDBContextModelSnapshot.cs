@@ -20,7 +20,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                 .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Assembly", b =>
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.Assembly", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,7 +53,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                     b.ToTable("Extension_Assembly","Hangfire");
                 });
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Job", b =>
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.Job", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -84,7 +84,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                     b.ToTable("Extension_Job","Hangfire");
                 });
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.JobConstructorParameter", b =>
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.JobConstructorParameter", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -115,7 +115,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                     b.ToTable("Extension_JobConstructorParameter","Hangfire");
                 });
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Plugin", b =>
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.Plugin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -137,7 +137,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                     b.ToTable("Extension_Plugin","Hangfire");
                 });
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Queue", b =>
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.Queue", b =>
                 {
                     b.Property<string>("Name")
                         .ValueGeneratedOnAdd();
@@ -153,7 +153,41 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                     b.ToTable("Extension_Queue","Hangfire");
                 });
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.Server", b =>
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.QueuePlan", b =>
+                {
+                    b.Property<string>("PlanName")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Args")
+                        .IsRequired()
+                        .HasMaxLength(500);
+
+                    b.Property<string>("AssemblyName")
+                        .IsRequired();
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.Property<string>("PlugName")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.Property<string>("QueueName")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<string>("TypeName")
+                        .IsRequired();
+
+                    b.HasKey("PlanName");
+
+                    b.ToTable("Extension_QueuePlan","Hangfire");
+                });
+
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.Server", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -177,7 +211,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                     b.ToTable("Extension_Server","Hangfire");
                 });
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.ServerPlugin", b =>
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.ServerPlugin", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -198,7 +232,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore.SqlServer.Migration
                     b.ToTable("Extension_ServerPlugin","Hangfire");
                 });
 
-            modelBuilder.Entity("Hangfire.JobDomains.Storage.EntityFrameworkCore.Entities.ServerQueue", b =>
+            modelBuilder.Entity("Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities.ServerQueue", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

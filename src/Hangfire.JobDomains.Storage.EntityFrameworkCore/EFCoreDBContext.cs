@@ -15,6 +15,8 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
 
         public DbSet<Queue> Queues { get; set; }
 
+        public DbSet<QueuePlan> QueuePlans { get; set; }
+
         public DbSet<ServerPlugin> ServerPlugs { get; set; }
 
         public DbSet<ServerQueue> ServerQueues { get; set; }

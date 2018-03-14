@@ -17,7 +17,7 @@ namespace Hangfire.PluginPackets.Tests
         private void EmitHelperTest()
         {
             var watch = Stopwatch.StartNew();
-            string s = null;
+           // string s = null;
             var st2 = new Student() { Name = "aaaaaa" };
             for (var i = 0; i < 5000000; i++)
                 st2.Name = "sdasdas11";
@@ -25,7 +25,7 @@ namespace Hangfire.PluginPackets.Tests
             Console.WriteLine("native:{0}", watch.ElapsedTicks);
 
             var watch3 = Stopwatch.StartNew();
-            s = null;
+            //s = null;
             dynamic st1 = new Student() { Name = "sdasdas" };
             for (var i = 0; i < 5000000; i++)
                 st1.Name = "sdasdas22";

@@ -1,20 +1,13 @@
 ﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Hangfire.Dashboard;
-using System.Collections.Concurrent;
-using Hangfire;
-using Microsoft.Owin;
 using Hangfire.PluginPackets.Storage;
 using Owin;
 using Hangfire.PluginPackets.Dashboard.Dispatchers;
-using Hangfire.PluginPackets.Dashboard;
 using Hangfire.PluginPackets.Dashboard.Pages;
 using System.Net;
+using Hangfire.PluginPackets.Dynamic;
+using System.Threading;
 
 namespace Hangfire.PluginPackets.Dashboard
 {
@@ -22,19 +15,17 @@ namespace Hangfire.PluginPackets.Dashboard
 
     public static class OwinExtensions
     {
-    
+
         /// <summary>
         /// 任务域服务（客户端模式）
         /// </summary>
         public static void UseHangfirePluginDashboard<T>(this IAppBuilder app, string controllerName = "/PluginPackets", string connectString = "") where T : IStorage, new()
         {
-            app.InitPluginsAtClient<T>(controllerName, connectString);
-        }
-       
-        static void InitPluginsAtClient<T>(this IAppBuilder app, string controllerName= "/PluginPackets", string connectString = "") where T : IStorage, new()
-        {
+            AppDomain.CurrentDomain.SetupInformation.PrivateBinPath = TypeFactory.DynamicPath;
+
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" Hangfire.PluginPackets 数据服务连接失败"));
+
             app.UseHangfireDashboard(controllerName, new DashboardOptions()
             {
                 Authorization = new[] { new CustomAuthorizeFilter() }
@@ -42,7 +33,7 @@ namespace Hangfire.PluginPackets.Dashboard
             InitRoute();
         }
 
-        public static void InitRoute()
+        static void InitRoute()
         {
 
             DashboardRoutes.Routes.Add("/jsex/domainScript", new EmbeddedResourceDispatcher(Assembly.GetExecutingAssembly(), "Hangfire.PluginPackets.Dashboard.Content.domainScript.js"));
@@ -51,6 +42,7 @@ namespace Hangfire.PluginPackets.Dashboard
 
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.MainPageRoute, x => new MainPage());
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.SystemPageRoute, x => new SystemPage());
+            DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.ClientPageRoute, x => new ClientPage());
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.BatchSchedulePageRoute, x => new BatchSchedulePage());
 
             DashboardRoutes.Routes.AddRazorPage(UrlHelperExtension.ServerListPageRoute, x => new  ServerListPage());
@@ -65,14 +57,18 @@ namespace Hangfire.PluginPackets.Dashboard
 
             DashboardRoutes.Routes.Add(UrlHelperExtension.JobCommandRoute, new JobCommandDispatcher());
             DashboardRoutes.Routes.Add(UrlHelperExtension.ServerCommandRoute, new ServerCommandDispatcher());
+            DashboardRoutes.Routes.Add(UrlHelperExtension.ClientCommandRoute, new ClientCommandDispatcher());
 
             NavigationMenu.Items.Add(page => new MenuItem(MainPage.Title, page.Url.To(UrlHelperExtension.MainPageRoute))
             {
                 Active = page.RequestPath.StartsWith(UrlHelperExtension.MainPageRoute)
             });
+
+            NavigationMenu.Items.Add(page => new MenuItem(ClientPage.Title, page.Url.To(UrlHelperExtension.ClientPageRoute))
+            {
+                Active = page.RequestPath.StartsWith(UrlHelperExtension.ClientPageRoute)
+            });
         }
-
-
-
+       
     }
 }

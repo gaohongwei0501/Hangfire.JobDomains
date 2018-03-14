@@ -21,7 +21,7 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
         public async Task<string> GetFromValue(string key)
         {
             var values = await GetFormValuesAsync(key);
-            return values == null ? string.Empty : values.FirstOrDefault();
+            return values == null ? string.Empty : (values.Count == 0 ? string.Empty : values.FirstOrDefault().Trim());
         }
 
         public async Task<V> GetFromValue<V>(string key, V def)

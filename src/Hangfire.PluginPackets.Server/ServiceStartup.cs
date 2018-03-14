@@ -1,4 +1,5 @@
 ﻿using Common.Logging;
+using Hangfire.PluginPackets.Command;
 using Hangfire.PluginPackets.Storage;
 using Hangfire.Server;
 using Owin;
@@ -31,7 +32,7 @@ namespace Hangfire.PluginPackets.Server
             GlobalConfiguration.Configuration.UseSqlServerStorage(con);
             StartHangfireServer(JobStorage.Current, Options);
 
-            PluginServiceManager.ImportPluginsBatch();
+            await BatchImportCommand.Invoke();
         }
 
         public void Start<T>(string con, string path = "", int count = 5) where T : IStorage, new()

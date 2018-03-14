@@ -252,6 +252,42 @@
 
     })();
 
+
+    hangfire.DomainClient = (function () {
+
+        function DomainClient() {
+            this._initialize();
+        }
+
+        DomainClient.prototype._initialize = function () {
+            $('.js-client-dynamic-create').click(function () {
+                var panel = $(this).parents(".panel");
+
+                $(".panel-error", panel).remove();
+                $(".panel-info", panel).remove();
+                $(".panel-success", panel).remove();
+
+                var cmd = $(this).data("cmd");
+                var url = $(panel).data("url");
+                var send = { cmd: cmd };
+
+                $.post(url, send, function (result) {
+                    $('#command_confirm_model').modal('hide');
+                    if (result.IsSuccess)
+                        AlertSuccess(panel, result.Message);
+                    else
+                        AlertError(panel, result.Message);
+                }).fail(function (xhr, status, error) {
+                    AlertError(panel, "There was an error. " + error);
+                });
+            });
+        }
+
+        return DomainClient;
+
+    })();
+
+
     function hideModal() {
         $('#LoadingWall').modal('hide');
     }
@@ -305,5 +341,7 @@ function serverScriptStart() {
     Hangfire.domainServer = new Hangfire.DomainServer();
 }
 
-
+function clientScriptStart() {
+    Hangfire.clientServer = new Hangfire.DomainClient();
+}
 

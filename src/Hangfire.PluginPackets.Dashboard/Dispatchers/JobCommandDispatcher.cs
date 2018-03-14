@@ -7,8 +7,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using  CronExpressionDescriptor;
 using Hangfire.PluginPackets.Interface;
+using Hangfire.PluginPackets.Command;
 
 namespace Hangfire.PluginPackets.Dashboard.Dispatchers
 {
@@ -65,14 +65,12 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
             if (TheJob == null) throw (new Exception("未正确定位到工作任务."));
             if (jobCmd == JobPageCommand.None) throw (new Exception("未正确定位到任务指令."));
 
-            var service = new DynamicService(paramer);
-
             switch (jobCmd)
             {
-                case JobPageCommand.Schedule: service.PeriodDispatch(); break;
-                case JobPageCommand.Delay: service.ScheduleDispatch(); break;
-                case JobPageCommand.Immediately: service.TestDispatch(); break;
-                case JobPageCommand.Test: service.TestDispatch(); break;
+                case JobPageCommand.Schedule: CreateJobCommand.Schedule(paramer); break;
+                case JobPageCommand.Delay:  CreateJobCommand.Delay(paramer); break;
+                case JobPageCommand.Immediately:  CreateJobCommand.Immediately(paramer); break;
+                case JobPageCommand.Test:  CreateJobCommand.Test(paramer); break;
             }
 
             return new JsonData

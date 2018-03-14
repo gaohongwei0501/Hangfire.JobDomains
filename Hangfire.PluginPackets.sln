@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobServer", "example\JobSer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.PluginPackets.Server", "src\Hangfire.PluginPackets.Server\Hangfire.PluginPackets.Server.csproj", "{BEEF8ADF-2FD2-4DF3-BDCA-23069B7E3907}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire.PluginPackets.ServiceInstallTool", "src\Hangfire.PluginPackets.ServiceInstallTool\Hangfire.PluginPackets.ServiceInstallTool.csproj", "{BABBE846-E5F9-4B0A-9297-690493DA6E29}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{BEEF8ADF-2FD2-4DF3-BDCA-23069B7E3907}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEEF8ADF-2FD2-4DF3-BDCA-23069B7E3907}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEEF8ADF-2FD2-4DF3-BDCA-23069B7E3907}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BABBE846-E5F9-4B0A-9297-690493DA6E29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BABBE846-E5F9-4B0A-9297-690493DA6E29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BABBE846-E5F9-4B0A-9297-690493DA6E29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BABBE846-E5F9-4B0A-9297-690493DA6E29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +110,7 @@ Global
 		{FB1BC260-9F0E-4E6D-BBE2-FC84190CBB44} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 		{FE846BB9-2F57-443B-B669-62F22C53B69F} = {44CA269D-E7C4-423A-9EBE-2FCF79EBF85C}
 		{BEEF8ADF-2FD2-4DF3-BDCA-23069B7E3907} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
+		{BABBE846-E5F9-4B0A-9297-690493DA6E29} = {913D80B9-4D5F-46A2-967B-76D7174B55A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE16536F-CDBB-4B00-9D4D-1A3B0C085462}

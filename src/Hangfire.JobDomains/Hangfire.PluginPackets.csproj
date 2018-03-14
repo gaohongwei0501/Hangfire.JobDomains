@@ -73,8 +73,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Command\BatchImportCommand.cs" />
+    <Compile Include="Command\CreateJobCommand.cs" />
+    <Compile Include="Command\ServerRefreshCommad.cs" />
+    <Compile Include="Command\SystemCommad.cs" />
+    <Compile Include="Config\ServiceStruct.cs" />
+    <Compile Include="Config\SettingCache.cs" />
     <Compile Include="CustomAuthorizeFilter.cs" />
+    <Compile Include="Dynamic\JobCreate.cs" />
+    <Compile Include="Dynamic\JobExecute.cs" />
+    <Compile Include="Dynamic\TypeFactory.cs" />
     <Compile Include="Models\QueueDefine.cs" />
+    <Compile Include="Models\QueuePlanDefine.cs" />
     <Compile Include="Models\ServerDefine.cs" />
     <Compile Include="ConvertExtension.cs" />
     <Compile Include="Models\ConstructorDefine.cs" />
@@ -83,12 +93,12 @@
     <Compile Include="Models\JobDefine.cs" />
     <Compile Include="Models\JsonData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Storage\DynamicBaseClass.cs" />
-    <Compile Include="Storage\DynamicClassExtension.cs" />
-    <Compile Include="Storage\DynamicService.cs" />
-    <Compile Include="Storage\DynamicFactory.cs" />
     <Compile Include="Storage\IStorage.cs" />
     <Compile Include="Storage\StorageService.cs" />
+    <Compile Include="_Helper\CoreBackgroundJobPerformer.cs" />
+    <Compile Include="_Helper\InvocationData.cs" />
+    <Compile Include="_Helper\TypeExtensions.cs" />
+    <Compile Include="_Helper\_AssemblyHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

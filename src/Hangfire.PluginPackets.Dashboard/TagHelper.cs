@@ -1,14 +1,11 @@
-﻿using Hangfire.Dashboard;
+﻿using Hangfire.PluginPackets.Dynamic;
 using Hangfire.PluginPackets.Models;
-using Hangfire.PluginPackets.Storage;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Hangfire.PluginPackets.Dashboard
 {
@@ -361,7 +358,7 @@ namespace Hangfire.PluginPackets.Dashboard
         {
             var bulider = new StringBuilder();
 
-            var path = DynamicFactory.DynamicPath;
+            var path = TypeFactory.DynamicPath;
             var files = Directory.GetFiles(path);
 
             var className = job.Title.Replace(" ", "_").Replace("-", "_").Replace(".", "_").Replace("\"", "_").Replace("'", "_");

@@ -1,5 +1,7 @@
-﻿using Hangfire.PluginPackets.Models;
+﻿using Hangfire.Common;
+using Hangfire.PluginPackets.Models;
 using Hangfire.PluginPackets.Storage;
+using Hangfire.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,9 +67,30 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
         {
             WriteBar();
 
-            var historyContent = PageContent.Tag.CreateJobHistoryList(TheDomain, TheAssembly, TheJob);
-            var historyPanel = PageContent.Tag.Panel("任务调取历史", string.Empty, historyContent, string.Empty);
-            WriteLiteral(historyPanel);
+            //using (var connection = Storage.GetConnection())
+            //{
+            //    var storageConnection = connection as JobStorageConnection;
+            //    if (storageConnection != null)
+            //    {
+            //        var recurringJobs = storageConnection.GetRecurringJobs(1,100);
+            //    }
+            //    else
+            //    {
+            //        var recurringJobs = connection.GetRecurringJobs();
+            //    }
+
+            //    var hash = connection.GetAllEntriesFromHash($"recurring-job:{"测试任务___1111"}");
+            //    var invocationData = JobHelper.FromJson<Hangfire.PluginPackets._Helper.InvocationData>(hash["Job"]);
+
+            //  //  var invocationData = new InvocationData("", "", "", "");
+            //    var Job = invocationData.Deserialize();
+
+            //}
+
+
+            //var historyContent = PageContent.Tag.CreateJobHistoryList(TheDomain, TheAssembly, TheJob);
+            //var historyPanel = PageContent.Tag.Panel("任务调取历史", string.Empty, historyContent, string.Empty);
+            //WriteLiteral(historyPanel);
 
             var structures = TheJob.GetConstructors();
 
@@ -107,7 +130,6 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
                         continue;
                     }
                 }
-
 
                 var heading = $"{TheJob.Name}({title.ToString().TrimEnd(',')})";
 

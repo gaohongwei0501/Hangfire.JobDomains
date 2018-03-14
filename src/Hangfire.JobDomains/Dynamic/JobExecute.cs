@@ -1,15 +1,17 @@
 ﻿using Hangfire.PluginPackets.Interface;
-using Hangfire.PluginPackets.Models;
+using Hangfire.PluginPackets.Storage;
 using Hangfire.States;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Hangfire.PluginPackets.Storage
+namespace Hangfire.PluginPackets.Dynamic
 {
-
-    public class DynamicBaseClass
+    public  class JobExecute
     {
-
         public void Enqueued(PluginParamer paramer)
         {
             IBackgroundJobClient hangFireClient = new BackgroundJobClient();
@@ -55,7 +57,4 @@ namespace Hangfire.PluginPackets.Storage
             }
         }
     }
-
 }
-
-

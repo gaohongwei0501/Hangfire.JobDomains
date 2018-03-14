@@ -97,6 +97,10 @@ namespace Hangfire.PluginPackets.Storage
             return queues;
         }
 
+        public Task<bool> AddQueuePlans(List<QueuePlanDefine> models) => Storage.AddQueuePlans(models);
+
+        public List<QueuePlanDefine>  GetQueuePlans(IEnumerable<string> queues) => Storage.GetQueuePlans(queues);
+
         IEnumerable<QueueDefine> GetActiveServerQueues(Hangfire.JobStorage hangfireStorage, string serverName)
         {
             var monitor = hangfireStorage.GetMonitoringApi();

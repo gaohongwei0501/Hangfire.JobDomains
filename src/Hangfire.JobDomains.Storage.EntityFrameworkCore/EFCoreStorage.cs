@@ -1,6 +1,7 @@
 ﻿using Common.Logging;
 using Hangfire.PluginPackets.Models;
 using Hangfire.PluginPackets.Storage.EntityFrameworkCore.Entities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -20,7 +21,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
         public abstract bool TransactionEnable { get; }
 
 
-        public async Task<T> TryTransaction<T>( Func<EFCoreDBContext, Task<T>> NomalBack, Func<T> ExceptionBack)
+        public async Task<T> TryTransaction<T>(Func<EFCoreDBContext, Task<T>> NomalBack, Func<T> ExceptionBack)
         {
 
             using (var context = GetContext())
@@ -132,7 +133,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
                 context.ServerPlugs.RemoveRange(plugs);
 
                 var queues = context.ServerQueues.Where(s => s.ServerName == model.Name);
-                context.ServerPlugs.RemoveRange(plugs);
+                context.ServerQueues.RemoveRange(queues);
 
                 await context.Servers.AddAsync(model.Convert());
                 var plugins = pluginNames.Select(s => new ServerPlugin(model.Name, s));
@@ -189,7 +190,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
         {
             using (var context = GetContext())
             {
-                var servers = context.ServerQueues.Select(s=>s.QueueName).Distinct().Select(s => new QueueDefine { Name = s, Description = "自定义队列" });
+                var servers = context.ServerQueues.Select(s => s.QueueName).Distinct().Select(s => new QueueDefine { Name = s, Description = "自定义队列" });
                 return servers.ToList();
             }
         }
@@ -198,7 +199,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
         {
             using (var context = GetContext())
             {
-                var servers = context.ServerQueues.Where(s => s.ServerName == server).Select(s =>new QueueDefine {  Name=s.QueueName, Description="自定义队列" } );
+                var servers = context.ServerQueues.Where(s => s.ServerName == server).Select(s => new QueueDefine { Name = s.QueueName, Description = "自定义队列" });
                 return servers.ToList();
             }
         }
@@ -207,18 +208,19 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
 
         #region  PluginDefine
 
-        void ClearPlugin(EFCoreDBContext context, string domainName)
+        void ClearPlugin(EFCoreDBContext context, string plugName)
         {
-            var domain = context.Plugins.SingleOrDefault(s => s.Title == domainName);
-            if (domain == null) return;
-            var assemblies = context.Assemblies.Where(s => s.PluginId == domain.Id);
-            var jobs = context.Jobs.Where(s => s.PluginId == domain.Id);
-            var constructorParameters = context.JobConstructorParameters.Where(s => s.PluginId  == domain.Id);
-
-            context.JobConstructorParameters.RemoveRange(constructorParameters);
-            context.Jobs.RemoveRange(jobs);
-            context.Assemblies.RemoveRange(assemblies);
-            context.Plugins.Remove(domain);
+            var plugs = context.Plugins.Where(s => s.Title == plugName);
+            if (plugs.Count() == 0) return;
+            foreach (var plug in plugs) {
+                var assemblies = context.Assemblies.Where(s => s.PluginId == plug.Id);
+                var jobs = context.Jobs.Where(s => s.PluginId == plug.Id);
+                var constructorParameters = context.JobConstructorParameters.Where(s => s.PluginId == plug.Id);
+                context.JobConstructorParameters.RemoveRange(constructorParameters);
+                context.Jobs.RemoveRange(jobs);
+                context.Assemblies.RemoveRange(assemblies);
+                context.Plugins.Remove(plug);
+            }
         }
 
         public Task<bool> AddPluginAsync(PluginDefine define)
@@ -262,13 +264,13 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
                 return true;
             }, () => false);
         }
- 
+
         public List<PluginDefine> GetAllPlugins()
         {
             using (var context = GetContext())
             {
                 var Plugins = context.Plugins.ToList();
-                return Plugins.Select(s => new PluginDefine(s.PathName,s.Title, s.Description)).ToList();
+                return Plugins.Select(s => new PluginDefine(s.PathName, s.Title, s.Description)).ToList();
             }
         }
 
@@ -281,7 +283,7 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
                              on o.PathName equals m.PlugName
                              where m.ServerName == server
                              select o;
-        
+
                 return result.Select(s => new PluginDefine(s.PathName, s.Title, s.Description)).ToList();
             }
         }
@@ -350,6 +352,70 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
 
         #endregion
 
+        #region QueuePlanDefine
 
+        public Task<bool> AddQueuePlans(List<QueuePlanDefine> models)
+        {
+            return TryTransaction<bool>(async (context) =>{
+
+                foreach (var model in models)
+                {
+                    var plan = context.QueuePlans.FirstOrDefault(s => s.PlanName == model.PlanName);
+                    if (plan == null)
+                    {
+                        var newPlan = new QueuePlan
+                        {
+                            PlanName = model.PlanName,
+                            PlugName = model.PlugName,
+                            AssemblyName = model.AssemblyName,
+                            TypeName = model.TypeName,
+                            Args = JsonConvert.SerializeObject(model.Args),
+                            QueueName = model.QueueName,
+                            Period = model.Period,
+                            CreatedAt = DateTime.Now,
+                        };
+                        await context.QueuePlans.AddAsync(newPlan);
+                    }
+                    else
+                    {
+                        context.QueuePlans.Remove(plan);
+                        context.SaveChanges();
+                        var  newPlan = new QueuePlan
+                        {
+                            PlanName = model.PlanName,
+                            PlugName = model.PlugName,
+                            AssemblyName = model.AssemblyName,
+                            TypeName = model.TypeName,
+                            Args = JsonConvert.SerializeObject(model.Args),
+                            QueueName = model.QueueName,
+                            Period = model.Period,
+                            CreatedAt = DateTime.Now,
+                        };
+                        await context.QueuePlans.AddAsync(newPlan);
+                    }
+                }
+                var result = await context.SaveChangesAsync();
+                return true;
+
+            }, () => false);
+        }
+
+        public List<QueuePlanDefine> GetQueuePlans(IEnumerable<string> queues) {
+            using (var context = GetContext())
+            {
+                var plans = context.QueuePlans.Where(s => queues.Contains(s.QueueName));
+                return plans.Select(s=>new QueuePlanDefine {
+                    PlanName = s.PlanName,
+                    PlugName = s.PlugName,
+                    AssemblyName = s.AssemblyName,
+                    TypeName = s.TypeName,
+                    Args = JsonConvert.DeserializeObject<string[]>(s.Args),
+                    QueueName = s.QueueName,
+                    Period = s.Period,
+                } ).ToList();
+            }
+        }
+
+        #endregion
     }
 }
