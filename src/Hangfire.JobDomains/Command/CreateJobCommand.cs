@@ -3,6 +3,7 @@ using CronExpressionDescriptor;
 using Hangfire.PluginPackets.Dynamic;
 using Hangfire.PluginPackets.Interface;
 using Hangfire.PluginPackets.Storage;
+using Hangfire.States;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,44 +22,42 @@ namespace Hangfire.PluginPackets.Command
 
         public static  void Schedule(PluginParamer paramer)
         {
-            var type = TypeFactory.CreateType<JobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle); 
+            if (IsPeriod(paramer.JobPeriod) == false) throw (new Exception("任务周期不能被识别"));
+            var key = $"{paramer.PluginName}_{paramer.JobTitle}_Period";
+            AddJob(key,paramer, "GetPeriodService");
 
-           // var InvokeType = TypeFactory.GetType<JobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
-            var Paramer = paramer;
-            if (IsPeriod(Paramer.JobPeriod) == false) throw (new Exception("任务周期不能被识别"));
-            var key = $"{Paramer.PluginName}_{Paramer.JobTitle}_Period";
-            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(type, "GetPeriodService"));
-            invoke(Paramer);
+            PlanCreate.AddNewPlan(paramer);
+
         }
 
         public static void Delay(PluginParamer paramer)
         {
-            var InvokeType = TypeFactory.GetType<JobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
-            var Paramer = paramer;
-            if (Paramer.JobDelay.Minutes < 0) throw (new Exception("任务启动时间设置失败"));
-            var key = $"{Paramer.PluginName}_{Paramer.JobTitle}_Schedule";
-            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetScheduleService"));
-            invoke(Paramer);
+            if (paramer.JobDelay.Minutes < 0) throw (new Exception("任务启动时间设置失败"));
+            var key = $"{paramer.PluginName}_{paramer.JobTitle}_Schedule";
+            AddJob(key, paramer, "GetScheduleService");
         }
 
         public static void Immediately(PluginParamer paramer)
         {
-            var InvokeType = TypeFactory.GetType<JobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
-            var Paramer = paramer;
-            var key = $"{Paramer.PluginName}_{Paramer.JobTitle}_Immediately";
-            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetEnqueuedService"));
-            invoke(Paramer);
+            if (paramer.JobDelay.Minutes < 0) throw (new Exception("任务启动时间设置失败"));
+            var key = $"{paramer.PluginName}_{paramer.JobTitle}_Immediately";
+            AddJob(key, paramer, "GetEnqueuedService");
         }
 
         public static void Test(PluginParamer paramer)
         {
-            var InvokeType = TypeFactory.GetType<JobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
-            var Paramer = paramer;
-            var key = $"{Paramer.PluginName}_{Paramer.JobTitle}_Test";
-            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(InvokeType, "GetTestService"));
-            invoke(Paramer);
+            if (paramer.JobDelay.Minutes < 0) throw (new Exception("任务启动时间设置失败"));
+            var key = $"{paramer.PluginName}_{paramer.JobTitle}_Test";
+            AddJob(key, paramer, "GetTestService");
         }
 
+
+        static void AddJob(string key, PluginParamer paramer, string method)
+        {
+            var type = TypeFactory.CreateType<JobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
+            var invoke = DynamicInvokes.GetOrAdd(key, k => CreateBuilderInvoke(type, method));
+            invoke(paramer);
+        }
 
         static Action<PluginParamer> CreateBuilderInvoke(Type type, string invokeName)
         {

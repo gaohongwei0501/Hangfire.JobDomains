@@ -13,7 +13,7 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
     internal class QueuePage : HtmlPage
     {
 
-        public const string Title = "任务服务器";
+        public const string Title = "队列详情";
 
         public Lazy<QueueDefine> TheQueue { get; private set; }
 

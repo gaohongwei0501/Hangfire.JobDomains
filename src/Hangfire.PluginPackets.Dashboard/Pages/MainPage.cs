@@ -12,7 +12,7 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
     internal class MainPage : HtmlPage
     {
 
-        public const string Title = "任务包管理";
+        public const string Title = "插件管理";
 
         public MainPage() 
         {

@@ -27,7 +27,7 @@ namespace Hangfire.PluginPackets.Server
 
             PluginServiceManager.LoadDynamic();
             app.UseHangfireServer(Options);
-            await BatchImportCommand.Invoke();
+            await BatchImportCommand.ImportCreate();
         }
 
 

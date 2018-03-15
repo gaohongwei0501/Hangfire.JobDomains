@@ -32,7 +32,7 @@ namespace Hangfire.PluginPackets.Server
             GlobalConfiguration.Configuration.UseSqlServerStorage(con);
             StartHangfireServer(JobStorage.Current, Options);
 
-            await BatchImportCommand.Invoke();
+            await BatchImportCommand.ImportCreate();
         }
 
         public void Start<T>(string con, string path = "", int count = 5) where T : IStorage, new()

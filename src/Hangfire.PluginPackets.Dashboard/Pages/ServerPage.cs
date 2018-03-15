@@ -11,7 +11,7 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
     internal class ServerPage : HtmlPage
     {
 
-        public const string Title = "任务服务器";
+        public const string Title = "服务器详情";
 
         public Lazy<ServerDefine> TheServer { get; private set; }
 
@@ -43,6 +43,11 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
             var domainsContent = PageContent.Tag.ListLink(domains, Url.CreateRoute);
             var pluginsPanel = PageContent.Tag.Panel("支持插件", string.Empty, domainsContent);
             WriteLiteral(pluginsPanel);
+
+            var plans = server.Plans;
+            var plansContent = PageContent.Tag.List(plans, s=> PageContent.Tag.ListItem(s.PlanName));
+            var plansPanel = PageContent.Tag.Panel("预制任务计划", string.Empty, plansContent);
+            WriteLiteral(plansPanel);
 
             WriteLiteral(PageContent.Tag.CreateCommandComfirmBox());
             PageContent.WriteScriptFile(Url.To("/jsex/domainScript"));

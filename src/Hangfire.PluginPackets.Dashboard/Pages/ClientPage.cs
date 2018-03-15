@@ -9,12 +9,12 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
 {
     internal class ClientPage : HtmlPage
     {
-        public const string Title = "UI服务器";
+        public const string Title = "前端服务器";
 
         public ClientPage()
         {
             FetchTitle = () => Title;
-            FetchHeader = () => $"当前UI服务器";
+            FetchHeader = () => $"前端服务器";
             Sidebar = () => SidebarMenus.DefaultMenu();
         }
 

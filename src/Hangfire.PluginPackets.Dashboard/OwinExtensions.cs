@@ -21,8 +21,6 @@ namespace Hangfire.PluginPackets.Dashboard
         /// </summary>
         public static void UseHangfirePluginDashboard<T>(this IAppBuilder app, string controllerName = "/PluginPackets", string connectString = "") where T : IStorage, new()
         {
-            AppDomain.CurrentDomain.SetupInformation.PrivateBinPath = TypeFactory.DynamicPath;
-
             var connecting = StorageService.Provider.SetStorage(new T(), connectString);
             if (connecting == false) throw (new Exception(" Hangfire.PluginPackets 数据服务连接失败"));
 

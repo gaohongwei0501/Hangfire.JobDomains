@@ -9,7 +9,7 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
 {
     internal class ServerListPage : HtmlPage
     {
-        public const string Title = "任务包服务器";
+        public const string Title = "插件服务器";
 
         public ServerListPage()
         {

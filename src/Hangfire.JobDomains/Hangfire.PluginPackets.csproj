@@ -82,6 +82,7 @@
     <Compile Include="CustomAuthorizeFilter.cs" />
     <Compile Include="Dynamic\JobCreate.cs" />
     <Compile Include="Dynamic\JobExecute.cs" />
+    <Compile Include="Dynamic\PlanCreate.cs" />
     <Compile Include="Dynamic\TypeFactory.cs" />
     <Compile Include="Models\QueueDefine.cs" />
     <Compile Include="Models\QueuePlanDefine.cs" />

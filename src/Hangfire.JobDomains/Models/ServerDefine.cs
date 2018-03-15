@@ -29,6 +29,8 @@ namespace Hangfire.PluginPackets.Models
 
         public List<QueueDefine> Queues { get; set; }
 
+        public List<QueuePlanDefine> Plans { get; set; }
+
     }
 
 

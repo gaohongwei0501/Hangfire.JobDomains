@@ -9,7 +9,7 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
 {
     internal class QueueListPage : HtmlPage
     {
-        public const string Title = "队列管理";
+        public const string Title = "插件队列";
 
         public QueueListPage()
         {

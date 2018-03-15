@@ -56,6 +56,7 @@ namespace Hangfire.PluginPackets.Storage
             var Server = Storage.GetServer(serverName);
             Server.Queues = GetQueues(hangfireStorage, serverName);
             Server.Plugins = Storage.GetPlugins(serverName);
+            Server.Plans = Storage.GetQueuePlans(Server.Queues.Select(s=>s.Name));
             return Server;
         }
 

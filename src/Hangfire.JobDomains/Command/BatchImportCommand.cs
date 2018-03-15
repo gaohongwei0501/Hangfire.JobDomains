@@ -73,7 +73,7 @@ namespace Hangfire.PluginPackets.Command
                 var index = model.AssemblyName.IndexOf(',');
                 var AssemblyName = model.AssemblyName.Substring(0, index);
                 index = model.TypeName.LastIndexOf('.');
-                var TypeName = model.TypeName.Substring(index);
+                var TypeName = model.TypeName.Substring(index+1);
                 var one = new PluginParamer
                 {
                     QueueName = model.QueueName,
