@@ -25,9 +25,8 @@ namespace Hangfire.PluginPackets.Server
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
             var Options = await PluginServiceManager.InitServer(path, workerCount);
 
-            PluginServiceManager.LoadDynamic();
+            await PluginServiceManager.BulidDynamic();
             app.UseHangfireServer(Options);
-            await BatchImportCommand.ImportCreate();
         }
 
 

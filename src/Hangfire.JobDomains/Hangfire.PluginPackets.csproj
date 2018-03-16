@@ -73,16 +73,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command\BatchImportCommand.cs" />
-    <Compile Include="Command\CreateJobCommand.cs" />
+    <Compile Include="Command\PluginPlanImportCommand.cs" />
+    <Compile Include="Command\PluginJobCreateCommand.cs" />
     <Compile Include="Command\ServerRefreshCommad.cs" />
     <Compile Include="Command\SystemCommad.cs" />
     <Compile Include="Config\ServiceStruct.cs" />
     <Compile Include="Config\SettingCache.cs" />
     <Compile Include="CustomAuthorizeFilter.cs" />
     <Compile Include="Dynamic\JobCreate.cs" />
-    <Compile Include="Dynamic\JobExecute.cs" />
-    <Compile Include="Dynamic\PlanCreate.cs" />
+    <Compile Include="Dynamic\JobCreateService\JobCreateService.cs" />
+    <Compile Include="Dynamic\JobCreateService\zh-CN\WebJobExecute.cs" />
+    <Compile Include="Dynamic\JobExecute\DomainJobExecute.cs" />
+    <Compile Include="Dynamic\JobExecute\JobExecute.cs" />
+    <Compile Include="Dynamic\JobCreateService\zh-CN\DomainJobExecute.cs" />
+    <Compile Include="Dynamic\JobExecute\WebJobExecute.cs" />
     <Compile Include="Dynamic\TypeFactory.cs" />
     <Compile Include="Models\QueueDefine.cs" />
     <Compile Include="Models\QueuePlanDefine.cs" />
@@ -111,6 +115,8 @@
       <Name>Hangfire.PluginPackets.Interface</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Dynamic\JobCreateService\en\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

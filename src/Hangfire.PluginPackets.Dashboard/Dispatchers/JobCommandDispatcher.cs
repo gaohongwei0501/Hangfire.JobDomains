@@ -67,10 +67,10 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
 
             switch (jobCmd)
             {
-                case JobPageCommand.Schedule: CreateJobCommand.Schedule(paramer); break;
-                case JobPageCommand.Delay:  CreateJobCommand.Delay(paramer); break;
-                case JobPageCommand.Immediately:  CreateJobCommand.Immediately(paramer); break;
-                case JobPageCommand.Test:  CreateJobCommand.Test(paramer); break;
+                case JobPageCommand.Schedule: PluginJobCreateCommand.Schedule(paramer); break;
+                case JobPageCommand.Delay:  PluginJobCreateCommand.Delay(paramer); break;
+                case JobPageCommand.Immediately:  PluginJobCreateCommand.Immediately(paramer); break;
+                case JobPageCommand.Test:  PluginJobCreateCommand.Test(paramer); break;
             }
 
             return new JsonData

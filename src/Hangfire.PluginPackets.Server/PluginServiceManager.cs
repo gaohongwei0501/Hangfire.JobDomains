@@ -1,9 +1,11 @@
 ﻿using Common.Logging;
+using Hangfire.Common;
 using Hangfire.PluginPackets.Command;
 using Hangfire.PluginPackets.Dynamic;
 using Hangfire.PluginPackets.Interface;
 using Hangfire.PluginPackets.Models;
 using Hangfire.PluginPackets.Storage;
+using Hangfire.Storage;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,10 +45,10 @@ namespace Hangfire.PluginPackets.Server
         public static async Task UpdateServer(string path)
         {
             await ServerRefreshCommad.Invoke(path);
-            await BatchImportCommand.ScanBatches(path);
+            await PluginPlanImportCommand.ScanPluginPlan(path);
         }
 
-        public static void LoadDynamic()
+        public static async Task BulidDynamic()
         {
             var plugins = StorageService.Provider.GetPluginDefines();
             foreach (var plugin in plugins)
@@ -57,12 +59,33 @@ namespace Hangfire.PluginPackets.Server
                     var jobs = ass.GetJobs();
                     foreach (var job in jobs)
                     {
-                        TypeFactory.Create<JobExecute>(plugin.PathName, ass.ShortName, job.Name, job.Title);
+                        TypeFactory.CreateInheritType<DomainJobExecute>(plugin.PathName, ass.ShortName, job.Name, job.Title);
                     }
                 }
             }
 
+            BulidHangfirePlan();
+            await PluginPlanImportCommand.CreateExcute();
             AppDomain.CurrentDomain.SetupInformation.PrivateBinPath = TypeFactory.DynamicPath;
+        }
+
+        static void BulidHangfirePlan()
+        {
+            var queues = StorageService.Provider.GetQueues(null, ServerName);
+            if (queues.Count == 0) return;
+            var queueNames = queues.Select(s => s.Name);
+            using (var connection = JobStorage.Current.GetConnection())
+            {
+                var ids = connection.GetAllItemsFromSet("recurring-jobs");
+                foreach (var id in ids)
+                {
+                    var hash = connection.GetAllEntriesFromHash($"recurring-job:{id}");
+                    var invocationData = JobHelper.FromJson<InvocationData>(hash["Job"]);
+                    var paramer = JobHelper.FromJson<PluginParamer>(invocationData.Arguments);
+                    if (queueNames.Contains(paramer.QueueName))
+                        TypeFactory.CreateInheritType<DomainJobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle);
+                }
+            }
         }
 
     }

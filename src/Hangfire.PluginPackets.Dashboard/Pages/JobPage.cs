@@ -67,31 +67,6 @@ namespace Hangfire.PluginPackets.Dashboard.Pages
         {
             WriteBar();
 
-            //using (var connection = Storage.GetConnection())
-            //{
-            //    var storageConnection = connection as JobStorageConnection;
-            //    if (storageConnection != null)
-            //    {
-            //        var recurringJobs = storageConnection.GetRecurringJobs(1,100);
-            //    }
-            //    else
-            //    {
-            //        var recurringJobs = connection.GetRecurringJobs();
-            //    }
-
-            //    var hash = connection.GetAllEntriesFromHash($"recurring-job:{"测试任务___1111"}");
-            //    var invocationData = JobHelper.FromJson<Hangfire.PluginPackets._Helper.InvocationData>(hash["Job"]);
-
-            //  //  var invocationData = new InvocationData("", "", "", "");
-            //    var Job = invocationData.Deserialize();
-
-            //}
-
-
-            //var historyContent = PageContent.Tag.CreateJobHistoryList(TheDomain, TheAssembly, TheJob);
-            //var historyPanel = PageContent.Tag.Panel("任务调取历史", string.Empty, historyContent, string.Empty);
-            //WriteLiteral(historyPanel);
-
             var structures = TheJob.GetConstructors();
 
             var customAttr=$@" data-domain=""{ TheDomain.Title }""  data-assembly=""{ TheAssembly.ShortName }"" data-job=""{ TheJob.Name }""  data-url=""{Url.To(UrlHelperExtension.JobCommandRoute)}"" ";

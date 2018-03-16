@@ -27,12 +27,11 @@ namespace Hangfire.PluginPackets.Server
             if (connecting == false) throw (new Exception(" HangfireDomain 数据服务连接失败"));
             var Options = await PluginServiceManager.InitServer(path, count);
 
-            PluginServiceManager.LoadDynamic();
+            await PluginServiceManager.BulidDynamic();
 
             GlobalConfiguration.Configuration.UseSqlServerStorage(con);
             StartHangfireServer(JobStorage.Current, Options);
 
-            await BatchImportCommand.ImportCreate();
         }
 
         public void Start<T>(string con, string path = "", int count = 5) where T : IStorage, new()

@@ -20,7 +20,6 @@ namespace Hangfire.PluginPackets.Storage.EntityFrameworkCore
 
         public abstract bool TransactionEnable { get; }
 
-
         public async Task<T> TryTransaction<T>(Func<EFCoreDBContext, Task<T>> NomalBack, Func<T> ExceptionBack)
         {
 

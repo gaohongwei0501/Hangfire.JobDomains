@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hangfire.PluginPackets.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,19 @@ namespace Hangfire.PluginPackets.Models
     {
 
         public QueuePlanDefine() { }
+
+        public QueuePlanDefine(PluginParamer paramer)
+        {
+
+            QueueName = paramer.QueueName;
+            PlanName = paramer.JobTitle;
+            Args = paramer.JobParamers;
+            Period = paramer.JobPeriod;
+            PlugName = paramer.PluginName;
+            AssemblyName = paramer.AssemblyFullName;
+            TypeName = paramer.JobFullName;
+        }
+
         public QueuePlanDefine(string plug, string assembly, string job, string queue, string plan, string cron, object[] args)
         {
             PlugName = plug;

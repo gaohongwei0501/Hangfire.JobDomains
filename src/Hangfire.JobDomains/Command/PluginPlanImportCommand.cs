@@ -12,41 +12,41 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Hangfire.PluginPackets.Command
 {
-    public class BatchImportCommand
+    public class PluginPlanImportCommand
     {
         static string ServerName => Environment.MachineName.ToLower();
 
-        static ILog loger = LogManager.GetLogger<BatchImportCommand>();
+        static ILog loger = LogManager.GetLogger<PluginPlanImportCommand>();
 
-        public static async Task Invoke()
+        public static async Task CreatePlan()
         {
             var batchParamers = GetPluginsBatches();
             foreach (var paramer in batchParamers)
             {
-                await TryInvoke(() => CreateJobCommand.Schedule(paramer));
+                await TryInvoke(() => PluginJobCreateCommand.Schedule(paramer));
             }
         }
 
-        public static async Task ImportCreate()
+        public static async Task CreateExcute()
         {
             var batchParamers = GetPluginsBatches();
             foreach (var paramer in batchParamers)
             {
-               await TryInvoke(() => TypeFactory.GetType<JobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle));
+               await TryInvoke(() => TypeFactory.CreateInheritType<DomainJobExecute>(paramer.PluginName, paramer.AssemblyName, paramer.JobName, paramer.JobTitle));
             }
         }
         
-        public static async Task ScanBatches(string pulgBasePath)
+        public static async Task ScanPluginPlan(string pluginBasePath)
         {
-            if (string.IsNullOrEmpty(pulgBasePath)) return;
-            if (Directory.Exists(pulgBasePath) == false) return;
-            var paths = Directory.GetDirectories(pulgBasePath);
+            if (string.IsNullOrEmpty(pluginBasePath)) return;
+            if (Directory.Exists(pluginBasePath) == false) return;
+            var paths = Directory.GetDirectories(pluginBasePath);
 
             foreach (var path in paths)
             {
                 var index = path.LastIndexOf("\\");
                 var dir = path.Substring(index + 1);
-                var files = Directory.GetFiles($"{pulgBasePath}\\{dir}", "*.dll");
+                var files = Directory.GetFiles($"{pluginBasePath}\\{dir}", "*.dll");
                 var assemblies = new List<AssemblyDefine>();
                 foreach (var assemblyFile in files)
                 {
@@ -104,7 +104,7 @@ namespace Hangfire.PluginPackets.Command
                     TypeName = type.FullName
                 };
 
-                var models = await BatchImportCommand.ReadDefine(arg);
+                var models = await PluginPlanImportCommand.ReadDefine(arg);
                 await StorageService.Provider.AddQueuePlans(models);
             }
         }

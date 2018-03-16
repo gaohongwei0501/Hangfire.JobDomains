@@ -33,7 +33,7 @@ namespace Hangfire.PluginPackets.Dashboard.Dispatchers
 
         public async Task<JsonData> RefreshClient()
         {
-            await BatchImportCommand.ImportCreate();
+            await PluginPlanImportCommand.CreateExcute();
 
             return new JsonData
             {

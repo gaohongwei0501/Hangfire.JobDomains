@@ -29,7 +29,7 @@ namespace Hangfire.PluginPackets.Tests
             });
         }
 
-        public class DynamicTestClass : JobExecute { }
+        public class DynamicTestClass : DomainJobExecute { }
 
         static void CreateDynamicTestClassTestMethod(TypeBuilder typeBuilder)
         {

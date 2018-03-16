@@ -10,26 +10,12 @@ using System.Threading.Tasks;
 
 namespace Hangfire.PluginPackets.Dynamic
 {
-    public  class JobExecute
+    /// <summary>
+    /// 插件域任务执行
+    /// </summary>
+    public  class DomainJobExecute: JobExecute
     {
-        public void Enqueued(PluginParamer paramer)
-        {
-            IBackgroundJobClient hangFireClient = new BackgroundJobClient();
-            EnqueuedState state = new Hangfire.States.EnqueuedState(paramer.QueueName);
-            hangFireClient.Create(() => Execute(paramer), state);
-        }
-
-        public bool Test(PluginParamer paramer)
-        {
-            return Execute<bool>(paramer, PrefabricationActivator.Test, domain => (bool)domain.GetData("result"));
-        }
-
-        public void Execute(PluginParamer paramer)
-        {
-            Execute<bool>(paramer, PrefabricationActivator.Dispatch, domain => true);
-        }
-
-        static T Execute<T>(PluginParamer paramer, Action act, Func<AppDomain, T> GetResult)
+        protected override T Execute<T>(PluginParamer paramer, Action act, Func<AppDomain, T> GetResult)
         {
             AppDomain Domain = null;
             try
